@@ -1,0 +1,15 @@
+sample,run_id
+AdultCTX1,m54082_181216_092744.subreads.bam
+AdultCTX2,m54082_181217_054735.subreads.bam
+AdultCTX3,m54082_180815_111944.subreads.bam
+AdultCTX4,m54082_180606_210950.subreads.bam
+AdultCTX5,m54082_180817_142929.subreads.bam
+FetalCTX1,m54082_180223_161459.subreads.bam
+FetalCTX2,m54082_170222_185554.subreads.bam
+FetalCTX3,m54082_190305_120835.subreads.bam
+FetalCTX4,m54082_170223_234030.subreads.bam
+FetalCTX5,m54082_190228_180141.subreads.bam
+FetalHIP1,m54082_170223_050133.subreads.bam
+FetalHIP2;m54082_170220_165730.subreads.bam
+FetalSTR1;m54082_170223_152109.subreads.bam
+FetalSTR2;m54082_170224_095950.subreads.bam

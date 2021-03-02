@@ -1,0 +1,28 @@
+#1.AdultCTX1; 1191A_Twin1
+/gpfs/mrc0/projects/Research_Project-MRC148213/ISOSEQ/Adult/4/m54082_181216_092744.subreads.bam
+#2.AdultCTX2; 1193A_Twin2
+/gpfs/mrc0/projects/Research_Project-MRC148213/ISOSEQ/Adult/5/m54082_181217_054735.subreads.bam
+#3.AdultCTX3; A002_94
+/gpfs/mrc0/projects/Research_Project-MRC148213/ISOSEQ/Adult/2/m54082_180815_111944.subreads.bam
+#4.AdultCTX4; A002_94b
+/gpfs/mrc0/projects/Research_Project-MRC148213/ISOSEQ/Adult/3/m54082_180606_210950.subreads.bam
+#5.AdultCTX5; A194-95
+/gpfs/mrc0/projects/Research_Project-MRC148213/ISOSEQ/Adult/1/m54082_180817_142929.subreads.bam
+#6.FetalCTX1; 11921FL
+/gpfs/mrc0/projects/Research_Project-MRC148213/ISOSEQ/Fetal/11921FL/m54082_180223_161459.subreads.bam
+#7.FetalCTX2; 12971FL
+/gpfs/mrc0/projects/Research_Project-MRC148213/ISOSEQ/Fetal/12971FL/m54082_170222_185554.subreads.bam
+#8.FetalCTX3; 12971FL2
+/gpfs/mrc0/projects/Research_Project-MRC148213/ISOSEQ/Fetal/12971FL2/m54082_190305_120835.subreads.bam
+#9.FetalCTX4; 12972FL
+/gpfs/mrc0/projects/Research_Project-MRC148213/ISOSEQ/Fetal/12972FL/m54082_170223_234030.subreads.bam
+#10.FetalCTX5; 12972FL2
+/gpfs/mrc0/projects/Research_Project-MRC148213/ISOSEQ/Fetal/12972FL2/m54082_190228_180141.subreads.bam
+#11.FetalHIP1; 12971HIP
+/gpfs/mrc0/projects/Research_Project-MRC148213/ISOSEQ/Fetal/12971HIP/m54082_170223_050133.subreads.bam
+#12.FetalHIP2; 12972HIP
+/gpfs/mrc0/projects/Research_Project-MRC148213/ISOSEQ/Fetal/12972HIP/m54082_170220_165730.subreads.bam
+#13.FetalSTR1; 12971STR
+/gpfs/mrc0/projects/Research_Project-MRC148213/ISOSEQ/Fetal/12971STR/m54082_170223_152109.subreads.bam
+#14.FetalSTR2; 12972STR
+/gpfs/mrc0/projects/Research_Project-MRC148213/ISOSEQ/Fetal/12972STR/m54082_170224_095950.subreads.bam
