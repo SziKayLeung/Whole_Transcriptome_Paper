@@ -101,8 +101,8 @@ run_CLUSTER(){
 
   cd $3
   echo "Processing $1 file for cluster"
-  if [ -f $1.unpolished.bam ]; then
-    echo "$1.unpolished.bam file already exists; Cluster no need to be processed on Sample $1"
+  if [ -f $1.clustered.bam ]; then
+    echo "$1.clustered.bam file already exists; Cluster no need to be processed on Sample $1"
   else
     # cluster <input.flnc.bam> <output.unpolished.bam>
     time isoseq3 cluster $2/$1.flnc.bam $1.clustered.bam --verbose --use-qvs 2> $1.cluster.log
@@ -346,7 +346,7 @@ run_kallisto(){
 
 ################################################################################################
 #************************************* SQANTI2 [Function 7]
-# run_sqanti2 <input_tofu_prefix> <input_gtf> <input_tofu_dir> <input_RNASEQ_dir> <input_KALLISTO_file> <input_abundance> <output_dir>
+# run_sqanti2 <input_tofu_prefix> <input_gtf> <input_tofu_dir> <input_RNASEQ_dir> <input_KALLISTO_file> <input_abundance> <output_dir> <mode=genome/noexp/lncrna>
 run_sqanti2(){
 
     source activate sqanti2_py3
@@ -376,19 +376,18 @@ run_sqanti2(){
     echo "Processing Sample $1 for SQANTI2 QC"
 
     # no kalliso file
-    if [ $5 = "NA" ]; then
-      python $SQANTI2_DIR/sqanti_qc2.py -t 30 --gtf $3/$2 $REFERENCE/gencode.vM22.annotation.gtf $REFERENCE/mm10.fa --cage_peak $CAGE_DIR/mm10.cage_peak_phase1and2combined_coord.bed --coverage "./*SJ.out.bed" \
-    --polyA_motif_list $SQANTI2_DIR/../human.polyA.list.txt --skipORF --fl_count $6 &> $1.sqanti.qc.log
+    if [ $8 == "noexp" ]; then
+      python $SQANTI2_DIR/sqanti_qc2.py -t 30 --gtf $3/$2 $REFERENCE/gencode.vM22.annotation.gtf $REFERENCE/mm10.fa --cage_peak $CAGE_DIR/mm10.cage_peak_phase1and2combined_coord.bed --coverage "./*SJ.out.bed" --polyA_motif_list $SQANTI2_DIR/../human.polyA.list.txt --skipORF --fl_count $6 &> $1.sqanti.qc.log
+
+    elif [ $8 == "lncRNA" ]; then
+      echo "Processing with lncRNA.gtf for genome annotation "
+      python $SQANTI2_DIR/sqanti_qc2.py -t 30 --gtf $3/$2 $REFERENCE/gencode.vM25.long_noncoding_RNAs.gtf $REFERENCE/mm10.fa --cage_peak $CAGE_DIR/mm10.cage_peak_phase1and2combined_coord.bed --coverage "./*SJ.out.bed" --polyA_motif_list $SQANTI2_DIR/../human.polyA.list.txt --skipORF --fl_count $6 &> $1.sqanti.qc.log
+
+    elif [ $8 == "genome" ]; then
+      echo "Processing with gencode.vM22.annotation.gtf for genome annotation "
+      python $SQANTI2_DIR/sqanti_qc2.py -t 30 --gtf $3/$2 $REFERENCE/gencode.vM22.annotation.gtf $REFERENCE/mm10.fa --cage_peak $CAGE_DIR/mm10.cage_peak_phase1and2combined_coord.bed --coverage "./*SJ.out.bed" --polyA_motif_list $SQANTI2_DIR/../human.polyA.list.txt --expression $5 --fl_count $6 &> $1.sqanti.qc.log
     else
-      python $SQANTI2_DIR/sqanti_qc2.py -t 30 \
-        --gtf $3/$2 \
-        $REFERENCE/gencode.vM22.annotation.gtf $REFERENCE/mm10.fa \
-        --cage_peak $CAGE_DIR/mm10.cage_peak_phase1and2combined_coord.bed \
-        --coverage "./*SJ.out.bed" \
-        --polyA_motif_list $SQANTI2_DIR/../human.polyA.list.txt \
-        --expression $5 \
-        --fl_count $6 \
-        &> $1.sqanti.qc.log
+      echo "8th argument required"
     fi
 
     echo "Processing Sample $1 for SQANTI2 filter"
@@ -487,6 +486,58 @@ run_ERCC_analysis(){
 
 
 ###############################################################################################
+# ccs_bam2fasta: convert ccs_bam to fasta
+# ccs_bam2fasta <sample_name> <input_ccs.bam_dir> <output_dir>
+# output file = <sample_name>.ccs.fasta
+ccs_bam2fasta(){
+
+    source activate sqanti2_py3
+    bam2fastq --version
+
+    echo "Converting CCS of sample $1 from bam to fasta"
+    ccs_file=$(find $2 -name "*.bam" | grep $1)
+    echo $ccs_file
+    cd $3
+    bam2fasta -u -o $1".ccs" $ccs_file 2>$1.bam2fasta.log
+
+    echo "Extracting length of Sample $1 CCS"
+    CUPCAKE=/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/softwares/Post_Isoseq3/cDNA_Cupcake
+    export PYTHONPATH=$PYTHONPATH:$CUPCAKE/sequence
+    export PATH=$PATH:$CUPCAKE/sequence
+    get_seq_stats.py $1".ccs.fasta" 2>$1.ccs.get_seq.log
+
+    source deactivate
+}
+
+# make_file_for_rarefaction <sample_name_prefix> <input_tofu_directory> <input_sqanti_tama_directory> <working_directory>
+make_file_for_rarefaction(){
+
+  CUPCAKE_ANNOTATION=/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/softwares/Post_Isoseq3/cDNA_Cupcake/annotation
+
+	cd $4
+	echo "Working with $1"
+	# make_file_for_subsampling_from_collapsed.py <sample_name_prefix>.input.file <sample_name_prefix>.output.file <sample_name_prefix>.classification.txt
+	python $CUPCAKE_ANNOTATION/make_file_for_subsampling_from_collapsed.py -i $2/$1".collapsed" -o $1".subsampling" -m2 $3/$1"_sqantitamafiltered.classification.txt"
+  python $CUPCAKE_ANNOTATION/subsample.py --by refgene --min_fl_count 2 --step 1000 $1".subsampling.all.txt" > $1".rarefaction.by_refgene.min_fl_2.txt"
+  python $CUPCAKE_ANNOTATION/subsample.py --by refisoform --min_fl_count 2 --step 1000 $1".subsampling.all.txt" > $1".rarefaction.by_refisoform.min_fl_2.txt"
+	python $CUPCAKE_ANNOTATION/subsample_with_category.py --by refisoform --min_fl_count 2 --step 1000 $1".subsampling.all.txt" > $1".rarefaction.by_refisoform.min_fl_2.by_category.txt"
+}
+
+# parse_stats_per_sample <input_ccs.bam_dir> <Input_LIMA_directory> <output_prefix_name>
+parse_stats_per_sample(){
+
+    # variable
+    CCS_dir=$1
+    LIMA_dir=$2
+    output_name=$3
+
+    FUNCTIONS=/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/Scripts/General/2_Transcriptome_Annotation
+    source activate sqanti2_py3
+    python $FUNCTIONS/IsoSeq_QC/CCS.py $CCS_dir "" $3
+    python $FUNCTIONS/IsoSeq_QC/LIMA.py $LIMA_dir "" $3
+    source deactivate
+}
+
 # RNASeq alone
 # run_stringtie <input_reference_gtf> <input_mapped_dir> <output_stringtie_dir> <output_prefix>
 # input: Sample names taken from working script
@@ -545,4 +596,3 @@ run_featurecounts_transcript_specified(){
 
     source deactivate
 }
-
