@@ -32,9 +32,17 @@ cat $FASTA
 
 ################################################################################################
 #*************************************  Isoseq3 [Function 1, 2, 3, 4]
-# run_CCS <input_ccs_bam> <prefix_output_name> <Output_directory>
+# run_CCS <input_ccs_bam> <prefix_output_name> <Output_directory> <chem=oldchem/newchem>
 run_CCS(){
-  source activate isoseq3
+  if [ $4 == "oldchem" ]; then
+    source activate isoseq3_paper
+    ccs --version
+  elif [ $4 == "newchem" ]; then
+    source activate isoseq
+    ccs --version
+  else 
+    echo "4th argument required"
+  fi
 
   cd $3
   echo "Processing Sample $2 from Functions script"

@@ -45,7 +45,7 @@ GROUP_SAMPLES=($HUMANCTX_SAMPLES_NAMES $ADULTCTX_SAMPLES_NAMES $FETALCTX_SAMPLES
 ################################################################################################
 #************************************* Isoseq3 and Post_Isoseq3 [Function 1,2,3]
 # 1) merging_at_refine <input_flnc_bam_dir> <output_directory> <output_name> <samples.....>
-for i in {0..4}; do merging_at_refine $PostIsoseq3_WKD/REFINE $Isoseq3_WKD/MERGED_CLUSTER ${GROUP_NAMES[$i]} ${GROUP_SAMPLES[$i]}; done
+for i in {0..4}; do merging_at_refine $Isoseq3_WKD/REFINE $Isoseq3_WKD/MERGED_CLUSTER ${GROUP_NAMES[$i]} ${GROUP_SAMPLES[$i]}; done
 
 # 2) run_map_cupcakecollapse <sample_prefix_input/output_name> <isoseq3_input_directory> <mapping_output_directory> <tofu_output_directory>
 for i in {0..4}; do run_map_cupcakecollapse ${GROUP_SAMPLES[$i]} $Isoseq3_WKD/MERGED_CLUSTER $PostIsoseq3_WKD/MAP $PostIsoseq3_WKD/TOFU; done

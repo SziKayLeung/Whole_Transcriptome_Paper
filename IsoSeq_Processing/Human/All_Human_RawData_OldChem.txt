@@ -1,0 +1,12 @@
+#7.FetalCTX2; 12971FL
+/gpfs/mrc0/projects/Research_Project-MRC148213/ISOSEQ/Fetal/12971FL/m54082_170222_185554.subreads.bam
+#9.FetalCTX4; 12972FL
+/gpfs/mrc0/projects/Research_Project-MRC148213/ISOSEQ/Fetal/12972FL/m54082_170223_234030.subreads.bam
+#11.FetalHIP1; 12971HIP
+/gpfs/mrc0/projects/Research_Project-MRC148213/ISOSEQ/Fetal/12971HIP/m54082_170223_050133.subreads.bam
+#12.FetalHIP2; 12972HIP
+/gpfs/mrc0/projects/Research_Project-MRC148213/ISOSEQ/Fetal/12972HIP/m54082_170220_165730.subreads.bam
+#13.FetalSTR1; 12971STR
+/gpfs/mrc0/projects/Research_Project-MRC148213/ISOSEQ/Fetal/12971STR/m54082_170223_152109.subreads.bam
+#14.FetalSTR2; 12972STR
+/gpfs/mrc0/projects/Research_Project-MRC148213/ISOSEQ/Fetal/12972STR/m54082_170224_095950.subreads.bam
