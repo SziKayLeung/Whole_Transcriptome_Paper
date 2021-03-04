@@ -38,9 +38,9 @@ run_CCS(){
     source activate isoseq3_paper
     ccs --version
   elif [ $4 == "newchem" ]; then
-    source activate isoseq
+    source activate isoseq3
     ccs --version
-  else 
+  else
     echo "4th argument required"
   fi
 

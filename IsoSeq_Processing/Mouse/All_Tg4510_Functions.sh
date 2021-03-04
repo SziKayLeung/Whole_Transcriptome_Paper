@@ -13,7 +13,15 @@
 # 10) run_sqanti2 <input_tofu_prefix> <input_tofu_dir> <input_RNASEQ_dir> <input_KALLISTO_file> <input_abundance> <output_dir>
 # 11) TAMA_remove_fragments <input_collapsed.filtered.gff> <input/output_prefix_name> <input/output_dir>
 # 12) TAMA_sqanti_filter <TAMA_remove_fragments.output> <sqanti_filtered_dir> <sqanti_output_txt> <sqanti_output_gtf> <sqanti_output_fasta> <output_prefix_name> <output_dir>
+### ERCC
 # 13) run_ERCC_analysis <sample_prefix_input/output_name> <isoseq3_input_directory> <output_dir>
+### QC
+# 14) ccs_bam2fasta <sample_name> <input_ccs.bam_dir> <output_dir>
+# 15) make_file_for_rarefaction <sample_name_prefix> <input_tofu_directory> <input_sqanti_tama_directory> <working_directory
+# 16) parse_stats_per_sample <input_ccs.bam_dir> <Input_LIMA_directory> <output_prefix_name>
+### RNA-Seq defined transcriptome
+# 17) run_stringtie <input_reference_gtf> <input_mapped_dir> <output_stringtie_dir> <output_prefix>
+
 ################################################################################################
 
 #************************************* DEFINE VARIABLES
@@ -152,7 +160,7 @@ merging_at_refine(){
 }
 
 ################################################################################################
-#************************************* Post_Isoseq3 (Minimap2, Cupcake, Demultiplex) [Function 2, 3]
+#************************************* Post_Isoseq3 (Minimap2, Cupcake, Demultiplex) [Function 5, 6]
 # run_map_cupcakecollapse <sample_prefix_input/output_name> <isoseq3_input_directory> <mapping_output_directory> <tofu_output_directory>
 # Prerequisite: mm10 cage peak
 run_map_cupcakecollapse(){
@@ -181,8 +189,8 @@ run_map_cupcakecollapse(){
     source activate cupcake
     head $CUPCAKE/README.md
     cd $4 #cd to $TOFU directory for output
-    collapse_isoforms_by_sam.py -c 0.85 -i 0.95 --input $2/$1.clustered.hq.fastq --fq -s $3/$1.sorted.sam --dun-merge-5-shorter -o $1 2> $1.collapse.log
-    get_abundance_post_collapse.py $1.collapsed $2/$1.clustered.cluster_report.csv 2> $1.abundance.log
+    collapse_isoforms_by_sam.py -c 0.85 -i 0.95 --input $2/$1.clustered.hq.fastq --fq -s $3/$1.sorted.sam --dun-merge-5-shorter -o $1 &>> $1.collapse.log
+    get_abundance_post_collapse.py $1.collapsed $2/$1.clustered.cluster_report.csv &>> $1.abundance.log
 
     source activate sqanti2_py3
     # convert rep.fq to rep.fa for SQANTI2 input
@@ -203,7 +211,7 @@ demux(){
 }
 
 ################################################################################################
-#************************************* RNAseq [Function 4,5]
+#************************************* RNAseq [Function 7,8]
 # run_star <list_of_samples> <J20/Tg4510_input_directory> <output_dir>
 # Aim: Individually align RNASeq filtered fastq files to STAR-indexed genome using STAR, and subsequently input SJ.out.bed file into SQANTI2
 run_star(){
@@ -305,7 +313,7 @@ mouse_merge_fastq(){
 
 
 ################################################################################################
-#************************************* RNASeq & IsoSeq [Function 6]
+#************************************* RNASeq & IsoSeq [Function 9]
 # run_kallisto <sample_prefix_output_name> <input_tofu_fasta> <merged_fastq_input_dir> <output_dir>
 # Aim: Align merged RNASeq fastq files to IsoSeq Tofu output fasta using Kallisto
 # Prerequisite:
@@ -345,8 +353,8 @@ run_kallisto(){
 }
 
 ################################################################################################
-#************************************* SQANTI2 [Function 7]
-# run_sqanti2 <input_tofu_prefix> <input_gtf> <input_tofu_dir> <input_RNASEQ_dir> <input_KALLISTO_file> <input_abundance> <output_dir> <mode=genome/noexp/lncrna>
+#************************************* SQANTI2 [Function 10]
+# run_sqanti2 <input_tofu_prefix> <input_gtf> <input_tofu_dir> <input_RNASEQ_dir> <input_KALLISTO_file> <input_abundance> <output_dir> <mode=genome/rnaseq/lncrna>
 run_sqanti2(){
 
     source activate sqanti2_py3
@@ -376,10 +384,10 @@ run_sqanti2(){
     echo "Processing Sample $1 for SQANTI2 QC"
 
     # no kalliso file
-    if [ $8 == "noexp" ]; then
-      python $SQANTI2_DIR/sqanti_qc2.py -t 30 --gtf $3/$2 $REFERENCE/gencode.vM22.annotation.gtf $REFERENCE/mm10.fa --cage_peak $CAGE_DIR/mm10.cage_peak_phase1and2combined_coord.bed --coverage "./*SJ.out.bed" --polyA_motif_list $SQANTI2_DIR/../human.polyA.list.txt --skipORF --fl_count $6 &> $1.sqanti.qc.log
+    if [ $8 == "rnaseq" ]; then
+      python $SQANTI2_DIR/sqanti_qc2.py -t 30 --gtf $3/$2 $REFERENCE/gencode.vM22.annotation.gtf $REFERENCE/mm10.fa --cage_peak $CAGE_DIR/mm10.cage_peak_phase1and2combined_coord.bed --coverage "./*SJ.out.bed" --polyA_motif_list $SQANTI2_DIR/../human.polyA.list.txt &> $1.sqanti.qc.log
 
-    elif [ $8 == "lncRNA" ]; then
+    elif [ $8 == "lncrna" ]; then
       echo "Processing with lncRNA.gtf for genome annotation "
       python $SQANTI2_DIR/sqanti_qc2.py -t 30 --gtf $3/$2 $REFERENCE/gencode.vM25.long_noncoding_RNAs.gtf $REFERENCE/mm10.fa --cage_peak $CAGE_DIR/mm10.cage_peak_phase1and2combined_coord.bed --coverage "./*SJ.out.bed" --polyA_motif_list $SQANTI2_DIR/../human.polyA.list.txt --skipORF --fl_count $6 &> $1.sqanti.qc.log
 
@@ -401,7 +409,7 @@ run_sqanti2(){
 
 
 ################################################################################################
-#************************************* TAMA [Function 8, 9]
+#************************************* TAMA [Function 11, 12]
 # TAMA_remove_fragments <input_collapsed.filtered.gff> <input/output_prefix_name> <input/output_dir>
 # remove short fragments from post tofu
 # Prerequisite: Require TAMA_prepare.R to change column 4 of bed12 to gene_name: transcript_name for correct file TAMA format
@@ -444,8 +452,8 @@ TAMA_sqanti_filter(){
 
 
 ################################################################################################
-#************************************* ERCC [Function 10]
-# run_ERCC_analysis <sample_prefix_input/output_name> <isoseq3_input_directory> <output_dir>
+#************************************* ERCC [Function 13]
+# run_ERCC_analysis <sample_prefix_input/output_name> <isoseq3_input_directory>
 run_ERCC_analysis(){
 
     CUPCAKE=/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/softwares/Post_Isoseq3/cDNA_Cupcake
@@ -468,8 +476,8 @@ run_ERCC_analysis(){
     echo "Processing Sample $1 for TOFU, with coverage $coverage_threshold and identity $identity_threshold"
     source activate cupcake
     head $CUPCAKE/README.md
-    collapse_isoforms_by_sam.py -c $coverage_threshold -i $identity_threshold --input $2/$1.clustered.hq.fastq --fq -s $1.sorted.sam --dun-merge-5-shorter -o $1 2> $1.collapse.log
-    get_abundance_post_collapse.py $1.collapsed $2/$1.polished.cluster_report.csv 2> $1.abundance.log
+    collapse_isoforms_by_sam.py -c $coverage_threshold -i $identity_threshold --input $2/$1.clustered.hq.fastq --fq -s $1.sorted.sam --dun-merge-5-shorter -o $1 &>> $1.collapse.log
+    get_abundance_post_collapse.py $1.collapsed $2/$1.polished.cluster_report.csv &>> $1.abundance.log
 
     # SQANTI
     source activate sqanti2_py3
@@ -477,15 +485,15 @@ run_ERCC_analysis(){
     prefix=$1.collapsed
     python $SQANTI2_dir/sqanti_qc2.py -v
     python $SQANTI2_dir/sqanti_qc2.py -t 30 --gtf $prefix.gff $REFERENCE_ERCC/ERCC92.gtf $REFERENCE_ERCC/ERCC92.fa
-    python $SQANTI2_dir/sqanti_filter2.py $prefix"_classification.txt" $prefix"_corrected.fasta" $prefix"_corrected.gtf" -a 0.6 -c 3 &> $1.sqanti.filter.log
-    TAMA_remove_fragments WT8IsoSeq.collapsed_classification.filtered_lite.gtf WT8IsoSeq $4
-    TAMA_sqanti_filter WT8IsoSeq.bed $4 WT8IsoSeq.collapsed_classification.filtered_lite_classification.txt WT8IsoSeq.collapsed_classification.filtered_lite.gtf WT8IsoSeq.collapsed_classification.filtered_lite.fasta WT8IsoSeq.collapsed_classification.filtered_lite_junctions.txt WT8IsoSeq $4
+    python $SQANTI2_dir/sqanti_filter2.py $prefix"_classification.txt" $prefix"_corrected.fasta" $prefix"_corrected.gtf" -a 0.6 -c 3 &>> $1.sqanti.filter.log
+    TAMA_remove_fragments WholeIsoSeq.collapsed_classification.filtered_lite.gtf WholeIsoSeq $3
+    TAMA_sqanti_filter WholeIsoSeq.bed $3 WholeIsoSeq.collapsed_classification.filtered_lite_classification.txt WholeIsoSeq.collapsed_classification.filtered_lite.gtf WholeIsoSeq.collapsed_classification.filtered_lite.fasta WholeIsoSeq.collapsed_classification.filtered_lite_junctions.txt WholeIsoSeq $3
 
     source deactivate
 }
 
-
-###############################################################################################
+################################################################################################
+#************************************* QC [Function 14]
 # ccs_bam2fasta: convert ccs_bam to fasta
 # ccs_bam2fasta <sample_name> <input_ccs.bam_dir> <output_dir>
 # output file = <sample_name>.ccs.fasta
@@ -498,29 +506,32 @@ ccs_bam2fasta(){
     ccs_file=$(find $2 -name "*.bam" | grep $1)
     echo $ccs_file
     cd $3
-    bam2fasta -u -o $1".ccs" $ccs_file 2>$1.bam2fasta.log
+    bam2fasta -u -o $1".ccs" $ccs_file &>> $1.bam2fasta.log
 
     echo "Extracting length of Sample $1 CCS"
     CUPCAKE=/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/softwares/Post_Isoseq3/cDNA_Cupcake
     export PYTHONPATH=$PYTHONPATH:$CUPCAKE/sequence
     export PATH=$PATH:$CUPCAKE/sequence
-    get_seq_stats.py $1".ccs.fasta" 2>$1.ccs.get_seq.log
+    get_seq_stats.py $1".ccs.fasta" &>> $1.ccs.get_seq.log
 
     source deactivate
 }
 
 # make_file_for_rarefaction <sample_name_prefix> <input_tofu_directory> <input_sqanti_tama_directory> <working_directory>
 make_file_for_rarefaction(){
+    source activate cupcake
+    CUPCAKE_ANNOTATION=/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/softwares/Post_Isoseq3/cDNA_Cupcake/annotation
 
-  CUPCAKE_ANNOTATION=/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/softwares/Post_Isoseq3/cDNA_Cupcake/annotation
+  	cd $4
+  	echo "Working with $1"
+    prefix=$1.collapsed
+  	# make_file_for_subsampling_from_collapsed.py <sample_name_prefix>.input.file <sample_name_prefix>.output.file <sample_name_prefix>.classification.txt
+  	python $CUPCAKE_ANNOTATION/make_file_for_subsampling_from_collapsed.py -i $2/$prefix -o $1.subsampling -m2 $3/$1_sqantitamafiltered.classification.txt
+    python $CUPCAKE_ANNOTATION/subsample.py --by refgene --min_fl_count 2 --step 1000 $1.subsampling.all.txt > $1.rarefaction.by_refgene.min_fl_2.txt
+    python $CUPCAKE_ANNOTATION/subsample.py --by refisoform --min_fl_count 2 --step 1000 $1.subsampling.all.txt > $1.rarefaction.by_refisoform.min_fl_2.txt
+  	python $CUPCAKE_ANNOTATION/subsample_with_category.py --by refisoform --min_fl_count 2 --step 1000 $1.subsampling.all.txt > $1.rarefaction.by_refisoform.min_fl_2.by_category.txt
 
-	cd $4
-	echo "Working with $1"
-	# make_file_for_subsampling_from_collapsed.py <sample_name_prefix>.input.file <sample_name_prefix>.output.file <sample_name_prefix>.classification.txt
-	python $CUPCAKE_ANNOTATION/make_file_for_subsampling_from_collapsed.py -i $2/$1".collapsed" -o $1".subsampling" -m2 $3/$1"_sqantitamafiltered.classification.txt"
-  python $CUPCAKE_ANNOTATION/subsample.py --by refgene --min_fl_count 2 --step 1000 $1".subsampling.all.txt" > $1".rarefaction.by_refgene.min_fl_2.txt"
-  python $CUPCAKE_ANNOTATION/subsample.py --by refisoform --min_fl_count 2 --step 1000 $1".subsampling.all.txt" > $1".rarefaction.by_refisoform.min_fl_2.txt"
-	python $CUPCAKE_ANNOTATION/subsample_with_category.py --by refisoform --min_fl_count 2 --step 1000 $1".subsampling.all.txt" > $1".rarefaction.by_refisoform.min_fl_2.by_category.txt"
+    source deactivate
 }
 
 # parse_stats_per_sample <input_ccs.bam_dir> <Input_LIMA_directory> <output_prefix_name>
@@ -538,6 +549,9 @@ parse_stats_per_sample(){
     source deactivate
 }
 
+
+################################################################################################
+#************************************* RNA-Seq defined transcriptome [Function 17]
 # RNASeq alone
 # run_stringtie <input_reference_gtf> <input_mapped_dir> <output_stringtie_dir> <output_prefix>
 # input: Sample names taken from working script
@@ -551,14 +565,14 @@ run_stringtie(){
     output_prefix=$4
 
     export PATH=$PATH:/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/softwares/stringtie
-    stringtie --version
+    echo "Stringtie version:" stringtie --version
     cd $output_stringtie_dir
 
     # run stringtie individually on rnaseq sorted bam file
     for i in ${SAMPLES_NAMES[@]}; do
        echo "Processing stringtie for sample $i against $input_reference_gtf"
        #stringtie -G <reference_gtf> -o <output_gtf> <input mapped rnaseq bam>
-       stringtie -G $input_reference_gtf -o $i.out.gtf $input_mapped_dir/$i.sorted.bam -v &> $i.stringtie.log
+       stringtie -G $input_reference_gtf -o $i.out.gtf $input_mapped_dir/$i/$i.sorted.bam -v &> $i.stringtie.log
     done
 
     # merge stringtie gtf output to one merged gtf
@@ -566,33 +580,16 @@ run_stringtie(){
     all_stringtie_gtf_names=$(echo "${all_stringtie_gtf[@]}")
     echo "Merging: $all_stringtie_gtf_names"
     stringtie --merge -G $input_reference_gtf -p 8 -o $output_prefix.gtf $all_stringtie_gtf_names
-}
 
+    # modify stringtie gtf for input into SQANTI2 due to some strands with no strand annotation (blips)
+    # https://github.com/gpertea/stringtie/issues/322
+    source activate sqanti2_py3
+    FUNCTIONS=/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/Scripts/General/2_Transcriptome_Annotation
+    # Rscript .R <path; input gtf> <path; output gtf>
+    Rscript $FUNCTIONS/RNASeq/Subset_Stringtiegtf.R $output_stringtie_dir/$output_prefix".gtf" $output_stringtie_dir/$output_prefix"_mod.gtf"
 
-# run_featurecounts at TRANSCRIPT level of all specified samples
-# run_featurecounts_transcript_specified <input_dir> <input_reference_dir> <output_prefix_name> <output_dir>
-# <input_dir> containing mapped, sorted bam files from STAR (RNASeq)
-run_featurecounts_transcript_specified(){
-    source activate sqanti2
+    # reinsert the quotation marks around the transcript id, gene id etc as required for recognition by SQANTI2
+    # note, these are removed after processing in R
+    sed 's/transcript_id \([^;]\+\)/transcript_id \"\1\"/g' $output_prefix"_mod.gtf" | sed 's/gene_id \([^;]\+\)/gene_id \"\1\"/g' | sed 's/gene_name \([^;]\+\)/gene_name \"\1\"/g' | sed 's/ref_gene_id \([^;]\+\)/ref_gene_id \"\1\"/g' > $output_prefix"_final.gtf"
 
-    Merge_Samples=$(echo ${SAMPLES_NAMES[@]})
-    all_sorted_bams=$(
-        for i in ${Merge_Samples[@]}; do
-            sorted_bam_name=$(find $1 -name "*.sorted.bam" -exec basename \{} \; | grep ^$i )
-            sorted_bam=$(find $1 -name "*.sorted.bam" | grep "$sorted_bam_name" )
-            echo $sorted_bam
-        done
-    )
-
-    # Featurecounts on transcript level
-    echo "Processing Feature Counts for Merged Bam"
-    featureCounts -v
-    echo "Merging the following sorted.bams"
-    echo ${all_sorted_bams[@]}
-
-    cd $4
-    # FeatureCounts using raw.sorted.bam
-    featureCounts -T 8 -O -g transcript_id -p -a $2/gencode.vM22.annotation.gtf -o $3.transcript_id.tsv $all_sorted_bams 2> $3.featurecounts.log
-
-    source deactivate
 }
