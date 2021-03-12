@@ -484,7 +484,7 @@ run_ERCC_analysis(){
     export PYTHONPATH=$PYTHONPATH:$SEQUENCE
     prefix=$1.collapsed
     python $SQANTI2_dir/sqanti_qc2.py -v
-    python $SQANTI2_dir/sqanti_qc2.py -t 30 --gtf $prefix.gff $REFERENCE_ERCC/ERCC92.gtf $REFERENCE_ERCC/ERCC92.fa
+    python $SQANTI2_dir/sqanti_qc2.py -t 30 --gtf $prefix.gff $REFERENCE_ERCC/ERCC92.gtf $REFERENCE_ERCC/ERCC92.fa &>> $1.sqanti.qc.log
     python $SQANTI2_dir/sqanti_filter2.py $prefix"_classification.txt" $prefix"_corrected.fasta" $prefix"_corrected.gtf" -a 0.6 -c 3 &>> $1.sqanti.filter.log
     TAMA_remove_fragments WholeIsoSeq.collapsed_classification.filtered_lite.gtf WholeIsoSeq $3
     TAMA_sqanti_filter WholeIsoSeq.bed $3 WholeIsoSeq.collapsed_classification.filtered_lite_classification.txt WholeIsoSeq.collapsed_classification.filtered_lite.gtf WholeIsoSeq.collapsed_classification.filtered_lite.fasta WholeIsoSeq.collapsed_classification.filtered_lite_junctions.txt WholeIsoSeq $3
@@ -526,8 +526,8 @@ make_file_for_rarefaction(){
   	echo "Working with $1"
     prefix=$1.collapsed
   	# make_file_for_subsampling_from_collapsed.py <sample_name_prefix>.input.file <sample_name_prefix>.output.file <sample_name_prefix>.classification.txt
-  	python $CUPCAKE_ANNOTATION/make_file_for_subsampling_from_collapsed.py -i $2/$prefix -o $1.subsampling -m2 $3/$1_sqantitamafiltered.classification.txt
-    python $CUPCAKE_ANNOTATION/subsample.py --by refgene --min_fl_count 2 --step 1000 $1.subsampling.all.txt > $1.rarefaction.by_refgene.min_fl_2.txt
+  	python $CUPCAKE_ANNOTATION/make_file_for_subsampling_from_collapsed.py -i $2/$prefix -o $1.subsampling -m2 $3/$1_sqantitamafiltered.classification.txt &>> $1.makefile.log
+    python $CUPCAKE_ANNOTATION/subsample.py --by refgene --min_fl_count 2 --step 1000 $1.subsampling.all.txt > $1.rarefaction.by_refgene.min_fl_2.txt 
     python $CUPCAKE_ANNOTATION/subsample.py --by refisoform --min_fl_count 2 --step 1000 $1.subsampling.all.txt > $1.rarefaction.by_refisoform.min_fl_2.txt
   	python $CUPCAKE_ANNOTATION/subsample_with_category.py --by refisoform --min_fl_count 2 --step 1000 $1.subsampling.all.txt > $1.rarefaction.by_refisoform.min_fl_2.by_category.txt
 

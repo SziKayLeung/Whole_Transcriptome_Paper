@@ -7,13 +7,12 @@
 # 4) merging_at_refine <input_flnc_bam_dir> <output_directory> <output_name> <samples.....>
 # 5) run_map_cupcakecollapse <sample_prefix_input/output_name> <isoseq3_input_directory> <mapping_output_directory> <tofu_output_directory>
 # 6) demux <input path read.stat file> <input path of samples file> <path of output>
-# 7) run_star <list_of_samples> <J20/Tg4510_input_directory> <output_dir>
-# 8) mouse_merge_fastq <RNASEQ_input_dir> <Kallisto_output_dir> <sample_prefix_output_name>
+# 7) run_STAR_human <list_of_samples> <J20/Tg4510_input_directory> <output_dir>
+# 8) fetal_merge_fastq <RNASEQ_input_dir> <Kallisto_output_dir> <sample_prefix_output_name>
 # 9) run_kallisto <sample_prefix_output_name> <input_tofu_fasta> <merged_fastq_input_dir> <output_dir>
 # 10) run_sqanti2 <input_tofu_prefix> <input_tofu_dir> <input_RNASEQ_dir> <input_KALLISTO_file> <input_abundance> <output_dir>
 # 11) TAMA_remove_fragments <input_collapsed.filtered.gff> <input/output_prefix_name> <input/output_dir>
 # 12) TAMA_sqanti_filter <TAMA_remove_fragments.output> <sqanti_filtered_dir> <sqanti_output_txt> <sqanti_output_gtf> <sqanti_output_fasta> <output_prefix_name> <output_dir>
-# 13) run_ERCC_analysis <sample_prefix_input/output_name> <isoseq3_input_directory> <output_dir>
 ################################################################################################
 
 #************************************* DEFINE VARIABLES
@@ -30,35 +29,34 @@ REFERENCE=/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/reference_2019
 FASTA=$REFERENCE/primer.fasta
 cat $FASTA
 
+head /gpfs/mrc0/projects/Research_Project-MRC148213/sl693/softwares/Post_Isoseq3/cDNA_Cupcake/README.md
 ################################################################################################
 #*************************************  Isoseq3 [Function 1, 2, 3, 4]
 # run_CCS <input_ccs_bam> <prefix_output_name> <Output_directory> <chem=oldchem/newchem>
 run_CCS(){
+  cd $3
+  echo "Processing Sample $2 from Functions script"
+  echo "Processing $1"
+  
   if [ $4 == "oldchem" ]; then
     source activate isoseq3_paper
     ccs --version
+    # ccs <input.subreads.bam> <output.ccs.bam>
+    # --minPredictedAccuracy 0.9 = default
+    time ccs $1 $2.ccs.bam --minPasses=1 --reportFile $2_ccs_report.txt
+    echo "CCS for Sample $2 successful"
+    ls *$2*    
   elif [ $4 == "newchem" ]; then
     source activate isoseq3
     ccs --version
+    # ccs <input.subreads.bam> <output.ccs.bam>
+    time ccs $1 $2.ccs.bam --minPasses=1 --min-rq 0.9 --reportFile $2_ccs_report.txt
+    echo "CCS for Sample $2 successful"
+    ls *$2*
   else
     echo "4th argument required"
   fi
 
-  cd $3
-  echo "Processing Sample $2 from Functions script"
-  echo "Processing $1"
-  echo "Checking if $2.ccs.bam exists"
-
-    if [ -f $2.ccs.bam ]; then
-      echo "$2.ccs.bam file already exists; CCS no need to be processed on Sample $2"
-    else
-      echo "$2.ccs.bam file does not exist"
-      echo "Processing CCS for sample $2"
-      # ccs <input.subreads.bam> <output.ccs.bam>
-      time ccs $1 $2.ccs.bam --minPasses=1 --min-rq 0.9 --reportFile $2_ccs_report.txt
-      echo "CCS for Sample $2 successful"
-      ls *$2*
-    fi
   source deactivate
 }
 
@@ -151,16 +149,18 @@ merging_at_refine(){
     cd $2
     printf '%s\n' "${all_flnc_bams[@]}" > $3.flnc.fofn
     cat $3.flnc.fofn
+    
+    echo "Merge Output: $3.clustered.bam"
 
     ###*********************
 
-    isoseq3 cluster $3.flnc.fofn $3.clustered.bam --verbose --use-qvs
+    isoseq3 cluster $3.flnc.fofn $3.clustered.bam --verbose --use-qvs 
     gunzip *.gz*
     source deactivate
 }
 
 ################################################################################################
-#************************************* Post_Isoseq3 (Minimap2, Cupcake, Demultiplex) [Function 2, 3]
+#************************************* Post_Isoseq3 (Minimap2, Cupcake, Demultiplex) [Function 5, 6]
 # run_map_cupcakecollapse <sample_prefix_input/output_name> <isoseq3_input_directory> <mapping_output_directory> <tofu_output_directory>
 # Prerequisite: mm10 cage peak
 run_map_cupcakecollapse(){
@@ -182,15 +182,14 @@ run_map_cupcakecollapse(){
 
     echo "Processing Sample $1 for Minimap2 and sort"
     cd $3 #cd to $MAP directory for output
-    minimap2 -t 30 -ax splice -uf --secondary=no -C5 -O6,24 -B4 $REFERENCE/hg38.fa $2/$1.polished.hq.fastq > $1.sam 2> $1.map.log
+    minimap2 -t 30 -ax splice -uf --secondary=no -C5 -O6,24 -B4 $REFERENCE/hg38.fa $2/$1.clustered.hq.fastq > $1.sam 2> $1.map.log
     samtools sort -O SAM $1.sam > $1.sorted.sam
 
     echo "Processing Sample $1 for TOFU, with coverage 85% and identity 95%"
     source activate cupcake
-    head $CUPCAKE/README.md
     cd $4 #cd to $TOFU directory for output
-    collapse_isoforms_by_sam.py -c 0.85 -i 0.95 --input $2/$1.clustered.hq.fastq --fq -s $3/$1.sorted.sam --dun-merge-5-shorter -o $1 2> $1.collapse.log
-    get_abundance_post_collapse.py $1.collapsed $2/$1.clustered.cluster_report.csv 2> $1.abundance.log
+    collapse_isoforms_by_sam.py -c 0.85 -i 0.95 --input $2/$1.clustered.hq.fastq --fq -s $3/$1.sorted.sam --dun-merge-5-shorter -o $1 &>> $1.collapse.log
+    get_abundance_post_collapse.py $1.collapsed $2/$1.clustered.cluster_report.csv &>> $1.abundance.log
 
     source activate sqanti2_py3
     # convert rep.fq to rep.fa for SQANTI2 input
@@ -211,7 +210,7 @@ demux(){
 }
 
 ################################################################################################
-#************************************* RNAseq [Function 4,5]
+#************************************* RNAseq [Function 7,8]
 # run_STAR_human <input_rnaseq_sample_name> <input_rnaseq_dir> <output_dir> <STAR_reference_input_directory>
 # Aim: Individually align RNASeq filtered fastq files to STAR-indexed genome using STAR, and subsequently input SJ.out.bed file into SQANTI2
 # Note: run_STAR_human and run_star (WT8_Isoseq3.1.2.sh) has the exact same command for STAR, but just different input of F_File and R_File
@@ -230,40 +229,44 @@ run_STAR_human(){
     echo "Processing Reverse Reads: $R_File"
 
     cd $3
-    STAR --runMode alignReads --runThreadN 64 --genomeDir $4/hg38 \
+    mkdir $1 
+    cd $1
+    
+    # Parameters according to https://github.com/jennylsmith/Isoseq3_workflow/blob/master/shell_scripts/8__STAR_Junctions_ShortReads.sh
+    # 2-pass mode alignment with chimeric read detection
+    # at least 25 bp of one read of a pair maps to a different loci than the rest of the read pair
+    # require 20 pb on either side of chimeric junction
+    # include chimeric reads in the output BAM
+    # don't include chimeras that map to reference genome contig with Ns
+    # --outSAMtype BAM SortedByCoordinate, output sorted by coordinate Aligned.sortedByCoord.out.bam file, similar to samtools sort command.
+    # note STAR indexed with genocde vM22 primary assembly annotation gtf therefore no need to include into command line, otherwise create additional folders
+    STAR --runMode alignReads --runThreadN 32 --genomeDir $4/hg38 \
     --readFilesIn $F_File $R_File \
     --outSAMtype BAM SortedByCoordinate \
     --chimSegmentMin 25 \
-    --chimJunctionOverhangMin 20 \
-    --chimOutType WithinBAM \
-    --chimFilter banGenomicN \
-    --chimOutJunctionFormat 1 \
-    --twopassMode Basic \
-    --twopass1readsN -1 #use all reads
-
-    echo "Processing Aligned sorted by Coordinated bam for $1"
-    mv Aligned.sortedByCoord.out.bam $1.sorted.bam
-    picard MarkDuplicates INPUT=$1.sorted.bam OUTPUT=$1.sorted.nodup.bam METRICS_FILE=$1.dup.txt VALIDATION_STRINGENCY=LENIENT REMOVE_DUPLICATES=true \
-    2> $1.PicardDup.log
-
-    ls -alth *
-}
-
-# post_STAR_process <output_sample_name> <input/output_dir>
-post_STAR_process(){
-    cd $2
-    ls -alth *Aligned.sortedByCoord.out.bam
-    echo "Processing Aligned sorted by Coordinated bam for $1"
-    mv Aligned.sortedByCoord.out.bam $1.sorted.bam
-    picard MarkDuplicates INPUT=$1.sorted.bam OUTPUT=$1.sorted.nodup.bam METRICS_FILE=$1.dup.txt VALIDATION_STRINGENCY=LENIENT REMOVE_DUPLICATES=true \
-    2> $1.PicardDup.log
-
+  	--chimJunctionOverhangMin 20 \
+  	--chimOutType WithinBAM \
+  	--chimFilter banGenomicN \
+  	--chimOutJunctionFormat 1 \
+  	--twopassMode Basic \
+  	--twopass1readsN -1 &>> $1_star.log #use all reads
+      #--readFilesCommand zcat \
+      #--sjdbGTFfile $4/gencode.vM22.primary_assembly.annotation.gtf \
+  
+    # to remove duplicates between samples
+    picard MarkDuplicates INPUT=$3/$1".sorted.bam" OUTPUT=$1".sorted.nodup.bam" METRICS_FILE=$1".dup.txt" VALIDATION_STRINGENCY=LENIENT REMOVE_DUPLICATES=true 2> $1.PicardDup.log
+  
     # rename output files
+    mv Aligned.sortedByCoord.out.bam $1.sorted.bam
     mv Log.final.out $1.Log.final.out
     mv Log.out $1.Log.out
     mv Log.progress.out $1.Log.progress.out
     mv SJ.out.tab $1.SJ.out.bed
+    mv $1.SJ.out.bed ../
+
+  source deactivate
 }
+
 
 # fetal_merge_fastq <Fetal_RNASEQ_input_dir> <Fetal_Kallisto_output_dir>
 # Aim: Merge forward and reverse of all RNASeq filtered fastq, for further downstream alignment to IsoSeq Tofu output using Kallisto
@@ -283,7 +286,7 @@ Fetal_merge_fastq(){
 
 
 ################################################################################################
-#************************************* RNASeq & IsoSeq [Function 6]
+#************************************* RNASeq & IsoSeq [Function 9]
 # run_kallisto <sample_prefix_output_name> <input_tofu_fasta> <merged_fastq_input_dir> <output_dir>
 # Aim: Align merged RNASeq fastq files to IsoSeq Tofu output fasta using Kallisto
 # Prerequisite:
@@ -322,8 +325,9 @@ run_kallisto(){
     source deactivate
 }
 
+
 ################################################################################################
-#************************************* SQANTI2 [Function 7]
+#************************************* SQANTI2 [Function 10]
 # run_sqanti2 <input_tofu_prefix> <inout_gtf> <input_tofu_dir> <coverage/genome=own_rnaseq/introplis/chess> <input_RNASEQ_dir> <input_kallisto_file> <input_abundance> <output_dir>
 # PreRequisite:
     # if running "own_rnaseq", define $MAPPED directory containing SJ.out.bed files in working script
@@ -334,7 +338,7 @@ run_sqanti2(){
     # variables
     input_tofu_prefix=$1
     input_gtf=$2
-    input_tofu_dir=$3
+    input_dir=$3
     coverage_decision=$4
     input_RNASEQ_dir=$5
     input_kallisto_file=$6
@@ -356,43 +360,51 @@ run_sqanti2(){
         echo "Processing with own RNASeq dataset and genocode.gtf for genome annotation "
         echo "Collapsing with the following bed files"
         echo $input_RNASEQ_dir/*SJ.out.bed
+        
+        cp $input_RNASEQ_dir/*SJ.out.bed .
 
-        python $SQANTI2_DIR/sqanti_qc2.py -t 30 --gtf $input_dir/$input_gtf $REFERENCE/gencode.v31.annotation.gtf $REFERENCE/hg38.fa --cage_peak $REFERENCE/hg38.cage_peak_phase1and2combined_coord.bed --coverage "$input_RNASEQ_dir/*SJ.out.bed" --expression $input_kallisto_file --polyA_motif_list $SQANTI2_DIR/../human.polyA.list.txt --fl_count $input_abundance &> $input_tofu_prefix.sqanti.qc.log
+        python $SQANTI2_DIR/sqanti_qc2.py -t 30 --gtf $input_dir/$input_gtf $REFERENCE/gencode.v31.annotation.gtf $REFERENCE/hg38.fa --cage_peak $REFERENCE/hg38.cage_peak_phase1and2combined_coord.bed --coverage "./*SJ.out.bed" --expression $input_kallisto_file --polyA_motif_list $SQANTI2_DIR/../human.polyA.list.txt --fl_count $input_abundance &>> $input_tofu_prefix.sqanti.qc.log
+        
+        rm *SJ.out.bed
 
     elif [ $coverage_decision == "intropolis" ]; then
         echo "Processing with own intropolis and genocode.gtf for genome annotation, no expression data"
         echo "Collapsing with the following coverage expression file"
         echo $introplis
 
-        python $SQANTI2_DIR/sqanti_qc2.py -t 30 --gtf $input_dir/$input_gtf $REFERENCE/gencode.v31.annotation.gtf $REFERENCE/hg38.fa --cage_peak $REFERENCE/hg38.cage_peak_phase1and2combined_coord.bed --coverage $introplis --polyA_motif_list $SQANTI2_DIR/../human.polyA.list.txt --fl_count $input_abundance &> $input_tofu_prefix.sqanti.qc.log
+        python $SQANTI2_DIR/sqanti_qc2.py -t 30 --gtf $input_dir/$input_gtf $REFERENCE/gencode.v31.annotation.gtf $REFERENCE/hg38.fa --cage_peak $REFERENCE/hg38.cage_peak_phase1and2combined_coord.bed --coverage $introplis --polyA_motif_list $SQANTI2_DIR/../human.polyA.list.txt --fl_count $input_abundance &>> $input_tofu_prefix.sqanti.qc.log
 
     elif [ $coverage_decision == "chess" ]; then
         echo "Processing with intropolis and chess.gtf for genome annotation"
         echo "Collapsing with the following coverage expression file"
         echo $introplis
 
-        python $SQANTI2_DIR/sqanti_qc2.py -t 30 --gtf $input_dir/$input_gtf $REFERENCE/chess2.2.gtf $REFERENCE/hg38.fa --cage_peak $REFERENCE/hg38.cage_peak_phase1and2combined_coord.bed --polyA_motif_list $SQANTI2_DIR/../human.polyA.list.txt --coverage $introplis --fl_count $input_abundance &> $input_tofu_prefix.sqanti.qc.log
+        python $SQANTI2_DIR/sqanti_qc2.py -t 30 --gtf $input_dir/$input_gtf $REFERENCE/chess2.2.gtf $REFERENCE/hg38.fa --cage_peak $REFERENCE/hg38.cage_peak_phase1and2combined_coord.bed --polyA_motif_list $SQANTI2_DIR/../human.polyA.list.txt --coverage $introplis --fl_count $input_abundance &>> $input_tofu_prefix.sqanti.qc.log
 
     elif [ $coverage_decision == "lncrna" ]; then
         echo "Processing with intropolis and gencode.v31.long_noncoding_RNAs.gtf for genome annotation"
         echo "Collapsing with the following coverage expression file"
         echo $introplis
 
-        python $SQANTI2_DIR/sqanti_qc2.py -t 30 --gtf $input_dir/$input_gtf $REFERENCE/gencode.v31.long_noncoding_RNAs.gtf $REFERENCE/hg38.fa --cage_peak $REFERENCE/hg38.cage_peak_phase1and2combined_coord.bed --polyA_motif_list $SQANTI2_DIR/../human.polyA.list.txt --coverage $introplis --fl_count $input_abundance &> $input_tofu_prefix.sqanti.qc.log
+        python $SQANTI2_DIR/sqanti_qc2.py -t 30 --gtf $input_dir/$input_gtf $REFERENCE/gencode.v31.long_noncoding_RNAs.gtf $REFERENCE/hg38.fa --cage_peak $REFERENCE/hg38.cage_peak_phase1and2combined_coord.bed --polyA_motif_list $SQANTI2_DIR/../human.polyA.list.txt --coverage $introplis --fl_count $input_abundance &>> $input_tofu_prefix.sqanti.qc.log
 
     else
         echo "ERROR: Require 4th argument to be either: own_rnaseq OR intropolis OR chess"
         return
     fi
+    
+    mkdir $1"_QC_PNG" $1"_FILTER_PNG"
+    mv *png* $1"_QC_PNG/"    
 
     # sqanti filter
     echo "Processing Sample $input_tofu_prefix for SQANTI2 filter"
-    python $SQANTI2_DIR/sqanti_filter2.py $input_tofu_prefix"_classification.txt" $input_tofu_prefix"_corrected.fasta" $input_tofu_prefix"_corrected.gtf" -a 0.6 -c 3 &> $input_tofu_prefix.sqanti.filter.log
+    python $SQANTI2_DIR/sqanti_filter2.py $input_tofu_prefix"_classification.txt" $input_tofu_prefix"_corrected.fasta" $input_tofu_prefix"_corrected.gtf" -a 0.6 -c 3 &>> $input_tofu_prefix.sqanti.filter.log
 
+    mv *png* $1"_FILTER_PNG/"
 }
 
 ################################################################################################
-#************************************* TAMA [Function 8, 9]
+#************************************* TAMA [Function 11, 12]
 # TAMA_remove_fragments <input_collapsed.filtered.gff> <input/output_prefix_name> <input/output_dir>
 # remove short fragments from post tofu
 # Prerequisite: Require TAMA_prepare.R to change column 4 of bed12 to gene_name: transcript_name for correct file TAMA format
@@ -429,6 +441,123 @@ TAMA_sqanti_filter(){
   # extract fasta sequence based on the pbid (https://www.biostars.org/p/319099/)
   # script.py <path/sqanti_filtered.fasta> <path/retained_pbid_tama.txt> <path/output.fasta>
   cd $8
-  awk '{ print $4 }' $1| cut -d ";" -f 2  > tama_retained_pbid.txt
-  python $GENERALFUNC/TAMA/tama_sqanti_fastasubset.py $2/$5 $8/tama_retained_pbid.txt $8/$7"_sqantifiltered_tamafiltered_classification.fasta"
+  awk '{ print $4 }' $1| cut -d ";" -f 2  > $7_tama_retained_pbid.txt
+  python $GENERALFUNC/TAMA/tama_sqanti_fastasubset.py $2/$5 $8/$7_tama_retained_pbid.txt $8/$7"_sqantifiltered_tamafiltered_classification.fasta"
+  
+  # generate file 
+  SQ_Report=/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/softwares/Post_Isoseq3/SQANTI2/utilities/SQANTI_report2.R
+  Rscript $SQ_Report $8/$7"_sqantitamafiltered.classification.txt" $8/$7"_sqantitamafiltered.junction.txt"
+  
+  mkdir $7"_PNG"
+  mv *png* $7"_PNG"
 }
+
+################################################################################################
+#************************************* QC [Function 13]
+# ccs_bam2fasta: convert ccs_bam to fasta
+# ccs_bam2fasta <sample_name> <input_ccs.bam_dir> <output_dir>
+# output file = <sample_name>.ccs.fasta
+ccs_bam2fasta(){
+
+    source activate sqanti2_py3
+    bam2fastq --version
+
+    echo "Converting CCS of sample $1 from bam to fasta"
+    ccs_file=$(find $2 -name "*.bam" | grep $1)
+    echo $ccs_file
+    cd $3
+    bam2fasta -u -o $1".ccs" $ccs_file &>> $1.bam2fasta.log
+
+    echo "Extracting length of Sample $1 CCS"
+    CUPCAKE=/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/softwares/Post_Isoseq3/cDNA_Cupcake
+    export PYTHONPATH=$PYTHONPATH:$CUPCAKE/sequence
+    export PATH=$PATH:$CUPCAKE/sequence
+    get_seq_stats.py $1".ccs.fasta" &>> $1.ccs.get_seq.log
+
+    source deactivate
+}
+
+# make_file_for_rarefaction <sample_name_prefix> <input_tofu_directory> <input_sqanti_tama_directory> <working_directory>
+make_file_for_rarefaction(){
+    source activate cupcake
+    CUPCAKE_ANNOTATION=/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/softwares/Post_Isoseq3/cDNA_Cupcake/annotation
+
+  	cd $4
+  	echo "Working with $1"
+    prefix=$1.collapsed
+  	# make_file_for_subsampling_from_collapsed.py <sample_name_prefix>.input.file <sample_name_prefix>.output.file <sample_name_prefix>.classification.txt
+  	python $CUPCAKE_ANNOTATION/make_file_for_subsampling_from_collapsed.py -i $2/$prefix -o $1.subsampling -m2 $3/$1_sqantitamafiltered.classification.txt &>> $1.makefile.log
+    python $CUPCAKE_ANNOTATION/subsample.py --by refgene --min_fl_count 2 --step 1000 $1.subsampling.all.txt > $1.rarefaction.by_refgene.min_fl_2.txt 
+    python $CUPCAKE_ANNOTATION/subsample.py --by refisoform --min_fl_count 2 --step 1000 $1.subsampling.all.txt > $1.rarefaction.by_refisoform.min_fl_2.txt
+  	python $CUPCAKE_ANNOTATION/subsample_with_category.py --by refisoform --min_fl_count 2 --step 1000 $1.subsampling.all.txt > $1.rarefaction.by_refisoform.min_fl_2.by_category.txt
+
+    source deactivate
+}
+
+# parse_stats_per_sample <input_ccs.bam_dir> <Input_LIMA_directory> <output_prefix_name> <oldchem/newchem>
+parse_stats_per_sample(){
+
+    # variable
+    CCS_dir=$1
+    LIMA_dir=$2
+    output_name=$3
+    chem=$4
+    samples=$(echo "${@:5}")
+   
+   # ccs report of samples
+    all_report=$(
+        for i in ${samples[@]}; do
+            name=$(find $CCS_dir -name "*ccs_report.txt" -exec basename \{} \; | grep ^$i )
+            report=$(find $CCS_dir -name "*ccs_report.txt" | grep "$name" )
+            echo $report
+        done
+    )
+    
+    # use different ccs python script for different ccs versions (due to different seqeuncing chemistries)
+
+    FUNCTIONS=/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/Scripts/General/2_Transcriptome_Annotation
+    
+    if [ $chem == "oldchem" ]; then
+      source activate sqanti2
+      echo "Stats of: $samples"
+      mkdir $CCS_dir/oldchem_ccs 
+      for f in ${all_report[@]}; do cp $f $CCS_dir/oldchem_ccs ; done 
+      python $FUNCTIONS/IsoSeq_QC/CCS_OldChem.py $CCS_dir/oldchem_ccs $CCS_dir/oldchem_ccs/ $output_name"_oldchem"
+    elif [ $chem == "newchem" ]; then 
+      source activate sqanti2_py3
+      echo "Stats of: $samples"
+      mkdir $CCS_dir/newchem_ccs 
+      for f in ${all_report[@]}; do cp $f $CCS_dir/newchem_ccs ; done 
+      python $FUNCTIONS/IsoSeq_QC/CCS.py $CCS_dir/newchem_ccs "" $output_name"_newchem"
+    else 
+      echo "4th argument required as newchem/oldchem"
+    fi 
+    
+    python $FUNCTIONS/IsoSeq_QC/LIMA.py $LIMA_dir "" $output_name
+    source deactivate
+}
+
+
+## Merged 
+# parse_ccs_merged_samples <sample_ccs_dir/*ccs.fasta> <sample_output_prefix> <output_dir>
+# Aim: To merge all the ccs.fasta files to see the merged distribution per sample 
+# Prerequisite: run parse_ccs_per_sample as require ccs.fasta as input 
+parse_ccs_merged_samples(){
+
+    source activate sqanti2_py3    
+    cd $3
+
+    echo "Merging the following fasta files to $2_merged.fasta"
+    ls $1/*fasta 
+
+    cat $1/*fasta > $2_merged.fasta
+    
+    CUPCAKE=/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/softwares/Post_Isoseq3/cDNA_Cupcake
+    export PYTHONPATH=$PYTHONPATH:$CUPCAKE/sequence
+    export PATH=$PATH:$CUPCAKE/sequence
+    get_seq_stats.py $2_merged.fasta 2> $2_merged.ccs.get_seq.log
+    mv $2_merged.fasta.seqlengths.txt $2_merged.fastq.seqlengths.txt  # for consistent file naming as fastq for downstream processing in rscript for plots
+
+    source deactivate
+}
+

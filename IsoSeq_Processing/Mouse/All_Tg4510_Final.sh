@@ -2,7 +2,7 @@
 #SBATCH --export=ALL # export all environment variables to the batch job
 #SBATCH -D . # set working directory to .
 #SBATCH -p mrcq # submit to the parallel queue
-#SBATCH --time=30:00:00 # maximum walltime for the job
+#SBATCH --time=15:00:00 # maximum walltime for the job
 #SBATCH -A Research_Project-MRC148213 # research project to submit under
 #SBATCH --nodes=1 # specify number of nodes
 #SBATCH --ntasks-per-node=16 # specify number of processors per node
@@ -25,7 +25,9 @@ ERCC=/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcrip
 #cd $PostIsoseq3_WKD/SQANTI2; mkdir GENOME LNCRNA
 #cd $PostIsoseq3_WKD/TAMA; mkdir GENOME LNCRNA
 #cd $PostIsoseq3_WKD/SQANTI_TAMA_FILTER; mkdir GENOME LNCRNA
-#cd $RNASeq_WKD; mkdir MAPPED STRINGTIE KALLISTO SQANTI2
+#cd $RNASeq_WKD; mkdir MAPPED 
+#cd $RNASeq_WKD; mkdir STRINGTIE KALLISTO SQANTI2
+
 
 # sourcing functions script and input directories
 FUNCTIONS=/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/Scripts/Whole_Transcriptome_Paper/IsoSeq_Processing/Mouse
@@ -85,6 +87,11 @@ TAMA_sqanti_filter $PostIsoseq3_WKD/TAMA/GENOME/WholeIsoSeq.bed $PostIsoseq3_WKD
 
 TAMA_sqanti_filter $PostIsoseq3_WKD/TAMA/LNCRNA/WholeIsoSeq.bed $PostIsoseq3_WKD/SQANTI2/LNCRNA $sqname"_classification.txt" $sqname".gtf" $sqname".fasta" $sqname"_junctions.txt" WholeIsoSeq $PostIsoseq3_WKD/SQANTI_TAMA_FILTER/LNCRNA
 
+
+source activate sqanti2_py3
+SQ_Report=/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/softwares/Post_Isoseq3/SQANTI2/utilities/SQANTI_report2.R
+cd $PostIsoseq3_WKD/SQANTI_TAMA_FILTER/GENOME; Rscript $SQ_Report WholeIsoSeq_sqantitamafiltered.classification.txt WholeIsoSeq_sqantitamafiltered.junction.txt $>> WholeIsoSeq_sqantitamafiltered.sq_qc.log
+cd $PostIsoseq3_WKD/SQANTI_TAMA_FILTER/LNCRNA; Rscript $SQ_Report WholeIsoSeq_sqantitamafiltered.classification.txt WholeIsoSeq_sqantitamafiltered.junction.txt $>> WholeIsoSeq_sqantitamafiltered.sq_qc.log
 ################################################################################################
 echo "#************************************* ERCC [Function 13]"
 ## 13) run_ERCC_analysis <sample_prefix_input/output_name> <isoseq3_input_directory>
@@ -93,7 +100,7 @@ run_ERCC_analysis WholeIsoSeq $Isoseq3_WKD/MERGED_CLUSTER $ERCC
 ################################################################################################
 echo "#************************************* QC [Function 14,15,16]"
 ## 14) make_file_for_rarefaction <sample_name_prefix> <input_tofu_directory> <input_sqanti_tama_directory> <working_directory>
-make_file_for_rarefaction WholeIsoSeq $PostIsoseq3_WKD/TOFU $PostIsoseq3_WKD/SQANTI_TAMA_FILTER/GENOME $PostIsoseq3_WKD/RAREFACTION
+#make_file_for_rarefaction WholeIsoSeq $PostIsoseq3_WKD/TOFU $PostIsoseq3_WKD/SQANTI_TAMA_FILTER/GENOME $PostIsoseq3_WKD/RAREFACTION
 
 # CCS and LIMA stats
 ## 15) parse_stats_per_sample <input_ccs.bam_dir> <Input_LIMA_directory> <output_prefix_name>
