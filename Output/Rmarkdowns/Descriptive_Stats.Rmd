@@ -1,0 +1,730 @@
+---
+title: "Descriptive Stats"
+author: Szi Kay Leung
+date: "`r Sys.Date()`"
+knit: (function(inputFile, encoding) { 
+      rmarkdown::render(inputFile,
+                        encoding=encoding, 
+                        output_file=paste0("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/Isoseq_Paper/Rmarkdowns",
+                        '/Descriptive_stats.html')) })
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: hide
+---
+
+```{r setup, include=FALSE, results="hide"}
+# 01/08/2020: NMD; added additional rows for percentages and more descriptions 
+
+knitr::opts_chunk$set(echo = TRUE,fig.width=14, fig.height= 7)
+
+list_of_packages <- c("ggplot2", "scales", "reshape", "gridExtra", "grid", "dplyr","stringr","viridis","extrafont","tidyr","purr","DT")
+req_packages <- list_of_packages[!(list_of_packages %in% installed.packages()[,"Package"])]
+if(length(req_packages)) install.packages(req_packages, repo="http://cran.rstudio.com/")
+
+suppressMessages(library(ggplot2))
+suppressMessages(library(scales))
+suppressMessages(library(reshape2))
+suppressMessages(library(gridExtra))
+suppressMessages(library(grid))
+suppressMessages(library(dplyr))
+suppressMessages(library(stringr)) 
+suppressMessages(library(viridis)) 
+suppressMessages(library(extrafont))
+suppressMessages(library(tidyr))
+suppressMessages(library(purrr))
+suppressMessages(library(DT))
+suppressMessages(library(plotly))
+suppressMessages(library(pheatmap))
+suppressMessages(library(devtools))
+#suppressMessages(library(easyGgplot2))
+suppressMessages(library(knitr))
+#suppressMessages(library(kableExtra))
+
+#font_import()
+```
+**Aims**: Tabulate descriptive stats from SQANTI2 classification files (pre and post-filtering):\
+1. Number of genes and isoforms (by structural category) as according to SQANTI2 report\
+2. Transcript Size (independent of structural category) \
+3. Coding vs Non coding isoforms \
+4. Unnannotated Genes \
+5. Cage peaks 
+
+
+```{r input, include = FALSE}
+#********************** Variables and input files
+#output_dir <- "/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/Isoseq_Paper/QC_Plots"
+#output_dir_tables <- "/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/Isoseq_Paper/Tables"
+
+source("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/Scripts/Whole_Transcriptome_Paper/Output/Input_Variables.R")
+sqanti_files()
+hipstr_sqanti_files()
+class.files <- list(class.files$Human,class.files$Adult,class.files$Fetal,class.files$Mouse)
+names(class.files) <- c("Human","Adult","Fetal","Mouse")
+
+```
+
+## Input SQANTI2 classificiation files
+
+**Mouse** - *`r class.names.files$Mouse`* \
+\
+**Adult Human** - *`r class.names.files$Adult`*, \
+\
+**Fetal Human** - *`r class.names.files$Fetal`*, \
+\
+
+
+```{r}
+## Functions
+
+# tabulating_sqanti_num: tabulating sqanti number of genes and isoforms
+# input: list of classification file of all datasets (already read.table) 
+# output: aggregated table of stats across all datasets
+tabulating_sqanti_num <- function(type_class_file){
+  dat <- data.frame()
+  count=1
+  for(i in type_class_file){
+    # Total Unique Isoforms: tabulated by number of rows
+    isoforms <- dim(i)[1]
+    # Total Unique Genes: Remove novel genes and count 
+    annotated_genes <- i[!grepl("NOVELGENE",i$associated_gene),] %>% count(associated_gene) %>% nrow(.)
+    # Total Novel Genes: 
+    novel_genes <- i[grepl("NOVELGENE",i$associated_gene),] %>% count(associated_gene) %>% nrow(.)
+    # Total Number of genes 
+    total_genes <- annotated_genes + novel_genes
+    # FSM % of isoforms 
+    FSM <- round(nrow(i[i$structural_category == "FSM",])/dim(i)[1]*100,2)
+    # Number of isoforms (Range per Gene)
+    isoform_count <- i %>% count(associated_gene) 
+    min_isoform_count <- min(isoform_count$n)
+    max_isoform_count <- max(isoform_count$n)
+    # Number of Genes with >1 isoform
+    num_isoform_morethanone <- nrow(isoform_count[isoform_count$n > 1,])
+    num_isoform_morethanten <- nrow(isoform_count[isoform_count$n > 10,]) 
+    perc_isoform_morethanone <- round((isoform_count[isoform_count$n > 1,] %>% nrow())/total_genes * 100, 2)
+    perc_isoform_morethanten <- round((isoform_count[isoform_count$n > 10,] %>% nrow())/total_genes * 100, 2)
+    
+    # percentage of annotated and novel genes 
+    annotated_genes <- paste0(annotated_genes, " (", round(annotated_genes/total_genes * 100,2), "%)")
+    novel_genes <- paste0(novel_genes, " (", round(novel_genes/total_genes * 100,2), "%)")
+    
+    # Number of Annotated Isoforms (FSM, ISM) 
+    annotated_isoforms <- paste0(nrow(i[i$associated_transcript != "novel",])," (",
+                                 round(nrow(i[i$associated_transcript != "novel",])/isoforms * 100,2),"%)")
+    novel_isoforms <- paste0(nrow(i[i$associated_transcript == "novel",])," (",
+                             round(nrow(i[i$associated_transcript == "novel",])/isoforms * 100,2),"%)")
+    
+    # Number of genes associated with novel isoforms 
+    gene_novel_isoforms <- length(unique(i[i$associated_transcript == "novel","associated_gene"]))
+    perc_gene_novel_isoforms <- round(gene_novel_isoforms/total_genes * 100,2)
+    
+    # Number of genes associated with known isoforms 
+    gene_known_isoforms <- length(unique(i[i$associated_transcript != "novel","associated_gene"]))
+    perc_gene_known_isoforms <- round(gene_known_isoforms/total_genes * 100,2)
+  
+    
+    # Number of Novel Isoforms
+    
+    # 9 levels of structural cateogory 
+    struct <- vector("numeric", 9)
+    for(num in 1:length(levels(i$structural_category))){
+      cate <- nrow(i[i$structural_category == levels(i$structural_category)[num],])
+      struct[num] <- paste0(cate, " (",
+                            round(cate/dim(i)[1]*100,2),"%)") 
+    }
+    
+    dat[1:12,count] <- rbind(total_genes,annotated_genes, novel_genes, isoforms, FSM, 
+                             paste(min_isoform_count, max_isoform_count, sep = "-"),
+                             paste0(num_isoform_morethanone, " (", perc_isoform_morethanone,"%)"),
+                             paste0(num_isoform_morethanten, " (", perc_isoform_morethanten, "%)"),
+                             annotated_isoforms, novel_isoforms,
+                             paste0(gene_novel_isoforms, " (", perc_gene_novel_isoforms, "%)"),
+                             paste0(gene_known_isoforms, " (", perc_gene_known_isoforms, "%)"))
+    dat[13:21,count] <- struct
+    colnames(dat)[count] <- names(type_class_file)[count]
+    count = count + 1
+  }
+  
+  row.names(dat) <- append(c("Total Number of Genes", "Annotated Genes","Novel Genes","Total Number of Isoforms", "Percentage of FSM", "Number of Isoforms per Gene", "Genes with > 1 Isoform", "Genes with > 10 Isoforms","Annotated Isoforms", "Novel Isoforms", "Genes associated with Novel Isoforms",
+                             "Genes associated with Known Isoforms"),
+                           levels(i$structural_category))
+  dat
+}
+
+# length_transcripts: tabulating transcript length (/size)
+  # input: list of classification file of all datasets (already read.table) 
+  # output: aggregated table of stats across all datasets
+length_transcripts <- function(type_class_file){
+  std <- function(x) sd(x)/sqrt(length(x))
+  count=1
+  dat <- data.frame()
+  for(i in type_class_file){
+    dat[1:9, count] <- c(round(median(i$length)), round(mean(i$length)), round(sd(i$length)), min(i$length), max(i$length), round(std(i$length),2),round(mean(i$exons),2), min(i$exons),max(i$exons))
+    dat[10, count] <- paste0(round(mean(i$length))," (s.d = ", round(sd(i$length)), ", range = ", min(i$length), "-",  max(i$length), ")")
+    colnames(dat)[count] <- names(type_class_file)[count]
+    count = count + 1
+    }
+  
+  row.names(dat) <- c("Median","Mean", "Standard Deviation", "Min", "Max", "SE", "Mean_num_exons","Min_num_exons","Max_num_exons","Summary")
+  dat 
+}
+
+# coding_potential: tabulating number of coding and non-coding isoforms
+  # input: list of classification file of all datasets (already read.table) 
+  # output: aggregated table of stats across all datasets
+coding_potential <- function(type_class_file){
+  dat <- data.frame()
+  count=1
+  for(i in type_class_file){
+    # number of isoforms, number of coding isoforms, number of non-coding isoforms
+    dat[1:5, count] <- c(nrow(i), 
+                         nrow(i[i$coding == "coding",]), 
+                         round(nrow(i[i$coding == "coding",])/nrow(i)*100,2),
+                         nrow(i[i$coding == "non_coding",]),
+                         round(nrow(i[i$coding == "non_coding",])/nrow(i)*100,2))
+    
+    colnames(dat)[count] <- names(type_class_file)[count]
+    count = count + 1
+  }
+  row.names(dat) <- c("Total Number of Isoforms", "Number of Coding Isoforms", 
+                      "Percentage of Coding Isoforms", "Number of Non-coding Isoforms", "Percentage of Non-coding Isoforms" )
+  dat
+}
+
+novelGene_attribute <- function(dat){
+  dat <- dat[grepl("NOVELGENE",dat$associated_gene),]
+  #dat$novelGene <- "Annotated Genes"
+  #dat[grepl("novelGene", dat$associated_gene), "novelGene"] <- "Novel Genes"
+  #dat$novelGene = factor(dat$novelGene, levels = c("Novel Genes","Annotated Genes"), ordered=TRUE)
+  # Number of transcripts per novel gene
+  dat$PB.gene.id <- paste0("PB.",word(dat$isoform, c(2), sep = fixed ('.')),"_",dat$Sample)
+  return(dat)
+}
+
+novelGene_characterisation <- function(dat){
+    relevant_cols <- c("structural_category", "associated_gene","subcategory", "novelGene","all_canonical","min_sample_cov","coding","PB.gene.id")
+    # obtain gene_id and whether coding
+    dat <- data.frame(dat[grepl("NOVELGENE",dat$associated_gene),relevant_cols])
+    dat %>% group_by(PB.gene.id) %>% tally()
+    unique_coding <- unique(dat[,c("PB.gene.id","coding","associated_gene")])
+    datFreq <- data.frame(table(dat$PB.gene.id))
+    datFreq <- merge(datFreq, unique_coding, by.x = "Var1", by.y = "PB.gene.id", all = TRUE)
+    datFreq
+}
+
+novelGene_stats <- function(type_class_file){
+  count=1
+  stats <- data.frame()
+  for(i in type_class_file){
+    dat <- data.frame(i[i$novelGene == "Novel Genes",])
+    datFreq <- data.frame(table(dat$PB.gene.id))
+    # number of novel/unnannotated genes 
+    stats[1,count] <- c(nrow(datFreq))
+    # number of novel transcripts in novel genes
+    stats[2,count] <- c(nrow(dat))
+    # number of multiexonic vs monoexonic transcripts 
+    stats[3,count] <- count(dat[dat$subcategory == "multi-exon",])
+    stats[4,count] <- count(dat[dat$subcategory == "mono-exon",])
+    # number of multiexonic transcripts with canonical junctions
+    stats[5,count] <- count(dat[dat$subcategory == "multi-exon" & dat$all_canonical == "canonical",])
+    # number of novel/unnannotated genes with more than one isoform 
+    stats[6,count] <- nrow(datFreq[datFreq$Freq > 1,])
+    # number of novel transcripts coding vs non_coding
+    stats[7, count] <- count(dat[dat$coding == "coding",])
+    stats[8, count] <- count(dat[dat$coding == "non_coding",])
+    
+    colnames(stats)[count] <- names(type_class_file)[count]
+    count = count + 1
+  }
+  
+  rownames(stats) <- c("Number of Novel/Unannotated Genes",
+                       "Number of Novel/Unannotated Transcripts",
+                       "Number of Multi-exonic Novel/Unnannotated Transcripts",
+                       "Number of Mono-exonic Novel/Unnanotated Transcripts", 
+                       "Number of Multi-exonic Novel/Unnanotated Transcripts with canonical junctions",
+                       "Number of Novel/Unannotated Transcripts with >1 isoform", 
+                       "Number of Novel/Unannotated Coding Transcripts",
+                       "Number of Novel/Unnannotated Non Coding Transcripts"
+                       )
+  stats
+}
+
+cage_stats <- function(type_class_file){
+  count=1
+  stats <- data.frame()
+  for(i in type_class_file){
+    # within cage peak 50 bp
+    stats[1,count] <- count(i[abs(i$dist_to_cage_peak) <= 50,])
+    stats[2,count] <- round(stats[1,count]/nrow(i)*100,2)
+    colnames(stats)[count] <- names(type_class_file)[count]
+    count = count + 1
+  }
+  rownames(stats) <- c("Number of Transcripts within cage peak", "Percentage of Transcripts within cage peak")
+  stats
+}
+
+
+# no_novel_transcripts_annotated_genes: tabulates number of novel transcripts of annotated genes only
+  # input: list of classification file of all datasets (already read.table), subset of annotated_genes
+  # output: aggregated table of stats across all datasets
+no_novel_transcripts_annotated_genes <- function(type_class_file){
+  count=1
+  dat <- data.frame()
+  for(i in type_class_file){
+    total_num_transcripts <- nrow(i)
+    total_num_known_genes <- i %>% group_by(associated_gene) %>% count() %>% nrow() 
+    no_novel_transcripts <- i[i$associated_transcript == "novel",] %>% nrow(.)
+    no_annotated_transcripts <- i[i$associated_transcript != "novel",] %>% nrow(.)
+    perc <- round(no_novel_transcripts/(no_novel_transcripts + no_annotated_transcripts) * 100 , 2)
+    no_genes_associated_novel_transcripts <- length(unique(i[i$associated_transcript == "novel","associated_gene"]))
+    no_genes_associated_known_transcripts <- length(unique(i[i$associated_transcript != "novel","associated_gene"]))
+    perc_genes_associated_novel_transcripts <- round(no_genes_associated_novel_transcripts/total_num_known_genes*100,2)
+    perc_genes_associated_known_transcripts <- round(no_genes_associated_known_transcripts/total_num_known_genes*100,2)
+    
+    
+    dat[1:6, count] <- c(paste0(no_novel_transcripts," (", round(no_novel_transcripts/total_num_transcripts*100,2),"%)"),
+                         paste0(no_annotated_transcripts," (", round(no_annotated_transcripts/total_num_transcripts*100,2),"%)"),
+                         total_num_known_genes,
+                         total_num_transcripts,
+                         paste0(no_genes_associated_novel_transcripts," (", perc_genes_associated_novel_transcripts,"%)"),
+                         paste0(no_genes_associated_known_transcripts," (",  perc_genes_associated_known_transcripts,"%)"))
+    colnames(dat)[count] <- names(type_class_file)[count]
+    count = count + 1
+    }
+  
+  row.names(dat) <- c("No of Novel Transcripts", "No of Known Transcripts", 
+                      "No of Annotated Genes", "Number of Transcripts associated with Annotated Genes",
+                      "No of Annotated Genes associated with Novel Transcripts",
+                      "No of Annotated Genes associated with Annotated Transcripts")
+  dat 
+}
+
+NMD <- function(type_class_file){
+  count=1
+  dat <- data.frame()
+  for(i in type_class_file){
+    # subset transcripts whether from annotated or novel genes
+    annotated_genes <- i[!grepl("NOVEL", i$associated_gene),]
+    novel_genes <- i[grepl("NOVEL", i$associated_gene),]
+    
+    # Annotated Genes, NMD transcripts
+    NMD_transcripts_annotated_genes <- annotated_genes %>% filter(predicted_NMD == "TRUE")
+    non_NMD_transcripts_annotated_genes <- annotated_genes %>% filter(predicted_NMD == "FALSE")
+    # Novel Genes, NMD transcripts 
+    NMD_transcripts_novel_genes <- novel_genes %>% filter(predicted_NMD == "TRUE")
+    
+    dat[1:6, count] <- c(length(unique(annotated_genes$associated_gene)),
+                         paste0(nrow(NMD_transcripts_annotated_genes)," (", round(nrow(NMD_transcripts_annotated_genes)/nrow(annotated_genes) * 100, 2),"%)"),
+                         paste0(length(unique(NMD_transcripts_annotated_genes$associated_gene))," (", 
+                                round(length(unique(NMD_transcripts_annotated_genes$associated_gene))/length(unique(annotated_genes$associated_gene)) * 100, 2),"%)"),
+                        
+                         # Stats of Novel Genes NMD transcripts 
+                         length(unique(novel_genes$associated_gene)),
+                         paste0(nrow(NMD_transcripts_novel_genes)," (", round(nrow(NMD_transcripts_novel_genes)/nrow(novel_genes) * 100, 2),"%)"),
+                         paste0(length(unique(NMD_transcripts_novel_genes$associated_gene))," (", 
+                                  round(length(unique(NMD_transcripts_novel_genes$associated_gene))/length(unique(novel_genes$associated_gene)) * 100, 2),"%)")
+                                
+    )
+    
+    #####NOTE that the novel genes is counted from the gene names and not the PB.ID so WRONG!
+    colnames(dat)[count] <- names(type_class_file)[count]
+    count = count + 1
+  }
+  
+  row.names(dat) <- c("Annotated Genes", "NMD transcripts of Annotated Genes", "Annotated Genes associated with NMD transcripts",
+                     "Novel Genes", "NMD transcripts of Novel Genes", "Novel Genes associated with NMD transcripts")
+  
+  dat 
+}
+
+IR <- function(type_class_file){
+  dat <- data.frame()
+  count=1
+  for(i in type_class_file){
+    
+    # intron retention 
+    intron_retention <- i[i$subcategory == "intron_retention",]
+    intron_retention_noncoding <- intron_retention[intron_retention$coding == "non_coding",]
+    intron_retention_coding <- intron_retention[intron_retention$coding == "coding",]
+    intron_retention_noncanonical <- intron_retention[intron_retention$all_canonical == "non_canonical",]
+    intron_retention_canonical <- intron_retention[intron_retention$all_canonical == "canonical",]
+    
+    intron_retention_gene_num <- nrow(intron_retention %>% group_by(associated_gene) %>% tally())
+    
+    # Total Unique Isoforms: tabulated by number of rows
+    isoforms <- dim(i)[1]
+    # Total Unique Genes: Remove novel genes and count 
+    annotated_genes <- i[!grepl("NOVELGENE",i$associated_gene),] %>% count(associated_gene) %>% nrow(.)
+    # Total Novel Genes: 
+    novel_genes <- i[grepl("NOVELGENE",i$associated_gene),] %>% count(associated_gene) %>% nrow(.)
+    # Total Number of genes 
+    total_genes <- annotated_genes + novel_genes
+    
+    
+    dat[1:4,count] <- rbind(paste0(nrow(intron_retention)," (",                                           
+                            round(nrow(intron_retention)/isoforms*100,2),"%)"),        
+                            
+                            paste0(as.integer(intron_retention_gene_num)," (",                            
+                            round(intron_retention_gene_num/total_genes * 100, 2),"%)"), 
+                            
+                            paste0(nrow(intron_retention_coding)," (", 
+                            round(nrow(intron_retention_coding)/nrow(intron_retention)*100,2),"%)"), 
+                            
+                            paste0(nrow(intron_retention_canonical)," (", 
+                            round(nrow(intron_retention_canonical)/nrow(intron_retention)*100,2),"%)")
+                            )
+    colnames(dat)[count] <- names(class.files)[count]
+    count = count + 1
+  }
+  rownames(dat) <- c("Isoforms with Intron Retention", 
+                     "Total Genes with Intron Retention",
+                     "Isoforms with Intron Retention that are coding", 
+                     "Isoforms with Intron Retention that have canonical splice junctions"
+                     )
+  return(dat)
+}
+
+```
+
+## All Genes
+Table 1) and 2) refers to reported numbers from SQANTI2(v6) \
+Table 3) and 4) reports on length (mean, standard deviation, min and max) of all transcripts (independent from structural cateogory) from SQANTI2(v6) \
+**Also tabulate FSM transcripts only?** \
+Table 5) and 6) reports on number of coding and non-coding isoforms (independent from structural cateogory) from SQANTI2(v6)
+Table 7) reports more stats on genes not previously known/annotated to genome (i.e. Unnannotated/Novel genes). \
+*Note: discrepancy in numbers of novel genes to that reported to SQANTI report due to misnaming*
+Table 8) and 9) reports the number and % of transcripts within cage peaks (independent of structural category)
+
+
+### Number of Genes/Isoforms
+```{r}
+datatable(tabulating_sqanti_num(class.files), caption = 'Table 2: Reported numbers from SQANTI classification file, post-filtering')
+datatable(tabulating_sqanti_num(hipstr.class.files), caption = 'Table 3: Reported numbers from SQANTI classification file, post-filtering')
+```
+
+#### Mouse 
+Number of isoforms detected per sample
+
+```{r}
+mouse_iso <- class.files$Mouse %>% select(starts_with("FL.")) %>% apply(.,2, function(x) length(which(x == "0"))) %>% melt() %>% mutate(sample = row.names(.)) %>% mutate(phenotype = word(sample, c(2), sep = "_")) %>% .[,c(2,3,1)]
+mouse_iso
+```
+
+Mean number of isoforms: `r mean(mouse_iso$value)/1000`K
+sd: `r sd(mouse_iso$value)/1000`K
+
+
+### Transcript Size
+
+```{r}
+kbl(length_transcripts(class.files)) %>% kable_styling(bootstrap_options = c("striped", "hover")) 
+```
+
+### Coding vs Non Coding 
+
+
+```{r}
+datatable(coding_potential(class.files), caption = 'Table 6: No/% of coding vs non-coding isoforms from SQANTI classification file, post-filtering')
+
+```
+
+### Unannotated Genes 
+
+
+```{r}
+## Miscounts
+# same as report == 138 genes
+#nrow(novelGene_attribute(class.files$Mouse) %>% group_by(associated_gene) %>% tally())
+# different to report == 130 genes
+#nrow(novelGene_attribute(class.files$Mouse) %>% group_by(PB.gene.id) %>% tally())
+# List of novel genes with >2 transcripts
+# novelGene_attribute(class.files$Mouse) %>% group_by(PB.gene.id) %>% tally() %>% .[.$n > 1,1])
+#relevant_cols <- c("structural_category", "associated_gene","subcategory", "novelGene","all_canonical","min_sample_cov","coding","PB.gene.id","chrom","CDS_genomic_start")
+#View(class.files$Mouse[class.files$Mouse$PB.gene.id %in% c("PB.11155_Mouse", #"PB.11352_Mouse","PB.1156_Mouse","PB.1291_Mouse","PB.1427_Mouse","PB.1824_Mouse","PB.2613_Mouse","PB.4554_Mouse","PB.5261_Mouse",  "PB.5996_Mouse", #"PB.5999_Mouse","PB.6012_Mouse","PB.6357_Mouse","PB.6490_Mouse","PB.7609_Mouse","PB.869_Mouse","PB.9791_Mouse"), relevant_cols])
+
+#pre.novel.class.files <- lapply(pre.class.files, function(x) novelGene_attribute(x))
+novel.class.files <- lapply(class.files, function(x) novelGene_attribute(x))
+PostSQANTI_novelGene_stats <- novelGene_stats(novel.class.files)
+
+datatable(PostSQANTI_novelGene_stats, caption = 'Table 7: More descriptive stats on Unnannotated genes from SQANTI classification file, post-filtering')
+datatable(length_transcripts(novel.class.files), caption = 'Stats of transcript lengths from SQANTI classification file, post-filtering')
+
+```
+
+## Cage Peaks
+
+```{r}
+# validation of cage_stats function
+#group_by(pre.class.files$Mouse, within_cage_peak) %>% summarise(count=n(), percentage=round(count/nrow(pre.class.files$Mouse)*100))
+
+datatable(cage_stats(class.files), caption = 'Table 9: Number/% of Transcripts within cage peaks from SQANTI classification file, post-filtering')
+
+# distance to cage peak 
+cat("Median Distance to Cage Peak in Human Cortex:", median(class.files$Human$dist_to_cage_peak, na.rm = T),"\n")
+cat("Median Distance to Cage Peak in Mouse Cortex:", median(class.files$Mouse$dist_to_cage_peak, na.rm = T),"\n")
+cat("Mean Distance to Cage Peak in Human Cortex:", mean(class.files$Human$dist_to_cage_peak, na.rm = T))
+cat("Mean Distance to Cage Peak in Mouse Cortex:", mean(class.files$Mouse$dist_to_cage_peak, na.rm = T))
+cat("Number of Cage Peaks in Mouse Cortex within 50bp:", nrow(class.files$Mouse[abs(class.files$Mouse$dist_to_cage_peak) <= 50,]))
+cat("% of Cage Peaks in Mouse Cortex within 50bp:", nrow(class.files$Mouse[abs(class.files$Mouse$dist_to_cage_peak) <= 50,])/nrow(class.files$Mouse) * 100)
+cat("Number of Cage Peaks in Human Cortex within 50bp:", nrow(class.files$Human[abs(class.files$Human$dist_to_cage_peak) <= 50,]))
+cat("% of Cage Peaks in Human Cortex within 50bp:", nrow(class.files$Human[abs(class.files$Human$dist_to_cage_peak) <= 50,])/nrow(class.files$Human) * 100)
+
+```
+
+## Annotated Genes Only
+
+Table 1) reports Number and % of novel transcripts in annotated genes \ 
+Table 2) further details of cateogories of novel transcripts in annotated genes \
+Table 3) reports on length (mean, standard deviation, min and max) of these transcripts (independent from structural cateogory) \
+**Also tabulate FSM transcripts only?** \
+Table 4) reports on number of coding and non-coding isoforms (independent from structural cateogory) \
+Table 5) reports the number and % of transcripts within cage peaks (independent of structural category)
+
+```{r}
+annotated.class.files <- lapply(class.files, function(x)
+  x[!grepl("NOVELGENE",x$associated_gene),] )
+
+datatable(no_novel_transcripts_annotated_genes(annotated.class.files), caption = "Table 1: Reported numbers of novel transcripts and known transcripts in annotated genes only")
+
+datatable(tabulating_sqanti_num(annotated.class.files))
+```
+
+
+```{r}
+# Subset only novel transcripts of annotated genes for descriptive stats
+annotatedgene_noveltranscripts.class.files <- lapply(annotated.class.files, function(x) x[x$associated_transcript == "novel",])
+annotatedgene_knowntranscripts.class.files <- lapply(annotated.class.files, function(x) x[x$associated_transcript != "novel",])
+
+datatable(tabulating_sqanti_num(annotatedgene_noveltranscripts.class.files), caption = 'Table 2: Reported numbers from SQANTI classification file, post-filtering of only annotated genes, novel transcripts')
+
+datatable(tabulating_sqanti_num(annotatedgene_knowntranscripts.class.files ), caption = 'Table 3: Reported numbers from SQANTI classification file, post-filtering of only annotated genes, annotated transcripts')
+
+datatable(length_transcripts(annotatedgene_noveltranscripts.class.files), caption = 'Table 4: Stats of transcript length from SQANTI classification file, post-filtering of only annotated genes, novel transcripts')
+
+datatable(length_transcripts(annotated.class.files), caption = 'Table 5: Stats of transcript length from SQANTI classification file, post-filtering of all transcripts from annotated genes')
+
+datatable(length_transcripts(annotatedgene_knowntranscripts.class.files), caption = 'Table 6: Stats of transcript length from SQANTI classification file, post-filtering of only annotated genes, annotated transcripts')
+
+datatable(coding_potential(annotatedgene_noveltranscripts.class.files), caption = 'Table 7: No/% of coding vs non-coding isoforms from SQANTI classification file, post-filtering of only annotated genes, novel transcripts')
+
+datatable(cage_stats(annotatedgene_noveltranscripts.class.files), caption = 'Table 8: Number/% of Transcripts within cage peaks from SQANTI classification file, post-filtering of only annotated genes, novel transcripts')
+
+datatable(length_transcripts(lapply(annotated.class.files, function(x) x[x$coding == "coding",])), caption = 'Table 9: Stats of transcript length from SQANTI classification file, post-filtering from SQANTI classification file, post-filtering of only annotated genes, coding transcripts (novel and annotated)')
+
+```
+### Number of known and novel transcripts per gene
+
+```{r}
+no_isoforms_annotated_gene <- function(type_class_file){
+    # table tallying the number of isoforms per annotated gene
+    all_annotated <- type_class_file %>% 
+    group_by(associated_gene) %>%
+    tally() %>%
+    `colnames<-`(c("associated_gene", "Num_of_all_isoforms"))
+    
+    novel_annotated <- type_class_file %>%
+    filter(associated_transcript == "novel") %>%
+    group_by(associated_gene) %>%
+    tally() %>%
+    `colnames<-`(c("associated_gene", "Num_of_novel_isoforms"))
+
+    annotated_genes_no_isoforms <- merge(all_annotated, novel_annotated, by = "associated_gene") %>%
+      mutate(perc = round(Num_of_novel_isoforms/Num_of_all_isoforms * 100,2)) 
+    
+    return(annotated_genes_no_isoforms)
+}
+
+datatable(no_isoforms_annotated_gene(annotated.class.files$Mouse), caption = "Number of known and novel transcripts per gene in Mouse dataset")
+
+#hist(no_isoforms_annotated_gene(annotated.class.files$Mouse)$perc)
+#write.csv(annotated_genes_no_isoforms,paste0(output_dir_tables,"/annotated_genes_no_isoforms.csv"))
+```
+
+## NMD
+```{r}
+datatable(NMD(class.files))
+# Fisher's test
+nmd_novel = nrow(annotatedgene_noveltranscripts.class.files$Mouse %>% filter(predicted_NMD == "TRUE"))
+nmd_anno = nrow(annotatedgene_knowntranscripts.class.files$Mouse %>% filter(predicted_NMD == "TRUE"))
+
+dat <- data.frame(nmd= c("nmd","non_nmd"),
+                  novel = c(nmd_novel,
+                            nrow(annotatedgene_noveltranscripts.class.files$Mouse) - nmd_novel),
+                  annotated = c(nmd_anno,
+                                nrow(annotatedgene_knowntranscripts.class.files$Mouse) - nmd_anno)) %>% 
+  remove_rownames %>% column_to_rownames(var="nmd")
+
+dat
+fisher.test(dat, alternative = "greater")
+
+```
+
+## IR
+```{r}
+datatable(IR(class.files)) 
+```
+
+## Cage peaks 
+```{r}
+annotatedgene_noveltranscripts.class.files <- lapply(annotated.class.files, function(x) x[x$associated_transcript == "novel",])
+annotatedgene_knowntranscripts.class.files <- lapply(annotated.class.files, function(x) x[x$associated_transcript != "novel",])
+cat("Number of novel transcripts of annotated genes Cage Peaks in Mouse Cortex within 50bp:", nrow(annotatedgene_noveltranscripts.class.files$Mouse[abs(annotatedgene_noveltranscripts.class.files$Mouse$dist_to_cage_peak) <= 50,]))
+cat("Number of annotated transcripts of annotated genes Cage Peaks in Mouse Cortex within 50bp:",
+nrow(annotatedgene_knowntranscripts.class.files$Mouse[abs(annotatedgene_knowntranscripts.class.files$Mouse$dist_to_cage_peak) <= 50,]))
+
+# Fisher's test
+within_50_novel = nrow(annotatedgene_noveltranscripts.class.files$Mouse[abs(annotatedgene_noveltranscripts.class.files$Mouse$dist_to_cage_peak) <= 50,])
+within_50_anno = nrow(annotatedgene_knowntranscripts.class.files$Mouse[abs(annotatedgene_knowntranscripts.class.files$Mouse$dist_to_cage_peak) <= 50,])
+
+dat <- data.frame(cage = c("within","without"),
+                  novel = c(within_50_novel,
+                            nrow(annotatedgene_noveltranscripts.class.files$Mouse) - within_50_novel),
+                  annotated = c(within_50_anno,
+                                nrow(annotatedgene_knowntranscripts.class.files$Mouse) - within_50_anno)) %>% 
+  remove_rownames %>% column_to_rownames(var="cage")
+
+dat
+fisher.test(dat)
+
+### FSM and ISM cage peaks
+within_50_FSM <- nrow(class.files$Mouse %>% filter(structural_category == "FSM" & abs(dist_to_cage_peak) <= 50))
+within_50_ISM <- nrow(class.files$Mouse %>% filter(structural_category == "ISM" & abs(dist_to_cage_peak) <= 50))
+dat <- data.frame(cage = c("within","without"),
+                  FSM = c(within_50_FSM,
+                          nrow(class.files$Mouse %>% filter(structural_category == "FSM")) - within_50_FSM),
+                  ISM = c(within_50_ISM,
+                          nrow(class.files$Mouse %>% filter(structural_category == "ISM")) - within_50_ISM)) %>% 
+  remove_rownames %>% column_to_rownames(var="cage")
+
+dat
+fisher.test(dat)
+
+# human
+
+cat("Number of novel transcripts of annotated genes Cage Peaks in Human Cortex within 50bp:", nrow(annotatedgene_noveltranscripts.class.files$Human[abs(annotatedgene_noveltranscripts.class.files$Human$dist_to_cage_peak) <= 50,]))
+
+```
+
+## RNASeq
+
+```{r}
+# Data in two numeric vectors
+novel_rnaseq_exp <- data.frame(value = annotated.class.files$Mouse[annotated.class.files$Mouse$associated_transcript == "novel","iso_exp"]) %>% mutate(type = "novel")
+known_rnaseq_exp <- data.frame(value = annotated.class.files$Mouse[annotated.class.files$Mouse$associated_transcript != "novel","iso_exp"]) %>% mutate(type = "known")
+rnaseq_exp <- bind_rows(novel_rnaseq_exp,known_rnaseq_exp)
+var.test(value ~ type, data = rnaseq_exp) #  no significant difference between the variances of the two sets of data. Therefore, we can use the classic t-test witch assume equality of the two variances.
+res = t.test(value ~ type, data = rnaseq_exp, var.equal = TRUE)
+res
+res$p.value
+```
+
+# TTS and TSS
+
+```{r}
+## TSS
+more_than_1000_novel = nrow(annotatedgene_noveltranscripts.class.files$Mouse[abs(annotatedgene_noveltranscripts.class.files$Mouse$diff_to_gene_TSS) >= 1000,])
+more_than_1000_known = nrow(annotatedgene_knowntranscripts.class.files$Mouse[abs(annotatedgene_knowntranscripts.class.files$Mouse$diff_to_gene_TSS) >= 1000,])
+dat <- data.frame(gene_TSS = c("morethan1000","lessthan1000"),
+                  novel = c(more_than_1000_novel,
+                            nrow(annotatedgene_noveltranscripts.class.files$Mouse) - more_than_1000_novel),
+                  annotated = c(more_than_1000_known,
+                                nrow(annotatedgene_knowntranscripts.class.files$Mouse) - more_than_1000_known)) %>% 
+  remove_rownames %>% column_to_rownames(var="gene_TSS")
+
+dat
+fisher.test(dat, alternative = "greater")
+
+## TTS
+more_than_1000_novel = nrow(annotatedgene_noveltranscripts.class.files$Mouse[abs(annotatedgene_noveltranscripts.class.files$Mouse$diff_to_gene_TTS) >= 1000,])
+more_than_1000_known = nrow(annotatedgene_knowntranscripts.class.files$Mouse[abs(annotatedgene_knowntranscripts.class.files$Mouse$diff_to_gene_TTS) >= 1000,])
+dat <- data.frame(gene_TSS = c("morethan1000","lessthan1000"),
+                  novel = c(more_than_1000_novel,
+                            nrow(annotatedgene_noveltranscripts.class.files$Mouse) - more_than_1000_novel),
+                  annotated = c(more_than_1000_known,
+                                nrow(annotatedgene_knowntranscripts.class.files$Mouse) - more_than_1000_known)) %>% 
+  remove_rownames %>% column_to_rownames(var="gene_TSS")
+
+dat
+fisher.test(dat, alternative = "less")
+
+novel_annotated_sites <- function(feature){
+  prepare_hist_breaks <- function(dat, feature){
+      dat <- dat %>% .[!is.na(.[[feature]]),] # remove NAs for that specific feature 
+      
+      # settting the breaks for the histogram
+      # threshold is for replacing >200, whic differs for each feature and dataset
+      diff_max <- max(max(abs(dat[[feature]])), max(abs(dat[[feature]])))
+      diff_breaks <- c(-(diff_max+1), seq(-200, 200, by = 20), diff_max+1)
+      dat$diff <- cut(-(dat[[feature]]), breaks = diff_breaks) 
+      threshold <- paste(formatC(diff_breaks[1], format = "g", digits = 3))
+      
+      # formatting of the x-axis to grab the first number, between the brackets
+      dat$diff2 <- gsub("]", "", paste(dat$diff))
+      dat$diff2 <- word(dat$diff2,c(2),  sep = fixed ('('))
+      dat$diff2 <- word(dat$diff2,c(1),  sep = fixed (','))
+      dat$diff2 <- as.factor(dat$diff2)
+      
+      levels(dat$diff2)[match(threshold,levels(dat$diff2))] <- ">-220"
+      dat$diff2 <- factor(dat$diff2,
+                          levels = c(">-220","-200","-180","-160","-140","-120",
+                                     "-100","-80","-60","-40","-20","0",
+                                     "20","40", "60", "80","100",
+                                     "120","140","160","180","200" ))
+      return(dat)
+  }
+ 
+  x_label <- 
+        if(feature == "diff_to_TSS"){paste("Distance to Annotated Transcription Start Site (bp)")}else{
+          if(feature == "dist_to_cage_peak"){paste("Distance to Annotated CAGE Peak (bp)")}else{
+            if(feature == "diff_to_TTS"){paste("Distance to Annotated Transcription Termination Site (bp)")}else{
+              if(feature == "diff_to_gene_TTS"){paste("Distance to any Annotated Transcription Termination Site (bp)")}else{
+                if(feature == "diff_to_gene_TSS"){paste("Distance to any Annotated Transcription Start Site (bp)")}else{
+                  paste("NA")
+                }
+              }
+            }
+          }
+        }
+
+
+  novel <- prepare_hist_breaks(annotatedgene_noveltranscripts.class.files$Mouse, feature) %>% mutate(Transcripts = "Novel Transcripts")
+  anno <- prepare_hist_breaks(annotatedgene_knowntranscripts.class.files$Mouse, feature) %>% mutate(Transcripts = "Known Transcripts")
+  
+  merge <- rbind(novel[,c("diff2","Transcripts")], anno[,c("diff2","Transcripts")]) 
+  p <- ggplot(merge, aes(x=diff2, fill = Transcripts)) +
+    geom_bar(aes(y = (..count..)/sum(..count..)*100), color="black", size=0.3, 
+             position = position_dodge())+
+    mytheme +
+    #scale_fill_manual(values=c(label_colour("Human"), label_colour("Mouse")), 
+      #                labels=c("Human Cortex", "Mouse Cortex"), name = "") +
+    labs(x = x_label, y = "Transcripts (%)") + 
+    theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.title = element_blank(), 
+          legend.position = c(0.85,0.85))
+  return(p)
+}
+
+novel_annotated_sites("diff_to_gene_TSS")
+novel_annotated_sites("diff_to_gene_TTS")
+
+### all
+nrow(class.files$Mouse %>% filter(abs(diff_to_gene_TSS) <= 5))/nrow(class.files$Mouse) 
+nrow(class.files$Mouse %>% filter(abs(diff_to_gene_TTS) <= 5))/nrow(class.files$Mouse) 
+```
+
+## Fusion
+
+```{r}
+#class.files$Human[class.files$Human$structural_category == "Fusion" & class.files$Human$coding == "coding",] 
+#class.files$Mouse[class.files$Mouse$structural_category == "Fusion" & class.files$Mouse$coding == "coding",] 
+#class.files$Mouse[class.files$Mouse$structural_category == "Fusion",] %>% nrow()
+#class.files$Mouse[class.files$Mouse$structural_category == "Fusion" & class.files$Mouse$iso_exp != 0,] %>% nrow()
+```
+
+```{r}
+# poly A motif
+#bind_rows(annotatedgene_knowntranscripts.class.files$Mouse %>% group_by(polyA_motif) %>% tally() %>% mutate(type = "known") %>% mutate(perc = n/sum(n)),
+ #         annotatedgene_noveltranscripts.class.files$Mouse %>% group_by(polyA_motif) %>% tally() %>% mutate(type = "novel") %>% mutate(perc = n/sum(n))) %>% 
+ # ggplot(., aes( x = polyA_motif, y = perc, fill = type)) + geom_bar(stat = "identity", position = position_dodge())
+```
+

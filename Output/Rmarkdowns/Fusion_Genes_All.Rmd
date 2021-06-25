@@ -1,0 +1,310 @@
+---
+title: "Fusion Genes"
+author: Szi Kay Leung
+date: "`r Sys.Date()`"
+knit: (function(inputFile, encoding) { 
+      rmarkdown::render(inputFile,
+                        encoding=encoding, 
+                        output_file=paste0("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/Isoseq_Paper/Rmarkdowns",
+                        '/Fusion_Genes_All.html')) })
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: hide
+---
+```{r setup, include=FALSE, results="hide"}
+knitr::opts_chunk$set(echo = TRUE,fig.width=14, fig.height= 7)
+
+list_of_packages <- c("ggplot2", "scales", "reshape", "gridExtra", "grid", "dplyr","stringr","viridis","extrafont","tidyr","purr","DT")
+req_packages <- list_of_packages[!(list_of_packages %in% installed.packages()[,"Package"])]
+if(length(req_packages)) install.packages(req_packages, repo="http://cran.rstudio.com/")
+
+suppressMessages(library(knitr)) 
+suppressMessages(library(ggplot2))
+#suppressMessages(library(ggpubr))
+suppressMessages(library(scales))
+suppressMessages(library(reshape2))
+suppressMessages(library(gridExtra))
+suppressMessages(library(grid))
+suppressMessages(library(dplyr))
+suppressMessages(library(stringr)) 
+suppressMessages(library(viridis)) 
+suppressMessages(library(extrafont))
+suppressMessages(library(tidyr))
+suppressMessages(library(purrr))
+suppressMessages(library(DT))
+#suppressMessages(library(plotly))
+suppressMessages(library(pheatmap))
+suppressMessages(library(devtools))
+suppressMessages(library(rlist))
+#suppressMessages(library(easyGgplot2))
+
+mytheme <- theme(axis.line = element_line(colour = "black"),
+                 panel.grid.major = element_blank(),
+                 panel.grid.minor = element_blank(),
+                 panel.border = element_blank(),
+                 panel.background = element_blank(),
+                 text=element_text(size=18,  family="ArialMT", colour = "black"),
+                 axis.title.x = element_text(vjust=-0.5),
+                 axis.title.y = element_text(vjust=0.5))
+#font_import()
+```
+Aims: Validate “fusion” genes from SQANTI2 classification files (post-filtering):
+1. with RNASeq data, by the presence of RNASeq reads in the genes (however this may not necessarily span the region between both genes) \
++ human: intropolis data \
++ mouse: RNASeq (Isabel) \
+2. with 10kb of a cage peak \
+
+```{r include=FALSE}
+#********************** Variables and input files
+source("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/Scripts/Whole_Transcriptome_Paper/Output/Figures/All_Plots_Functions.R")
+sqanti_files()              # SQANTI2 filtered classification files (Reference genome alignment)
+sqanti_gtf()
+
+# Merge gtf and sqanti2 classification files, necessary for validating coordinate between novel genes in gencode and genes from chess
+# read_merge_gtf in SQANTI_General.R 
+gtf.class.files <- list()
+for(i in 1:length(class.names.files)){
+  print(paste("Processing SQANTI2 classification file", class.names.files[[i]]))
+  print(paste("Processing SQANTI2 gtf file", sqanti.gtf.names.files[[i]]))
+  
+  gtf.class.files[[i]] <- read_merge_gtf(sqanti.gtf.names.files[[i]], class.files[[i]])
+}
+
+names(gtf.class.files) <- c("Mouse","Adult","Fetal","Human")
+
+```
+## Input SQANTI2 classificiation files
+
+**Mouse** - *`r class.names.files$Mouse`* \
+\
+**Adult Human** - *`r class.names.files$Adult`*, \
+\
+**Fetal Human** - *`r class.names.files$Fetal`*, \
+\
+**Human** - *`r class.names.files$Human`*, \
+```{r}
+## Functions 
+
+# RNASeq_CAGE
+# Aim: whether RNASeq validation or within CAGE peak 
+# Input: sqanti2 classification file (sqanti2_prepared/read) filtered to novel/unannotated genes
+# Output: dataframe with 6 columns 
+RNASeq_CAGE <- function(sqanti2_read_class){
+  dat <- data.frame()
+  
+  #loop through each row in sqanti2 input file
+  for(i in 1:nrow(sqanti2_read_class)){
+    # paste isoform name into first column of dat
+    dat[i,1] <- sqanti2_read_class$isoform[i]
+    
+    # paste associated_gene name into second column of dat
+    dat[i,2] <- sqanti2_read_class$Sample[i]
+    
+    # paste gtf coordinates 
+    dat[i,3] <- sqanti2_read_class$gtf_coordinates[i]
+    
+    # paste associated_gene name into second column of dat
+    dat[i,4] <- sqanti2_read_class$associated_gene[i]
+    
+    # whether supported by RNAseq data using min_coverage column
+    dat[i,5] <- ifelse(sqanti2_read_class$gene_exp[i] != 0, paste("Yes"), paste("No"))
+    
+    # whether within cage peak 
+    dat[i,6] <- ifelse(sqanti2_read_class$within_cage_peak[i] == "True", paste("Yes"),paste("No"))
+    
+    # Number of FL reads 
+    dat[i,7] <- sqanti2_read_class$FL[i]
+  }
+  
+  colnames(dat) <- c("isoform","Sample","gtf_coordinates","associated_gene","rnaseq","cagepeak","FL")
+  return(dat)
+}
+
+# stats_validation
+# Aim: create a statistics table using all datasets
+# Input: 
+  # fusion_validation_output: output from RNASeq Cage, all datasets saved into a list 
+  # read_class_files: list of original classification file, all datasets saved into a list for % calculation
+# Important to ensure the list of fusion_validation output and read_clas_files are in the same order for species
+stats_validation <- function(fusion_validation_output,read_class_files){
+  dat <- data.frame()
+  
+  count=1
+  for(i in fusion_validation_output){
+    
+    # input individual class_files and description stats for percentages
+    class_files_individual <- read_class_files[[count]]
+    class_files_individual <- class_files_individual[!grepl("NOVEL",class_files_individual$associated_gene),]
+    total_num_genes <- length(unique(class_files_individual$associated_gene))
+    total_num_transcripts <- nrow(class_files_individual)
+    
+    # number of fusion genes with more than one trnascript
+    num_genes_morethan1_transcript <- i %>% group_by(associated_gene) %>% count() %>% filter(n > 1) %>% nrow(.)
+    
+    dat[1:5, count] <- c(# number of genes with Fusion Genes, perc from total num genes
+                         paste0(length(unique(i$associated_gene))," (",
+                               round(length(unique(i$associated_gene))/total_num_genes*100,2),"%)"),
+                         
+                         # number of fusion genes with more than 1 transcript 
+                         paste0(num_genes_morethan1_transcript," (",
+                               round(num_genes_morethan1_transcript/length(unique(i$associated_gene))*100,2),"%)"),
+                         
+                         # number of fusion transcripts
+                         paste0(nrow(i)," (",round(nrow(i)/total_num_transcripts*100,2),"%)"), 
+                         
+                         # supported by RNASeq
+                         paste0(nrow(i[i$rnaseq == "Yes",]),
+                                " (",round(nrow(i[i$rnaseq == "Yes",])/nrow(i)*100,2),"%)"), 
+                         
+                         # supported by cagepeak
+                         paste0(nrow(i[i$cagepeak == "Yes",]),
+                                " (",round(nrow(i[i$cagepeak == "Yes",])/nrow(i)*100,2),"%)")
+    )
+  
+    colnames(dat)[count] <- names(fusion_validation_output)[count]
+    count = count + 1
+    }
+  
+  row.names(dat) <- c("# and % of Fusion Genes","# and % of Fusion Genes with more than 1 transcript", "# and % of Transcripts fusing across genes","# and % of those Transcripts supported by RNASeq", "# and % of those Transripts supported by cagepeak")
+  return(dat) 
+}
+
+# fusion_gene_numbers
+# Aim: Tabulate the number of occurences of each fusion_gene 
+# Input: fusion = list of 12 classification files containing only fusion genes
+# Output: fuson_gene_numbers = table of the number of fusion genes per sample
+fusion_across_datasets <- function(all_fusion){
+  
+  # Tabulate number of occurences of the fusion genes 
+  fusion_gene_numbers <- all_fusion %>% 
+    group_by(associated_gene,Sample) %>% 
+    tally() %>%
+    spread(Sample,n) %>%
+    replace(is.na(.), 0)
+  
+  # Sum the number of occurences per fusion gene across all samples to give total number 
+  fusion_gene_numbers$Total <- rowSums(fusion_gene_numbers[,c(-1)])
+  
+  # Rearrange columns
+  fusion_gene_numbers <- fusion_gene_numbers[order(-fusion_gene_numbers$Total),
+                                           c("associated_gene","Total","Human (Adult)","Human (Fetal)","Mouse", "Human")]
+  
+  return(fusion_gene_numbers)
+}
+
+
+# list_fusion_gene 
+# Aim: string split each of the fusion genes between the datasets to find common genes; reason being that the order of gene1_gene2 might not be the same, but still present between the datasets 
+# Input: dataset = <Adult> <Fetal> <Mouse>
+# Output: list of fusion genes 
+list_fusion_gene <- function(dataset){
+  
+  # split and save the first word from the fusion gene "Gene1_Gene2"
+  list1 <- sapply(common_fusion[common_fusion[[dataset]] > 0, "associated_gene"], 
+                    function(x) word(x, c(1), sep = fixed ('_')))
+  
+  # split and save the second word from the fusion gene "Gene1_Gene2"
+  list2 <- sapply(common_fusion[common_fusion[[dataset]] > 0, "associated_gene"], 
+                    function(x) word(x, c(2), sep = fixed ('_')))
+  
+  # concatenate and save as one list
+  return(do.call(c, list(list1 ,list2)))
+
+}
+
+# disease_fusion_gene 
+# Aim: check for fusion genes between dataset and disease gene list 
+# Input: output from list_fusion_gene, and the name of the disease (column names) from diseaselist
+output_table_dir <- "/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/Scripts/Whole_Transcriptome_Paper/Output/Tables"
+diseaselist <- read.csv(paste0(output_table_dir,"/Disease/DiseaseList.csv"))
+disease_fusion_gene <- function(dataset_fusion_gene_list, disease){
+  dat <- intersect(dataset_fusion_gene_list, diseaselist[[disease]])
+  return(dat)
+}
+
+```
+
+## Validation of Fusion Genes
+
+```{r}
+all_fusion <- rbind(gtf.class.files$Mouse[gtf.class.files$Mouse$structural_category == "Fusion",c(1:47,length(gtf.class.files$Mouse))],
+                   gtf.class.files$Adult[gtf.class.files$Adult$structural_category == "Fusion",c(1:47,length(gtf.class.files$Adult))],
+                   gtf.class.files$Fetal[gtf.class.files$Fetal$structural_category == "Fusion",c(1:47,length(gtf.class.files$Fetal))],
+                   gtf.class.files$Human[gtf.class.files$Human$structural_category == "Fusion",c(1:47,length(gtf.class.files$Human))]
+                   )
+
+fusion_validation <- RNASeq_CAGE(all_fusion)
+datatable(fusion_validation, caption = "Fusion Genes", options = list(autoWidth = TRUE, pageLength = 5,scrollX = TRUE))
+```
+
+## Summary Stats
+
+```{r}
+# list fusion_validation into dataframe by datasets to run into function "stats_validation"
+fusion_validation_output <- list(fusion_validation[fusion_validation$Sample == "Mouse",],
+                                        fusion_validation[fusion_validation$Sample == "Human (Fetal)",],
+                                        fusion_validation[fusion_validation$Sample == "Human (Adult)",],
+                                 fusion_validation[fusion_validation$Sample == "Human",])
+names(fusion_validation_output) <- c("Mouse","Adult","Fetal","Human")
+
+# Note RNASeq should be 0 for Adult, Fetal and Human as expression data is 0 
+kable(stats_validation(fusion_validation_output, class.files))
+#View(stats_validation(fusion_validation_output, class.files))
+cat("Number of Fusion transcripts in Fetal:", class.files$Fetal %>% filter(structural_category == "Fusion") %>% nrow(), "\n")
+cat("Number of Fusion transcripts in Fetal supported by RNASeq:", class.files$Fetal %>% filter(structural_category == "Fusion" & iso_exp != 0) %>% nrow(), "\n")
+
+cat("Number of Fusion transcripts in Mouse:", class.files$Mouse %>% filter(structural_category == "Fusion") %>% nrow(), "\n")
+cat("Number of Fusion transcripts in Mouse supported by RNASeq:", class.files$Mouse %>% filter(structural_category == "Fusion" & iso_exp != 0) %>% nrow(), "\n")
+```
+
+## Comparisons
+
+```{r}
+common_fusion <- fusion_across_datasets(all_fusion)
+datatable(common_fusion, caption = "Fusion Genes Across Datasets", options = list(autoWidth = TRUE, pageLength = 5,scrollX = TRUE))
+
+datatable(common_fusion[common_fusion$`Human (Adult)`> 0 & common_fusion$`Human (Fetal)` > 0,], caption = "Common fusion genes between human adult and human fetal cortex")
+datatable(common_fusion[common_fusion$Human > 0 & common_fusion$Mouse > 0,], caption = "Common fusion genes between human and mouse cortex")
+
+# separate the 2 fusion genes 
+common_fusion <- common_fusion %>% mutate(gene1 = word(associated_gene,c(1),  sep = fixed ('_'))) %>%
+  mutate(gene2 = word(associated_gene,c(2),  sep = fixed ('_')))
+fusion <- fusion %>% mutate(gene1 = word(associated_gene,c(1),  sep = fixed ('_'))) %>%
+  mutate(gene2 = word(associated_gene,c(2),  sep = fixed ('_')))
+
+write.csv(common_fusion, paste0(output_table_dir,"/Fusion_Genes/Fusion_Genes.csv"))
+```
+
+
+
+
+### Common Fusion Genes between datasets
+```{r}
+
+fusion_genes <- list(list_fusion_gene("Adult"), list_fusion_gene("Fetal"), list_fusion_gene("Mouse"), list_fusion_gene("Human"))
+names(fusion_genes) <- c("Adult", "Fetal", "Mouse","Human")
+
+cat("Common Fusion Genes between Human Adult and Mouse:", intersect(fusion_genes$Adult,fusion_genes$Mouse))
+cat("Common Fusion Genes between Human Fetal and Mouse:", intersect(fusion_genes$Fetal,fusion_genes$Mouse))
+cat("Common Fusion Genes between Human Adult and Fetal:", intersect(fusion_genes$Adult,fusion_genes$Fetal))
+
+
+```
+
+### Disease List 
+```{r}
+# Create list of fusion genes common with disease list 
+disease_fusion <- list(sapply(colnames(diseaselist), function(x) disease_fusion_gene(fusion_genes$Adult, x)),
+                       sapply(colnames(diseaselist), function(x) disease_fusion_gene(fusion_genes$Fetal, x)),
+                       sapply(colnames(diseaselist), function(x) disease_fusion_gene(fusion_genes$Mouse, x)),
+                       sapply(colnames(diseaselist), function(x) disease_fusion_gene(fusion_genes$Human, x)))
+names(disease_fusion) <- c("Adult", "Fetal", "Mouse","Human")
+
+# Concatenate list and print
+All_disease_fusion <- as.data.frame(do.call("rbind", disease_fusion))
+kable(All_disease_fusion)
+
+
+```

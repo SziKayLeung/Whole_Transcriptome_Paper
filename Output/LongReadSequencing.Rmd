@@ -1,0 +1,73 @@
+---
+title: "Long Read Sequencing"
+author: Szi Kay Leung
+date: "`r Sys.Date()`"
+output:
+  rmdformats::material:
+    self_contained: true
+    thumbnails: true
+    lightbox: true
+    gallery: true
+    highlight: tango
+    code_folding: hide
+    fig_caption: true
+    cards: true
+---
+```{r setup, include=FALSE, results="hide", message=FALSE}
+
+knitr::opts_chunk$set(echo = TRUE,fig.width=14, fig.height= 7)
+suppressMessages(library(kableExtra))
+
+
+source("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/Scripts/Whole_Transcriptome_Paper/Output/Input_Variables.R")
+sqanti_files()
+
+# Functions
+source("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/Scripts/human_mouse_isoseq/DownStream/LongReadSequencing_Functions.R")
+
+```
+
+# Dataset
+
+# Summary Statistics
+
+## Genes {.tabset .tabset-fade .tabset-pills}
+
+### Table Overview
+
+```{r}
+tabulating_sqanti_num(class.files) %>% .[c(1:3,6:8),] %>% kbl(caption ="Table 1: Annotation of human and mouse cortex transcriptome from SQANTI") %>% kable_styling(bootstrap_options = c("striped", "hover"), full_width = T) 
+```
+
+### Number of Isoforms {.tabset .tabset-fade .tabset-pills}
+
+#### Human vs Mouse Cortex
+
+```{r}
+#plot_grid(no_of_isoforms_group()[[1]], no_of_isoforms_group()[[2]], labels = "auto", label_size = 30, label_fontfamily = "ArialMT")
+
+output_dir_tables <- "/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Isoseq_Paper/Tables"
+human_mouse <- read.csv(paste0(output_dir_tables,"/human_mouse_multiexonic_NUM.csv"))
+datatable(human_mouse[,-1] %>% arrange(-Human_Detected_Num_Isoseq))
+
+```
+
+#### Human Adult vs Human Fetal Cortex
+
+```{r}
+```
+
+
+## Isoforms 
+
+```{r}
+
+tabulating_sqanti_num(class.files) %>% .[c(4,6,9,11,12,10,13:19),] %>% kbl(caption ="Table 1: Annotation of human and mouse cortex transcriptome from SQANTI") %>% kable_styling(bootstrap_options = c("striped", "hover"),full_width = T) %>%
+  add_indent(c(4:5,7:13)) %>%
+  footnote(general = "Novel isoforms refer to transcripts not previously annotated to reference genome",
+           general_title = "",
+           footnote_as_chunk = T
+           )
+
+```
+

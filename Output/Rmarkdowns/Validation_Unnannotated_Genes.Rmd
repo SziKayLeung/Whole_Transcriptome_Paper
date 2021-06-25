@@ -1,0 +1,508 @@
+---
+title: "Unnannotated Genes"
+author: Szi Kay Leung
+date: "`r Sys.Date()`"
+knit: (function(inputFile, encoding) { 
+      rmarkdown::render(inputFile,
+                        encoding=encoding, 
+                        output_file=paste0("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/Isoseq_Paper/Rmarkdowns",
+                        '/Validation_Unnannotated_Genes.html')) })
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: hide
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE,fig.width=14, fig.height= 7)
+
+list_of_packages <- c("ggplot2", "scales", "reshape", "gridExtra", "grid", "dplyr","stringr","viridis","extrafont","tidyr","purr","DT")
+req_packages <- list_of_packages[!(list_of_packages %in% installed.packages()[,"Package"])]
+if(length(req_packages)) install.packages(req_packages, repo="http://cran.rstudio.com/")
+
+suppressMessages(library(ggplot2))
+suppressMessages(library(dplyr))
+suppressMessages(library(stringr)) 
+suppressMessages(library(DT))
+suppressMessages(library(knitr))
+suppressMessages(library(ggplot2))
+suppressMessages(library(grid)) # ggplot add corr value
+suppressMessages(library(gridExtra)) # ggplot add corr value
+suppressMessages(library(ggthemes)) # ggplot minimum theme
+suppressMessages(library(tidyr)) # ggplot minimum theme
+suppressMessages(library(extrafont))
+
+
+
+#font_import()
+mytheme <- theme(axis.line = element_line(colour = "black"),
+                 panel.grid.major = element_blank(),
+                 panel.grid.minor = element_blank(),
+                 panel.border = element_blank(),
+                 panel.background = element_blank(),
+                 text=element_text(size=20,  family="ArialMT", colour = "black"),
+                 axis.title.x = element_text(vjust=-0.5),
+                 axis.title.y = element_text(vjust=0.5), 
+                 legend.position = "bottom")
+```
+**Aims**: Validate “novel” genes defined as not previously annotated to genome from SQANTI2 classification files (post-filtering):\
+1. with RNASeq data \
+    + human: intropolis data\
+    + mouse: RNASeq (Isabel)\
+2. within 50bp of a cage peak \
+3. Found in existing [chess](http://ccb.jhu.edu/chess/) annotation. \
+    + Note: only available for human dataset\
+    + chaining script still not reliable, therefore compared transcripts between gencode and chess using genome coordinates (Extracted from respective sqanti.gtf)\
+
+```{r input, results="hide"}
+#********************** Variables and input files
+output_dir <- "/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/Isoseq_Paper/QC_Plots"
+output_table_dir <- "/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/Scripts/Whole_Transcriptome_Paper/Output/Tables"
+
+# INPUT: DIRECTORY PATH
+mouse_sqanti2_dir <- "/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcriptome/All_Tg4510/Post_IsoSeq/SQANTI_TAMA_FILTER/GENOME"
+human_sqanti2_gencode_dir <- "/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcriptome/Human/Post_IsoSeq/SQANTI_TAMA_FILTER/GENOME"
+human_sqanti2_chess_dir <- "/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcriptome/Human/Post_IsoSeq/SQANTI_TAMA_FILTER/CHESS"
+
+# INPUT: SQANTI FILTERED DATA!
+class.names.files <- list(
+  paste0(mouse_sqanti2_dir,"/WholeIsoSeq_sqantitamafiltered.classification.txt"),
+  paste0(human_sqanti2_gencode_dir,"/AdultCTX_sqantitamafiltered.classification.txt"),
+  paste0(human_sqanti2_gencode_dir,"/FetalCTX_sqantitamafiltered.classification.txt"),
+  paste0(human_sqanti2_gencode_dir,"/HumanCTX_sqantitamafiltered.classification.txt"),
+  paste0(human_sqanti2_chess_dir,"/HumanCTX_sqantitamafiltered.classification.txt")
+)
+names(class.names.files) <- c("Mouse_Gencode","Adult_Gencode","Fetal_Gencode","Human_Gencode","Human_Chess")
+
+# INPUT: SQANTI GTF FILE!
+gtf.names.files <- list(
+  paste0(mouse_sqanti2_dir,"/WholeIsoSeq_sqantitamafiltered.classification.gtf"),
+  paste0(human_sqanti2_gencode_dir,"/AdultCTX_sqantitamafiltered.classification.gtf"),
+  paste0(human_sqanti2_gencode_dir,"/FetalCTX_sqantitamafiltered.classification.gtf"),
+  paste0(human_sqanti2_gencode_dir,"/HumanCTX_sqantitamafiltered.classification.gtf"),
+  paste0(human_sqanti2_chess_dir,"/HumanCTX_sqantitamafiltered.classification.gtf")
+)
+names(gtf.names.files) <- c("Mouse_Gencode","Adult_Gencode","Fetal_Gencode","Human_Gencode","Human_Chess")
+
+
+#********************** Apply function to datasets 
+source("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/Scripts/Whole_Transcriptome_Paper/Output/SQANTI_General.R")
+
+# SQANTI_class_preparation(input.class.file, output.class.file)
+# According to SQANTI_report2.R (version 8.7) to prepare classification file in terms of ID columns etc 
+class.files <- lapply(class.names.files, function(x) SQANTI_class_preparation(x))
+
+
+# Merge gtf and sqanti2 classification files, necessary for validating coordinate between novel genes in gencode and genes from chess
+# read_merge_gtf in SQANTI_General.R 
+
+gtf.class.files <- list()
+for(i in 1:length(class.names.files)){
+  print(paste("Processing SQANTI2 classification file", class.names.files[[i]]))
+  print(paste("Processing SQANTI2 gtf file", gtf.names.files[[i]]))
+  
+  gtf.class.files[[i]] <- read_merge_gtf(gtf.names.files[[i]], class.files[[i]])
+}
+
+names(gtf.class.files) <- c("Mouse_Gencode","Adult_Gencode","Fetal_Gencode","Human_Gencode","Human_Chess")
+
+```
+```{r results="hide"}
+# Functions
+
+# RNASeq_CAGE
+# Aim: whether RNASeq validation or within CAGE peak 
+# Input: sqanti2 classification file (sqanti2_prepared/read) filtered to novel/unannotated genes
+# Output: dataframe with 6 columns 
+RNASeq_CAGE <- function(sqanti2_read_class){
+  dat <- data.frame()
+  sqanti2_read_class <- sqanti2_read_class %>% mutate(cage_50bp = ifelse(abs(.$dist_to_cage_peak) <= 50, "Cage_within_50bp","Cage_notwithin_50bp"))
+  
+  #loop through each row in sqanti2 input file
+  for(i in 1:nrow(sqanti2_read_class)){
+    # paste isoform name into first column of dat
+    dat[i,1] <- sqanti2_read_class$isoform[i]
+  
+    # paste associated gene coordinates
+    dat[i,2] <- sqanti2_read_class$gtf_coordinates[i]
+    
+    # paste coding or not coding
+    dat[i,3] <- sqanti2_read_class$coding[i]
+    
+    # paste associated_gene name into second column of dat
+    dat[i,4] <- sqanti2_read_class$associated_gene[i]
+    
+    # paste number of FL reads associated 
+    dat[i,5] <- sqanti2_read_class$FL[i]
+    
+    # whether supported by RNAseq data using gene_expression column
+    dat[i,6] <- ifelse(sqanti2_read_class$iso_exp[i] != 0, paste("Yes"), paste("No"))
+    
+    # whether within cage peak 
+    dat[i,7] <- ifelse(sqanti2_read_class$cage_50bp[i] == "Cage_within_50bp", paste("Yes"),paste("No"))
+    
+    # structural category 
+    dat[i,8] <- sqanti2_read_class$structural_category[i]
+    
+  }
+  
+  colnames(dat) <- c("isoform","gtf_coordinates","coding", "associated_gene","FL","rnaseq","cagepeak","structural_category")
+  return(dat)
+}
+
+
+# chess_novelgenes_support
+# Aim: check whether coordinates from novel gene in gencode matches coordinates from novel gene in chess; this validation only works for human datasets as non-chess-equivalent dataset for Mouse
+# Input: 
+  #1. classification.txt (SQANTI2 post-filtering) filtered with novel genes only from alignment with genocode.gtf
+  #2. classification.txt (SQANTI2 post-fitlering), not filtered, alignment with chess.gtf
+# Output: dataframe with 3 columns
+chess_novelgenes_support <- function(human_sqanti2_gencode_file, human_sqanti2_chess_file){
+  dat <- data.frame()
+  
+  for(i in 1:nrow(human_sqanti2_gencode_file)){
+    # paste isoform name into first column of dat
+    dat[i,1] <- human_sqanti2_gencode_file$isoform[i]
+
+    # check with pb.id in genocode matches with that in chess
+    Pb.ID <- human_sqanti2_gencode_file$isoform[i]
+    dat[i,2] <-  human_sqanti2_gencode_file$gtf_coordinates[i]
+    dat[i,3] <- if(Pb.ID %in% human_sqanti2_chess_file$isoform == "FALSE"){
+      "NA"
+    }else if(human_sqanti2_chess_file[human_sqanti2_chess_file$isoform == Pb.ID,c("novelGene")] == "Novel Genes"){
+      "Yes"
+    }else{
+      "No"
+    }
+  }
+  
+  colnames(dat) <- c("isoform","gtf_coordinate","NovelGene_Chessannotation")
+  return(dat)
+}
+
+# Blast from PacBio Datasets 
+blast_validation <- function(blast_input, novel.gtf.class.files, dataset){
+  dat <- read.table(blast_input, as.is=T, sep="\t", header = F)
+  colnames(dat) <- c("Query_ID","Subject_ID","Perc_Identity","alignment_length","mismatches", "gap","q.start","q.end","s.start","s.end","evalue","bit_score")
+  
+  #hist(dat$alignment_length)
+  
+  All <- merge(dat[dat$Perc_Identity == "100" & dat$alignment_length > 300,]
+             ,novel.gtf.class.files[,c("isoform","gtf_coordinates","Log_ISOSEQ_TPM")], 
+             by.x = "Query_ID", by.y = "isoform", all = T)
+  
+  All$Detected <- ifelse(is.na(All$Subject_ID), "Not_Detected","Detected")
+  
+  dat_Detection <- All %>%
+  select(Query_ID, Subject_ID,gtf_coordinates, Detected) %>%
+  distinct() %>% 
+  group_by(Query_ID, Detected) %>%
+  tally() 
+  
+  ifelse(dataset == "PacBio", colnames(dat_Detection) <- c("isoform", "PacBioAD", "No_Blast_Hits_PacBioAD"),
+         ifelse(dataset == "Gandal", 
+                colnames(dat_Detection) <- c("isoform", "Gandal", "No_Blast_Hits_Gandal"), print("PacBio or Gandal")))
+
+  return(dat_Detection)
+}
+
+
+# novel_gene_validation 
+# Aim: Links all functions abvoe for each dataset
+  # Mouse, only perform RNASeq_CAGE 
+  # Human: perform RNASeq_CAGE and chess_novelgenes_support
+# Input: <species="mouse","fetal","adult"> 
+        # <classification.txt filtered to novel genes only, note must be merged with gtf coordinates>            
+        # <classification.txt all genes, note must be merged with gtf coordinates>
+        # <Pb.blast.files>: only for human adult and fetal input blast.txt from blasting with PacBio AD Isoseq dataset 
+# Output: dataframe with 9 columns
+# did not run chess on adult and fetal human
+novel_gene_validation <- function(species, novel.gtf.class.files, gtf.class.files.chess){
+  if(species %in% c("mouse","adult","fetal")){
+    dat <- RNASeq_CAGE(novel.gtf.class.files)
+    dat$Sample <- paste(species)
+    dat$NovelGene_Chessannotation <- paste("NA")
+  }else{
+    dat1 <- RNASeq_CAGE(novel.gtf.class.files)
+    dat2 <- chess_novelgenes_support(novel.gtf.class.files, gtf.class.files.chess)
+    dat <- merge(dat1, dat2, by = "isoform", all = TRUE)
+    dat$Sample <- paste(species)
+  }
+   dat <- dat[, c("isoform", "Sample", "gtf_coordinates","associated_gene","structural_category","FL","coding", "rnaseq","cagepeak","NovelGene_Chessannotation")]
+   return(dat)
+}
+
+# isoform2gene
+# Aim: create new column in sqanti2 classification file with just the 1st part of the PB.ID with the assumption that the 1st part refers to all transcripts from the same gene
+# Output: sqanti2_read_class with additional column 
+isoform2gene <- function(sqanti2_read_class){
+  sqanti2_read_class$PB.gene.id <- paste0("PB.",
+                                          word(sqanti2_read_class$isoform, c(2), sep = fixed ('.')))
+  return(sqanti2_read_class)
+}
+
+# stats_validation
+# Aim: create a statistics table using all datasets
+# Input: 
+  # novel_gene_validation_output: output from novel_gene_validation, all datasets saved into a list 
+  # novel_gene_class_file: list of classification file, filtered to novel genes, after isoform2gene
+stats_validation <- function(novel_gene_validation_output, novel_gene_class_file){
+  count=1
+  dat <- data.frame()
+  
+  # To tabulate the number of novel genes, by assuming all having the same PB.gene.id
+  #count=1
+  #for(i in novel_gene_class_file){
+    #dat[1, count] <- length(unique(i$PB.gene.id))
+    #count = count + 1
+ # }
+  
+  count=1
+  for(i in novel_gene_validation_output){
+    dat[1:9, count] <- c(i[grepl("novelGene", i$associated_gene),] 
+                         %>% count(associated_gene) %>% nrow(.),
+                         nrow(i),           # number of novel transcripts
+                         nrow(i[i$coding == "coding",]), # number of coding novel transcripts
+                         nrow(i[i$coding == "non_coding",]), # number of non_coding novel transcripts
+                         nrow(i[i$rnaseq == "Yes",]), # supported by RNASeq
+                         i %>% filter(cagepeak == "Yes") %>% nrow(), # supported by cagepeak
+                         nrow(i[i$NovelGene_Chessannotation == "Novel in Gencode and in Chess",]),
+                         nrow(i[i$PacBioAD == "Detected",]), # supported by PacBioAD
+                         nrow(i[i$Gandal== "Detected",]) # supported by Gandal dataset
+    )
+  
+    colnames(dat)[count] <- names(novel_gene_validation_output)[count]
+    count = count + 1
+    }
+  
+  row.names(dat) <- c("Number of Novel Genes","Total Nunber of Novel Transcripts", "Number of Coding, Novel Transcripts", "Number of Non-Coding, Novel Transcripts","Number of Novel Transcripts supported by RNASeq", "Number of Novel Transripts supported by cagepeak", "Number of Novel Transcripts in Gencode and in Chess", "Number of Novel Transcripts detected in PacBio AD public dataset", "Number of Novel Transcripts detected in Gandal dataset")
+  
+  #dat["Number of Novel Transcripts not in Chess", "Mouse"] <- "NA"
+  return(dat) 
+}
+
+# disease_fusion_gene 
+# Aim: check for fusion genes between dataset and disease gene list 
+# Input: output from list_fusion_gene, and the name of the disease (column names) from diseaselist
+diseaselist <- read.csv(paste0(output_table_dir,"/Disease/DiseaseList.csv"))
+disease_read_gene <- function(dataset_read_gene_list, disease){
+  dat <- intersect(dataset_read_gene_list, diseaselist[[disease]])
+  return(dat)
+}
+
+##############################################
+# RNASeq threshold of estimated counts and tpm from Kallisto input
+
+# subset_kallisto_by_isoformid
+# Aim: subset kallisto original output into the just the isoforms of interest 
+# Input: 
+  # kallisto_input: path of kallisto output, ending with .tsv (also that used in SQANTI2 input for expression) 
+  # list_of_isoform_id: list of PB.Ids for just showing those interested to plot/analyse etc.
+# Output: table of kallisto original input but just shwowing transcripts of interest, also log10 of counts and tpm   for plot
+subset_kallisto_by_isoformid <- function(kallisto_input, list_of_isoform_id){
+  # read kallisto input (original output ending with .tsv)
+  dat <- read.table(kallisto_input, header = TRUE)
+  
+  # create new column with just the isoform id rather than list of coordinates etc from original file
+  dat$isoform <- word(dat$target_id, c(1),  sep = fixed ('|'))
+  
+  # subset kallisto input with only the isoform_id specified
+  df <- dat[dat$isoform %in% list_of_isoform_id,]
+  
+  # log estimated counts, and log tpm for plots
+  df$log_est_counts <- log10(df$est_counts)
+  df$log_tpm <- log10(df$tpm)
+  
+  return(df)
+}
+
+# density_plot_rna_tpm_counts
+# Aim: plot density of output table from subset_kallisto_by_isoformid
+# Input: output from subset_kallisto_by_isoformid
+# Output: density plot 
+density_plot_rna_tpm_counts <- function(kallisto_input_subset){
+  
+  print(cor.test(kallisto_input_subset$est_counts,kallisto_input_subset$tpm))
+  cor(kallisto_input_subset$est_counts,kallisto_input_subset$tpm, use = "pairwise.complete.obs")
+  
+  corr.value <- cor(kallisto_input_subset$est_counts,kallisto_input_subset$tpm, use = "pairwise.complete.obs")
+  p.value <- cor.test(kallisto_input_subset$est_counts,kallisto_input_subset$tpm, use = "pairwise.complete.obs")$p.value
+  
+  # corr.value <- cor(FSM_TPM$ISOSEQ_TPM_Normalised,FSM_TPM$RNASeq_TPM) # normalised ISOSEQ FL counts to length
+  corr <- grobTree(textGrob(paste("r = ", round(corr.value, 2)), x = 0.05, y = 0.97, hjust = 0,
+                            gp = gpar(col = "black", fontsize = 20, fontface = "italic")))
+
+  
+  mytheme <- theme(axis.line = element_line(colour = "black"),
+                   panel.grid.major = element_blank(),
+                   panel.grid.minor = element_blank(),
+                   panel.border = element_blank(),
+                   panel.background = element_blank(),
+                   text=element_text(size=20,  family="ArialMT"),
+                   axis.title.x = element_text(vjust=-0.5),
+                   axis.title.y = element_text(vjust=0.5))
+  
+  p <- ggplot(kallisto_input_subset, aes(x = log_est_counts, y = log_tpm)) +
+    annotation_custom(corr) +
+    stat_density_2d(aes(fill = stat(level)), geom = "polygon") +
+    geom_point(size = 0.4, alpha = 0.8) +
+    scale_fill_distiller(palette=4, direction=1, name = "Density") +
+    theme_bw() +
+    labs(x = "Kallisto Expected Counts (Log10)", y = "TPM (Log10)") +
+    geom_smooth(method=lm, colour = "black") +
+    mytheme
+  
+  return(p)
+}
+
+# kallisto_plot
+# loops through dataframe with subset_kallisto_by_isoforid and density_plot_rna_tpm_counts as functions 
+# Input: input requirements for kallisto_input_file function
+# Output: density plot from function in density_plot_rna_tpm_counts
+kallisto_plot <- function(kallisto_input_file,list_of_isoform_id){
+  kallisto_novel_genes <- subset_kallisto_by_isoformid(kallisto_input_file, list_of_isoform_id)
+  p1 <- density_plot_rna_tpm_counts(kallisto_novel_genes)
+  return(p1)
+}
+
+
+```
+
+## Validation of Novel Genes
+
+```{r}
+# Application of function 
+
+# Filter for only novel genes and apply isoform2gene
+Novel.gtf.class.files <- lapply(gtf.class.files, function(x) x[grepl("^novel", x$associated_gene),])
+Novel.gtf.class.files <- lapply(Novel.gtf.class.files, function(x) isoform2gene(x))
+
+# Create list of novel genes with the validation across multiple metrics (for each dataset)
+Mouse <- novel_gene_validation("mouse",Novel.gtf.class.files$Mouse_Gencode,gtf.class.files$Mouse_Gencode)
+Adult <- novel_gene_validation("adult",Novel.gtf.class.files$Adult_Gencode,Novel.gtf.class.files$Adult_Gencode)
+Fetal <- novel_gene_validation("fetal",Novel.gtf.class.files$Fetal_Gencode,Novel.gtf.class.files$Fetal_Gencode)
+Human <- novel_gene_validation("human",Novel.gtf.class.files$Human_Gencode,gtf.class.files$Human_Chess)
+
+
+
+# combine all datasets into one 
+All <- rbind(Mouse,Adult,Fetal,Human)
+All.list <- list(Mouse,Adult,Fetal,Human)
+names(All.list) <- c("Mouse", "Adult", "Fetal","Human")
+
+datatable(All, caption = "Novel Genes", options = list(autoWidth = TRUE, pageLength = 5,scrollX = TRUE))
+write.csv(rbind(Mouse,Adult,Fetal,Human),paste0(output_table_dir,"/Novel_Genes/Novel_Genes.csv"))
+
+
+```
+
+### Summary Statistics
+
+*Note: Number of Novel genes counted by the assumption that the first part of the Pb.ID refers to the same gene*
+
+```{r}
+stats <- stats_validation(All.list,
+                 list(Novel.gtf.class.files$Mouse_Gencode,
+                      Novel.gtf.class.files$Adult_Gencode,
+                      Novel.gtf.class.files$Fetal_Gencode,
+                      Novel.gtf.class.files$Human_Gencode))
+
+kable(stats)
+
+# NovelGene Annotation
+cat("Novel Genes supported by Chess:", nrow(All[All$Sample == "human" & All$NovelGene_Chessannotation == "Yes",]))
+cat("Novel Genes supported by RNASeq in Fetal:", nrow(All[All$Sample == "fetal" & All$rnaseq == "Yes",]))
+```
+
+### RNASeq Support
+
+#### RNASeq threshold for deciding whether IsoSeq transcript is supported by RNASeq Reads 
+Rather than using the min_cov column in SQANTI2 (i.e. whether the junction of the transcript is supported by RNASeq), better to use the iso_exp column in SQANTI2 (i.e. whether there is RNASeq coverage for that transcript). This gene_exp column is derived from kallisto input file used in sqanti_qc.py. 
+
+However, difficult to ascertain which threshold of TPM from gene_exp to use to decide whether an Iso-Seq transcript is supported or not. Of course, it is possible to just cut the threshold at 0 TPM (i.e 0 Reads). 
+
+Below is a density plot of the RNASeq expected read counts and RNASeq TPM of transcripts of "novel genes". Each dot is a transcript of a "novel gene". Note, two transcripts have 0 support coverage and are thus not shown in the logarithmic scale. Also there is a number of transcripts which also have a very low coverage (bottom left corner) -- remove? Majority of transcripts from novel genes have 20-30 expected RNASeq read counts, ~ 1TPM.
+```{r}
+#kallisto_novel_genes <- subset_kallisto_by_isoformid(mouse_kallisto_input_file, #Novel.gtf.class.files$Mouse_Gencode$isoform)
+#p1 <- density_plot_rna_tpm_counts(kallisto_novel_genes)
+
+#p1
+
+# INPUT: KALLISTO FILE! (input into SQANTI2)
+kallisto_input_file <- c(
+  # Mouse
+  "/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/WholeTranscriptome/WT8_ISOSEQ/IsoSeq3.1.2/KALLISTO/WT8.abundance.tsv",
+  # Adult
+  "/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/Adult/KALLISTO/Adult.abundance.tsv",
+  # Fetal
+  "/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/Fetal/KALLISTO/Fetal.abundance.tsv")
+ 
+# Novel gtf.class gencode dataframes per dataset (ordered the same as list of Kallisto: Mouse, Adult, Fetal)
+Novel.gtf.class.gencode <- list(Novel.gtf.class.files$Mouse_Gencode,
+                                Novel.gtf.class.files$Adult_Gencode,
+                                Novel.gtf.class.files$Fetal_Gencode)
+
+# Loop datasets through kallisto_plot function
+# Important to ensure that the kallisto and novel gtf.class gencode is the same dataset
+species <- c("Mouse","Adult", "Fetal")
+for(i in 1:3){
+  print(paste0("Processing with:",kallisto_input_file[i]))
+  input_gencode <- Novel.gtf.class.gencode[[i]]
+  plot <- kallisto_plot(kallisto_input_file[i], input_gencode$isoform)
+  print(plot + labs(title = paste0(species[i],"\n\n")))
+}
+
+```
+
+
+```{r}
+p2 <- All %>% 
+  filter(Sample %in% c("mouse","fetal")) %>%
+  ggplot(., aes(Sample, fill = rnaseq)) + 
+  geom_bar(position = "fill") +
+  mytheme + 
+  labs(x = "", y = "", title = "Novel Transcripts from Novel Genes with RNASeq Support\n\n") +
+  scale_fill_discrete(name="RNASeq Coverage",
+                         labels=c("No Support", "Support")) +
+  scale_y_continuous(labels = scales::percent)
+
+p2
+```
+
+### Cage Peak Support
+
+```{r}
+p3 <- ggplot(All, aes(Sample, fill = cagepeak)) + 
+  geom_bar(position = "fill") +
+  mytheme + 
+  labs(x = "", y = "", title = "Novel Transcripts from Novel Genes with Cage Peak Support\n\n") +
+  scale_fill_discrete(name="Cage Peak",
+                         labels=c("Not Within", "Within")) +
+  scale_y_continuous(labels = scales::percent)
+
+p3
+```
+
+### Support by Chess Annotation
+
+```{r}
+All$NovelGene_Chessannotation <- factor(All$NovelGene_Chessannotation,levels = c("No", "Yes"))
+
+p4 <- ggplot(All[All$Sample != "mouse",], aes(Sample, fill = NovelGene_Chessannotation)) + 
+  geom_bar(position = "fill") +
+  mytheme + 
+  labs(x = "", y = "", title = "Novel Transcripts from Novel Genes Supported by Chess Annotation\n\n") +
+  scale_fill_discrete(name="Chess Annotation",
+                      labels=c("No", "Yes")) +
+  scale_y_continuous(labels = scales::percent)
+
+p4
+```
+
+## Disease Gene List 
+```{r}
+# Loop through novel genes that have gene names, for any commonality with disease list
+sapply(colnames(diseaselist), function(x) disease_read_gene(word(All$associated_gene, c(2), sep = fixed("_")), x))
+
+```

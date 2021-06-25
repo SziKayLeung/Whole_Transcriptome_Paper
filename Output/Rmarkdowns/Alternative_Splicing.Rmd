@@ -1,0 +1,586 @@
+---
+title: "Suppa2 Output"
+author: Szi Kay Leung
+date: "`r Sys.Date()`"
+knit: (function(inputFile, encoding) { 
+      rmarkdown::render(inputFile,
+                        encoding=encoding, 
+                        output_file=paste0("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/Isoseq_Paper/Rmarkdowns",
+                        '/Suppa2_output.html')) })
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: hide
+---
+
+```{r setup, include=FALSE, results="hide"}
+knitr::opts_chunk$set(echo = TRUE,fig.width=14, fig.height= 7)
+suppressMessages(library(dplyr))
+suppressMessages(library(stringr)) 
+suppressMessages(library(DT))
+suppressMessages(library(tidyr))
+suppressMessages(library(ggplot2))
+suppressMessages(library(knitr))
+suppressMessages(library(viridis))
+suppressMessages(library(grid))
+
+mytheme <- theme(axis.line = element_line(colour = "black"),
+                 panel.grid.major = element_blank(),
+                 panel.grid.minor = element_blank(),
+                 panel.border = element_blank(),
+                 panel.background = element_blank(),
+                 text=element_text(size=20,  family="ArialMT"),
+                 axis.title.x = element_text(vjust=-0.5, colour = "black"),
+                 axis.title.y = element_text(vjust=0.5, margin = margin(t = 0, r = 10, b = 0, l = 0)),
+                 #legend.position = c(.90, 0.95),
+                 #legend.justification = c(1,1),
+                 legend.box.just = "right",
+                 legend.margin = margin(6, 6, 6, 6), 
+                 legend.text = element_text(size = 20))
+
+```
+**Aims**: Tabulate output from SUPPA2:\
+1. Number of splice events per dataset \
+2. Number of Genes reported per splicing event per dataset \
+3. List of Genes with the number of splicing events 
+
+```{r, results="hide"}
+output_table_dir <- "/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/Scripts/Whole_Transcriptome_Paper/Output/Tables"
+mouse_sqanti_dir <- "/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcriptome/All_Tg4510/Post_IsoSeq/SQANTI_TAMA_FILTER/GENOME"
+human_sqanti_dir <- "/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcriptome/Human/Post_IsoSeq/SQANTI_TAMA_FILTER/GENOME"
+mouse_suppa_dir <- "/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcriptome/All_Tg4510/Post_IsoSeq/SUPPA"
+human_suppa_dir <- "/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcriptome/Human/Post_IsoSeq/SUPPA"
+
+# List suppa2 output files (modified from python script)
+SUPPA2_input_dir <- list(mouse_suppa_dir,human_suppa_dir, human_suppa_dir, human_suppa_dir)
+names(SUPPA2_input_dir) <- c("WholeIsoSeq","HumanCTX","AdultCTX","FetalCTX") # also prefix of files
+
+# List SQANTI2 classificatin file (post filtering)
+SQANTI2_suffix_file_name <- "_sqantitamafiltered.classification.txt"
+SQANTI2_input_file <- list(paste0(mouse_sqanti_dir,"/WholeIsoSeq",SQANTI2_suffix_file_name),
+                           paste0(human_sqanti_dir,"/HumanCTX",SQANTI2_suffix_file_name),
+                           paste0(human_sqanti_dir,"/AdultCTX",SQANTI2_suffix_file_name),
+                           paste0(human_sqanti_dir,"/FetalCTX",SQANTI2_suffix_file_name))
+names(SQANTI2_input_file) <- c("WholeIsoSeq","HumanCTX","AdultCTX","FetalCTX")
+
+
+```
+## SUPPA2 output
+
+For SUPPA2 command, the input is SQANTI2 gtf file containing of PB.ID rather than associated genes and transcript name. SUPPA2 output is therfore also of PB ids, which make it difficult to use. Table below shows an example SUPPA2 output of skipped exon in mouse dataset using SQANTI2 filitered gtf file. 
+
+```{r, results='asis'}
+
+SUPPA2_SE <- read.table(paste0(SUPPA2_input_dir$WholeIsoSeq,"/WholeIsoSeq_SE_strict.ioe"), header = TRUE)
+kable(SUPPA2_SE[1:5,], caption = "SUPPA2 output for Skipping Exon in mouse dataset")
+
+```
+
+## Aggregate SUPPA2 output with SQANTI classification 
+
+PB Ids from the SUPPA2 output is therefore replaced with associated genes/transcript name from SQANTI2 classification output file (using script: Suppa2_output_mod_updated.py). The table below shows an example of the same SUPPA2 output with the replacement of the PB Ids with the associated name of the gene/transcript. 
+
+### Skipped Exon
+
+
+```{r, results='asis'}
+SUPPA2_SE_mod <- read.table(paste0(SUPPA2_input_dir$WholeIsoSeq,"/WholeIsoSeq_SE_strict.ioe.txt"), header = TRUE)
+kable(SUPPA2_SE_mod [1:3,], caption = "Modified SUPPA2 output for Skipping Exon in mouse dataset")
+
+
+```
+
+### Alternative 5'
+
+Note: alternative transcript is classified as novel transcripts from SQANTI2 classification file
+
+
+```{r, results='asis'}
+kable((read.table(paste0(SUPPA2_input_dir$WholeIsoSeq,"/WholeIsoSeq_A5_strict.ioe.txt"), header = TRUE)[c(1,5,10),]), caption = "Modified SUPPA2 output for Alternative 5' in mouse dataset")
+```
+
+### Checking replacement is valid
+
+The table below shows that the replacement is correct --> PB ids from the SUPPA2 output and the associated gene from the SUPPA2 modified output corresponds to the SQANTI2 output.  
+```{r, results='asis'}
+SQANTI2_mouse <- read.table(SQANTI2_input_file$WholeIsoSeq, header = TRUE)
+checking_pb_ids <- c("PB.4.2","PB.32.1","PB.46.1")
+kable(SQANTI2_mouse[SQANTI2_mouse$isoform %in% checking_pb_ids,1:8], caption = "SQANTI2 classification file for Mouse")
+
+```
+
+```{r}
+############ Functions 
+# Suppa2_input 
+# Input: path of SUPPA2 output files, and prefix name 
+# Output: list of SUPPA2 output file paths 
+Suppa2_input <- function(SUPPA2_input_dir, dataset){
+  SUPPA2_dir <- paste0(SUPPA2_input_dir)
+  SUPPA2_output_files <<- list.files(path = SUPPA2_dir, pattern = paste0('^',dataset,'.*txt'), full.names = TRUE)
+  SUPPA2_output_files_name <<- list.files(path = SUPPA2_dir, pattern = paste0('^',dataset,'.*txt'))
+  print(SUPPA2_output_files_name)
+}
+
+# Sqanti2_prepare
+# Input: path of SQANTI2 classification file
+# Output: read SQANTI2 classification table
+Sqanti2_prepare <- function(SQANTI2_class_file){
+  source("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/Scripts/Whole_Transcriptome_Paper/Output/SQANTI_General.R")
+  print(paste("Processing with:",SQANTI2_class_file))
+  SQANTI2 <- paste(SQANTI2_class_file)
+  class.file <- SQANTI_class_preparation(SQANTI2)
+  return(class.file)
+}
+
+
+# Gene_Per_Event(SUPPA2 modified output file)
+# Input: Suppa2 modified output file from python script ending .txt saved in list of SUPPA2_output_files
+# Aim: Adds two columns to existing input dataframe: Gene names & Splicing event name 
+# Necessary to count the number of genes reported for each splicing event
+# Output: Suppa2 modified output file with 2 additional columns
+Gene_Per_Event <- function(input_mod_file){
+  dat <- read.table(input_mod_file, header = TRUE)
+  # Gene name taken from first entry of each row of total_transcripts column
+  # Assumption: Each splicing event is only involving the one same gene, and no overlap between genes/fusion genes
+  transcript <- word(dat$total_transcripts, c(1),  sep = fixed (','))
+  gene <- word(transcript, c(1), sep = fixed('_'))
+  dat$Gene <- gene 
+  
+  # Splicing eent name taken from first entry of each row of event_id
+  event <- word(dat$event_id, c(1),  sep = fixed (':'))
+  event <- word(event, c(2),  sep = fixed (';'))
+  dat$Event <- event
+  return(dat)
+}
+
+# Total_Number_Genes(Gene_Per_Event output file)
+# Input: Gene_Per_Event outut file (previous function)
+# Aim: Count the number of occurences of genes reported for each splicing event
+# Output: Table of genes reported and its frequency with splicing events
+Total_Number_Genes <- function(Gene_Per_Event_output_file){
+  dat <- Gene_Per_Event_output_file %>% 
+    group_by(Gene) %>% 
+    tally()
+  
+  # Create a tag of splicing event for each file input for later aggregation
+  dat$Event <- Gene_Per_Event_output_file$Event[1]
+  colnames(dat) <- c("Gene", "No_of_Events", "Event")
+  return(dat[order(-dat$No_of_Events),])
+}
+
+Suppa2_output_final_table <- function(SUPPA2_input_dir, dataset){
+  Suppa2_input(SUPPA2_input_dir, dataset)
+  #Sqanti2_prepare(SQANTI2_class_file)
+  
+  SUPPA2_mod_output <- lapply(SUPPA2_output_files, function(x) Gene_Per_Event(x))
+  names(SUPPA2_mod_output) <- SUPPA2_output_files_name
+  return(SUPPA2_mod_output)
+}
+  
+
+Suppa2_total_gene_output_table <- function(SUPPA2_mod_output){
+  SUPPA2_total_gene_output <- lapply(SUPPA2_mod_output, function(x) Total_Number_Genes(x))
+  SUPPA2_all_Total_gene_output <- bind_rows(SUPPA2_total_gene_output)
+  return(SUPPA2_all_Total_gene_output)
+}
+ 
+
+Sum_No_Events <- function(SUPPA2_all_Total_gene_output){
+  # Sum the number of splicing events per event 
+  No_Events <- aggregate(SUPPA2_all_Total_gene_output$No_of_Events, 
+          by=list(Events=SUPPA2_all_Total_gene_output$Event), FUN=sum)
+  
+  # Percentage of each splicing event over the sum of total events 
+  No_Events$perc <- apply(No_Events["x"], 2, function(x) round(x/sum(No_Events["x"])*100,2))
+  colnames(No_Events) <- c("Events", "No of Events", "Perc")
+  return(No_Events)
+}
+
+Sum_No_Genes <- function(SUPPA2_all_Total_gene_output, SQANTI2.class.file){
+  SQANTI2.read.class.file <- Sqanti2_prepare(SQANTI2.class.file)
+  gene_count <- SQANTI2.read.class.file %>% group_by(associated_gene) %>% count() %>% nrow(.)
+  #print(paste("Number of total genes:",gene_count))
+  
+  # Sum the number of genes oer event; percentage refers to the proportion of total number of genes reported from SQANTI2 classification file (post-filtering)
+  Gene_Events <- SUPPA2_all_Total_gene_output %>% 
+  group_by(Event) %>%
+  tally() %>%
+  mutate(perc = round((n /gene_count)*100,2))
+
+  colnames(Gene_Events) <- c("Events", "Number of Total Genes", "Percentage")
+  return(Gene_Events)
+}
+
+
+Gene_with_no_events <- function(SUPPA2_all_Total_gene_output){
+  dat <- SUPPA2_all_Total_gene_output %>%
+    group_by(Gene) %>%
+    tally() %>%
+    arrange(-n)
+
+  colnames(dat) <- c("Genes", "Number of Splicing Events")
+  return(dat)
+}
+
+Gene_with_most_events <- function(dataset, species){
+  dat <- dataset$SUPPA2_genes %>%
+    group_by(Gene) %>%
+    tally() %>%
+    arrange(-n) %>%
+    head(10)
+  
+  dat$Species <- paste(species)
+  colnames(dat) <- c("Genes", "Number of Splicing Events", "Dataset")
+  dat
+}
+
+exon_event_table <- function(SQANTI2_class_file){
+  Sqanti2_read_class_file <- Sqanti2_prepare(SQANTI2_class_file)
+  
+  dat <- data.frame()
+  count = 1
+  for(i in unique(Sqanti2_read_class_file$associated_gene)){
+    max_number_exons <- max(Sqanti2_read_class_file[Sqanti2_read_class_file$associated_gene == i,"exons"])
+    dat[count,1] <- paste(i)
+    dat[count,2] <- paste(max_number_exons)
+    count = count + 1
+  }
+  colnames(dat) <- c("Gene","No_of_Exons")
+  dat$No_of_Exons <- as.integer(as.character(dat$No_of_Exons))
+  
+  return(dat)
+}
+
+
+sum_no_all_splicing_events <- function(SUPPA2_all_Total_gene_output){
+  dat <- aggregate(SUPPA2_all_Total_gene_output$No_of_Events, 
+                   by=list(Gene = SUPPA2_all_Total_gene_output$Gene), 
+                   FUN = sum)
+  
+  colnames(dat) <- c("Gene", "sum_of_all_splicing_events")
+  dat$log_sum <- log10(dat$sum_of_all_splicing_events)
+
+  return(dat)
+}
+
+
+density_plot <- function(dat,x.var,y.var, x_lab, y_lab,title){
+
+  print(cor.test(dat[[x.var]],dat[[y.var]], method = "spearman", exact = FALSE))
+  cor(dat[[x.var]],dat[[y.var]], use = "pairwise.complete.obs", method = "spearman")
+  
+  corr.value <- cor(dat[[x.var]],dat[[y.var]], use = "pairwise.complete.obs", method = "spearman")
+  p.value <- cor.test(dat[[x.var]],dat[[y.var]], use = "pairwise.complete.obs", method = "spearman")$p.value 
+  
+  # corr.value <- cor(FSM_TPM$ISOSEQ_TPM_Normalised,FSM_TPM$RNASeq_TPM) # normalised ISOSEQ FL counts to length
+  corr <- grobTree(textGrob(paste("r = ", round(corr.value, 2)), x = 0.05, y = 0.97, hjust = 0, 
+                            gp = gpar(col = "black", fontsize = 20, fontface = "italic")))
+  
+  x.var <- rlang::sym(quo_name(enquo(x.var)))
+  y.var <- rlang::sym(quo_name(enquo(y.var)))
+  
+  mytheme <- theme(axis.line = element_line(colour = "black"),
+                 panel.grid.major = element_blank(),
+                 panel.grid.minor = element_blank(),
+                 panel.border = element_blank(),
+                 panel.background = element_blank(),
+                 text=element_text(size=20,  family="ArialMT"),
+                 axis.title.x = element_text(vjust=-0.5, colour = "black"),
+                 axis.title.y = element_text(vjust=0.5, margin = margin(t = 0, r = 10, b = 0, l = 0)),
+                 legend.position = c(.90, 0.95),
+                 #legend.justification = c(1,1),
+                 legend.box.just = "right",
+                 legend.margin = margin(6, 6, 6, 6), 
+                 legend.text = element_text(size = 20))
+  
+  p <- ggplot(dat, aes(x = !! x.var, y = !! y.var)) +
+    annotation_custom(corr) +
+    stat_density_2d(aes(fill = stat(level)), geom = "polygon") +
+    geom_point(size = 0.4, alpha = 0.25) +
+    scale_fill_distiller(palette=4, direction=1, name = "Density") +
+    theme_bw() +
+    labs(x = "No of Exons", y = "No of Splicing Events", title = paste(title,"\n\n\n")) + 
+    geom_smooth(method=lm, colour = "black") + 
+    mytheme 
+  
+  return(p)
+}
+
+```
+
+
+```{r, results="hide"}
+
+datasets <- c("WholeIsoSeq","HumanCTX","AdultCTX","FetalCTX")
+
+for(i in datasets){
+  print(paste("Processing with:", i))
+  SUPPA2_output <- Suppa2_output_final_table(SUPPA2_input_dir[i], i)
+  SUPPA2_genes <- Suppa2_total_gene_output_table(SUPPA2_output)
+  SUPPA2_events_no <- Sum_No_Events(SUPPA2_genes)
+  SUPPA2_genes_no <- Sum_No_Genes(SUPPA2_genes, SQANTI2_input_file[i])
+  SUPPA2_genes_no_events <- Gene_with_no_events(SUPPA2_genes)
+  SUPPA2_genes_sum_events <- sum_no_all_splicing_events(SUPPA2_genes)
+    
+  # Exon and number of splicing events correlation 
+  SQANTI2_exon <- exon_event_table(SQANTI2_input_file[i])
+  SQANTI2_exon$dataset <- i
+  SUPPA2_SQANTI2_exon <- merge(SQANTI2_exon, SUPPA2_genes_no_events, by.x = "Gene", by.y = "Genes")
+  
+  # Exon and sum of all splicing events correlatiion
+  SUPPA2_SQANTI2_exon_sum <- merge(SQANTI2_exon, SUPPA2_genes_sum_events, by.x = "Gene", by.y = "Gene")
+  
+  SUPPA2_events_no$dataset <- i
+  SUPPA2_genes_no$dataset <- i
+  SUPPA2_genes_no_events$dataset <- i
+  
+  SUPPA2_all_output <- list(SUPPA2_output,SUPPA2_genes,SUPPA2_events_no,SUPPA2_genes_no,
+  SUPPA2_genes_no_events, SUPPA2_SQANTI2_exon, SUPPA2_SQANTI2_exon_sum)
+  names(SUPPA2_all_output) <- c("SUPPA2_output","SUPPA2_genes","SUPPA2_events_no","SUPPA2_genes_no",
+                                "SUPPA2_genes_no_events","SUPPA2_SQANTI2_exon","SUPPA2_SQANTI2_exon_sum")
+  assign(paste0(i,"_SUPPA2_all_output"), SUPPA2_all_output, envir=.GlobalEnv)
+  rm(SUPPA2_output,SUPPA2_genes,SUPPA2_events_no,SUPPA2_genes_no,SUPPA2_genes_no_events, SUPPA2_SQANTI2_exon, SUPPA2_SQANTI2_exon_sum)
+  
+}
+
+```
+
+## Number of splice events per dataset
+
++ Combined Human (Adult and Fetal): *`r SQANTI2_input_file$combined`* \
++ Human Adult: *`r SQANTI2_input_file$adult`* \
++ Human Fetal: *`r SQANTI2_input_file$fetal`* \
++ Mouse: *`r SQANTI2_input_file$WT8`* \
+
+```{r}
+
+Sum_No_Events <- rbind(WholeIsoSeq_SUPPA2_all_output$SUPPA2_events_no,
+                       HumanCTX_SUPPA2_all_output$SUPPA2_events_no,
+                       AdultCTX_SUPPA2_all_output$SUPPA2_events_no,
+                       FetalCTX_SUPPA2_all_output$SUPPA2_events_no)
+
+Total_No_Events <- aggregate(`No of Events`~ dataset, Sum_No_Events, sum) %>%
+  mutate(`No of Events` = as.character(`No of Events`)) %>%
+  spread(., dataset, `No of Events`) 
+
+Sum_No_Events_table <- Sum_No_Events %>%
+  mutate(concat = paste0(Sum_No_Events$`No of Events`," (", Sum_No_Events$Perc,"%)")) %>%
+  select("Events","dataset","concat") %>%
+  spread(., dataset, concat) %>%
+  bind_rows(., Total_No_Events[1,]) %>%
+  mutate(Events=replace(Events, is.na(Events), "Total AS Events"))
+
+kable(Sum_No_Events_table, caption = "Number and Proportion of Splicing Events")
+
+# output for all plots in one place (All_Plots_Functions.sh)
+ write.csv(Sum_No_Events, paste0(output_table_dir, "/AS_IR/SUPPA2_Sum_No_Events.csv"))
+
+p1 <- Sum_No_Events %>%
+  mutate(percentage_plot = Perc/100) %>%
+  ggplot(., aes(x = dataset, y = percentage_plot, fill = Events)) + 
+  geom_bar(stat = "identity") + 
+  theme_bw() +
+  mytheme + 
+  scale_fill_viridis(discrete=TRUE) + 
+  scale_y_continuous(labels = scales::percent) +
+  scale_x_discrete(labels=c("Human", "Human(Adult)", "Human(Fetal)", "Mouse")) + 
+  #theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
+  labs(x = "", y = "Splicing Events")
+
+p1
+```
+
+## Number of Genes 
+
+# Note this plot has redundant genes that have different splicinge events 
+```{r}
+Sum_No_Genes <- rbind(WholeIsoSeq_SUPPA2_all_output$SUPPA2_genes_no,
+                       HumanCTX_SUPPA2_all_output$SUPPA2_genes_no,
+                       AdultCTX_SUPPA2_all_output$SUPPA2_genes_no,
+                       FetalCTX_SUPPA2_all_output$SUPPA2_genes_no)
+
+Total_No_Genes <- aggregate(`Number of Total Genes`~ dataset, Sum_No_Genes, sum) %>%
+  mutate(`Number of Total Genes` = as.character(`Number of Total Genes`)) %>%
+  spread(., dataset, `Number of Total Genes`) 
+
+Total_No_Genes_Perc <- aggregate(Percentage~ dataset, Sum_No_Genes, sum) %>%
+  mutate(Percentage= as.character(Percentage)) %>%
+  spread(., dataset, Percentage) 
+
+Sum_No_Genes_table <- Sum_No_Genes %>%
+  mutate(concat = paste0(Sum_No_Genes$`Number of Total Genes`," (", Sum_No_Genes$Percentage,"%)")) %>%
+  select("Events","dataset","concat") %>%
+  spread(., dataset, concat) %>%
+  bind_rows(.,Total_No_Genes[1,]) %>%
+  mutate(Events=replace(Events, is.na(Events), "Total Genes with Events")) %>%
+  bind_rows(.,Total_No_Genes_Perc[1,]) %>%
+  mutate(Events=replace(Events, is.na(Events), "Total Genes with Events (%)"))
+  
+kable(Sum_No_Genes_table, caption = "Number and Proportion of Genes with reported splicing events")
+
+write.csv(Sum_No_Genes, paste0(output_table_dir, "/AS_IR//SUPPA2_Sum_No_Genes.csv"))
+
+p2 <- Sum_No_Genes %>%
+  mutate(percentage_plot = Percentage/100) %>%
+  filter(dataset != "combined") %>%
+  ggplot(., aes(x = dataset, y = `percentage_plot`, fill = Events)) + 
+  geom_bar(stat = "identity") + 
+  theme_bw() +
+  mytheme +
+  scale_fill_viridis(discrete=TRUE) + 
+  scale_y_continuous(labels = scales::percent) +
+  scale_x_discrete(labels=c("Human(Adult)", "Human(Fetal)", "Mouse")) + 
+  #theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
+  labs(x = "", y = "Genes")
+
+p2
+
+unique_num_genes_events <- function(i){
+    # number of genes with splicing events (excluding novel genes)
+    annotated <- i[i[["Gene"]] != "noveGene",]
+    print(length(unique(annotated[["Gene"]])))
+}
+
+unique_num_genes_events(HumanCTX_SUPPA2_all_output$SUPPA2_genes)
+unique_num_genes_events(AdultCTX_SUPPA2_all_output$SUPPA2_genes)
+unique_num_genes_events(FetalCTX_SUPPA2_all_output$SUPPA2_genes)
+unique_num_genes_events(WholeIsoSeq_SUPPA2_all_output$SUPPA2_genes)
+
+
+#as.numeric(count(unique(HumanCTX_SUPPA2_all_output$SUPPA2_genes[HumanCTX_SUPPA2_all_output$SUPPA2_genes[["Gene"]] != "novelGene",])))
+#human_AS_genes <- HumanCTX_SUPPA2_all_output$SUPPA2_genes$Gene[
+  #HumanCTX_SUPPA2_all_output$SUPPA2_genes$Gene != "novelGene"]
+
+#length(human_AS_genes)
+```
+
+## List of Genes with the most observed splicing events 
+
+## Example: Human Combined
+Following table refers to the top 10 genes observed with greatest number of splicing events i.e. genes with greatest diversity of splicing events. \
+Note: Greatest number of splicing events = 7 from A3, A5, AF, AL, MX, RI, SE as SUPPA2 output
+
+```{r}
+kable(Gene_with_most_events(HumanCTX_SUPPA2_all_output, "combined"), 
+      caption = "Top 10 genes with greatest numer of splicing events in combined_human dataset ")
+kable(HumanCTX_SUPPA2_all_output$SUPPA2_genes[HumanCTX_SUPPA2_all_output$SUPPA2_genes$Gene == "CAMK2B",], caption = "Proof of CAMK2B observed with 7 different splicing events")
+
+## Save as output for plotting in IsoSeq paper of the number of splicig events and percentage of genes
+num_events_merge <- bind_rows(HumanCTX_SUPPA2_all_output$SUPPA2_genes_no_events, 
+         AdultCTX_SUPPA2_all_output$SUPPA2_genes_no_events, 
+         FetalCTX_SUPPA2_all_output$SUPPA2_genes_no_events, 
+         WholeIsoSeq_SUPPA2_all_output$SUPPA2_genes_no_events)
+
+write.csv(num_events_merge, paste0(output_table_dir, "/AS_IR//SUPPA2_NumEvents_PerGene.csv"))
+
+
+# number of genes with >6 events 
+for(i in list(HumanCTX_SUPPA2_all_output$SUPPA2_genes_no_events,
+              AdultCTX_SUPPA2_all_output$SUPPA2_genes_no_events, 
+              FetalCTX_SUPPA2_all_output$SUPPA2_genes_no_events, 
+              WholeIsoSeq_SUPPA2_all_output$SUPPA2_genes_no_events)){
+  print(nrow(i[i$`Number of Splicing Events` >= 6,]))
+}
+
+WholeIsoSeq_SUPPA2_all_output$SUPPA2_genes_no_events$Genes <- toupper(WholeIsoSeq_SUPPA2_all_output$SUPPA2_genes_no_events$Genes) 
+intersect(HumanCTX_SUPPA2_all_output$SUPPA2_genes_no_events[HumanCTX_SUPPA2_all_output$SUPPA2_genes_no_events$`Number of Splicing Events` >= 6, "Genes"],
+          WholeIsoSeq_SUPPA2_all_output$SUPPA2_genes_no_events[WholeIsoSeq_SUPPA2_all_output$SUPPA2_genes_no_events$`Number of Splicing Events` >= 6, "Genes"])
+
+
+
+```
+
+## Across all datasets
+
+Table below aggreates the top 10 genes with the number of splicing events per dataset, to identify the most common diverse gene across the datasets: CAMK2B/ MEG3
+```{r}
+Genes_Splicing_Event <- list(Gene_with_most_events(HumanCTX_SUPPA2_all_output, "combined"),
+                            Gene_with_most_events(AdultCTX_SUPPA2_all_output, "adult"),
+                            Gene_with_most_events(FetalCTX_SUPPA2_all_output, "fetal"),
+                            Gene_with_most_events(WholeIsoSeq_SUPPA2_all_output, "WT8"))
+
+
+
+Genes_Splicing_Event <- do.call("rbind", Genes_Splicing_Event)
+Genes_Splicing_Event$Genes <- toupper(Genes_Splicing_Event$Genes)
+
+Genes_Splicing_Event %>%
+  spread(Genes, "Number of Splicing Events") %>%
+  .[,c(1,9,31,2:8,10:30,32)] %>%
+  datatable(., caption = "Number of Splicing Events in top 10 most diverse genes per dataset")
+```
+
+
+```{r}
+ggplot(AdultCTX_SUPPA2_all_output$SUPPA2_SQANTI2_exon, aes(x = `No_of_Exons`, y = `Number of Splicing Events`)) + geom_point()
+
+density_plot(HumanCTX_SUPPA2_all_output$SUPPA2_SQANTI2_exon,"No_of_Exons","Number of Splicing Events","No of Exons","No of Splicing Events","Combined" )
+
+density_plot(AdultCTX_SUPPA2_all_output$SUPPA2_SQANTI2_exon,"No_of_Exons","Number of Splicing Events","No of Exons","No of Splicing Events","Adult" )
+
+density_plot(FetalCTX_SUPPA2_all_output$SUPPA2_SQANTI2_exon,"No_of_Exons","Number of Splicing Events","No of Exons","No of Splicing Events","Fetal" )
+
+density_plot(WholeIsoSeq_SUPPA2_all_output$SUPPA2_SQANTI2_exon,"No_of_Exons","Number of Splicing Events","No of Exons","No of Splicing Events","Mouse" )
+```
+
+
+```{r}
+
+density_plot(HumanCTX_SUPPA2_all_output$SUPPA2_SQANTI2_exon_sum,"No_of_Exons","sum_of_all_splicing_events","No of Exons","No of Splicing Events","Combined" )
+
+density_plot(AdultCTX_SUPPA2_all_output$SUPPA2_SQANTI2_exon_sum,"No_of_Exons","sum_of_all_splicing_events","No of Exons","No of Splicing Events","Adult" )
+
+density_plot(FetalCTX_SUPPA2_all_output$SUPPA2_SQANTI2_exon_sum,"No_of_Exons","sum_of_all_splicing_events","No of Exons","No of Splicing Events","Fetal" )
+
+density_plot(WholeIsoSeq_SUPPA2_all_output$SUPPA2_SQANTI2_exon_sum,"No_of_Exons","sum_of_all_splicing_events","No of Exons","No of Splicing Events","WT8" )
+  
+hist(log(FetalCTX_SUPPA2_all_output$SUPPA2_SQANTI2_exon_sum$sum_of_all_splicing_events))
+hist(FetalCTX_SUPPA2_all_output$SUPPA2_SQANTI2_exon_sum$sum_of_all_splicing_events)
+
+density_plot(FetalCTX_SUPPA2_all_output$SUPPA2_SQANTI2_exon_sum,"No_of_Exons","log_sum","No of Exons","No of Splicing Events","Fetal" )
+
+density_plot(FetalCTX_SUPPA2_all_output$SUPPA2_SQANTI2_exon_sum[FetalCTX_SUPPA2_all_output$SUPPA2_SQANTI2_exon_sum$sum_of_all_splicing_events < 20,],"No_of_Exons","sum_of_all_splicing_events","No of Exons","No of Splicing Events","Combined Human" )
+
+```
+```{r}
+#pdf(paste0(output_dir,"/AS_IR//SUPPA_AS_Plots.pdf"), width = 11, height = 8.5)
+#p1
+#p2
+#dev.off()
+```
+
+## Comparison of Intron Retention between SUPPA2 and SQANTI2
+
+```{r}
+SUPPA2_IR <- unique(WholeIsoSeq_SUPPA2_all_output$SUPPA2_output$WT8IsoSeq_RI_strict.ioe.txt$Gene)
+SQANTI2_IR <- unique(SQANTI2_mouse[SQANTI2_mouse$subcategory == "intron_retention", "associated_gene"])
+
+length(SUPPA2_IR)
+length(SQANTI2_IR)
+# Genes with intron retention, identified in SUPPA2 but not SQANTI2 
+setdiff(SUPPA2_IR,SQANTI2_IR)
+
+# Genes with intron retention, identified in SQANTI2 but not in SUPPA2
+setdiff(SQANTI2_IR,SUPPA2_IR)
+
+SQANTI2_mouse[SQANTI2_mouse$associated_gene == "Psmc5",]
+```
+
+## Venn Diagram 
+```{r}
+# write output for input to plot in All_Plots.R
+AdultCTX_SUPPA2_all_output$SUPPA2_genes$Sample <- "Adult"
+FetalCTX_SUPPA2_all_output$SUPPA2_genes$Sample <- "Fetal"
+HumanCTX_SUPPA2_all_output$SUPPA2_genes$Sample <- "Human"
+WholeIsoSeq_SUPPA2_all_output$SUPPA2_genes$Sample <- "Mouse"
+
+ALL_SUPPA2_Genes <- bind_rows(AdultCTX_SUPPA2_all_output$SUPPA2_genes, 
+                              FetalCTX_SUPPA2_all_output$SUPPA2_genes, 
+                              HumanCTX_SUPPA2_all_output$SUPPA2_genes,
+                              WholeIsoSeq_SUPPA2_all_output$SUPPA2_genes)
+
+write.table(ALL_SUPPA2_Genes, paste0(output_table_dir, "/AS_IR/ALL_SUPPA2_Genes_Output.txt"))
+```
+
+
