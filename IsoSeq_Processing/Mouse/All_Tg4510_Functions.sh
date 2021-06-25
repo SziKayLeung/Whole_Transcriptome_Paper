@@ -17,11 +17,19 @@
 # 13) run_ERCC_analysis <sample_prefix_input/output_name> <isoseq3_input_directory> <output_dir>
 ### QC
 # 14) ccs_bam2fasta <sample_name> <input_ccs.bam_dir> <output_dir>
-# 15) make_file_for_rarefaction <sample_name_prefix> <input_tofu_directory> <input_sqanti_tama_directory> <working_directory
-# 16) parse_stats_per_sample <input_ccs.bam_dir> <Input_LIMA_directory> <output_prefix_name>
+# 15) lenghts <sample> <prefix.fasta> <input_dir> <output_dir>
+# 16) make_file_for_rarefaction <sample_name_prefix> <input_tofu_directory> <input_sqanti_tama_directory> <working_directory
+# 17) parse_stats_per_sample <input_ccs.bam_dir> <Input_LIMA_directory> <output_prefix_name>
 ### RNA-Seq defined transcriptome
-# 17) run_stringtie <input_reference_gtf> <input_mapped_dir> <output_stringtie_dir> <output_prefix>
-
+# 18) run_stringtie <input_reference_gtf> <input_mapped_dir> <output_stringtie_dir> <output_prefix>
+# 19) run_longshort_gffcompare <longread_gtf> <shortread_gtf> <output_dir> <output_name>
+# 20) run tama merge <isoseq_gtf> <rnaseq_gtf> <isoseq_gtf_name> <rnaseq_gtf_name> <output_dir> <tama_output_name>
+### Iso-Seq vs RNA-Seq defined transcriptome
+# 21) run_counts_isoseqrnaseqtranscriptome <alignmentgtf> <fwd_rnaseq> <rev_rnaseq> <output_name> <output_dir>
+### ALternative Splicing
+# 22) run_suppa2 <input_gtf> <input_class> <output_dir> <output_name>
+### Human MAPT
+# 23) find_humanMAPT <cluster_dir> <output_dir> <merged_cluster.fa>
 ################################################################################################
 
 #************************************* DEFINE VARIABLES
@@ -101,6 +109,21 @@ run_REFINE(){
   fi
 
   source deactivate
+}
+
+refine2fasta(){
+  input_dir=$1
+  output_dir=$2
+
+  Samples=$(echo "${@:3}")
+
+  REFERENCE=/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/reference_2019
+  cd $output_dir
+  source activate sqanti2_py3
+  for i in ${Samples[@]}; do echo "Processing: $i"; samtools bam2fq $input_dir/$i.flnc.bam | seqtk seq -A > $i.fa; done
+  cat *fa* > All_flnc.fasta
+  minimap2 -t 30 -ax splice -uf --secondary=no -C5 -O6,24 -B4 $REFERENCE/mm10.fa All_flnc.fasta > All.sam 2> All.map.log
+  samtools sort -O SAM All.sam > All.sorted.sam
 }
 
 # run_CLUSTER $Sample $Input_REFINE_directory $Output_directory
@@ -184,6 +207,19 @@ run_map_cupcakecollapse(){
     cd $3 #cd to $MAP directory for output
     minimap2 -t 30 -ax splice -uf --secondary=no -C5 -O6,24 -B4 $REFERENCE/mm10.fa $2/$1.clustered.hq.fastq > $1.sam 2> $1.map.log
     samtools sort -O SAM $1.sam > $1.sorted.sam
+
+    # Alignment stats
+    mkdir PAF; cd PAF
+    source activate nanopore
+    htsbox samview -pS $3/$1.sorted.sam > $1.paf
+    awk -F'\t' '{if ($6="*") {print $0}}' $1.paf > $1.allread.paf # all reads
+    awk -F'\t' '{if ($6=="*") {print $0}}' $1.paf > $1.notread.paf
+    awk -F'\t' '{if ($6!="*") {print $0}}' $1.paf > $1.filtered.paf
+    awk -F'\t' '{print $1,$6,$8+1,$2,$4-$3,($4-$3)/$2,$10,($10)/($4-$3),$5,$13,$15,$17}' $1.filtered.paf | sed -e s/"mm:i:"/""/g -e s/"in:i:"/""/g -e s/"dn:i:"/""/g | sed s/" "/"\t"/g > $1"_reads_with_alignment_statistics.txt"
+    echo "Number of mapped transcripts to genome:"
+    wc -l $1.filtered.paf
+    echo "Number of ummapped transcripts to genome:"
+    wc -l $1.notread.paf
 
     echo "Processing Sample $1 for TOFU, with coverage 85% and identity 95%"
     source activate cupcake
@@ -393,7 +429,7 @@ run_sqanti2(){
 
     elif [ $8 == "genome" ]; then
       echo "Processing with gencode.vM22.annotation.gtf for genome annotation "
-      python $SQANTI2_DIR/sqanti_qc2.py -t 30 --gtf $3/$2 $REFERENCE/gencode.vM22.annotation.gtf $REFERENCE/mm10.fa --cage_peak $CAGE_DIR/mm10.cage_peak_phase1and2combined_coord.bed --coverage "./*SJ.out.bed" --polyA_motif_list $SQANTI2_DIR/../human.polyA.list.txt --expression $5 --fl_count $6 &> $1.sqanti.qc.log
+      python $SQANTI2_DIR/sqanti_qc2.py -t 30 --gtf $3/$2 $REFERENCE/gencode.vM22.annotation.gtf $REFERENCE/mm10.fa --cage_peak $CAGE_DIR/mm10.cage_peak_phase1and2combined_coord.bed --coverage ./*SJ.out.bed --polyA_motif_list $SQANTI2_DIR/../human.polyA.list.txt --expression $5 --fl_count $6 &> $1.sqanti.qc.log
     else
       echo "8th argument required"
     fi
@@ -417,7 +453,7 @@ TAMA_remove_fragments(){
 
     TAMAFUNCTIONS=/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/Scripts/General/2_Transcriptome_Annotation/TAMA
     TAMA_DIR=/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/softwares/tama/tama_go/filter_transcript_models
-    source activate sqanti2
+    source activate sqanti2_py3
     cd $3
 
     # convert gtf to bed12
@@ -427,6 +463,7 @@ TAMA_remove_fragments(){
 
     # Rscript script.R <name>.bed12 <input_dir>
 	  Rscript $TAMAFUNCTIONS/TAMA_Merge_Prepare.R Tama_$2 $3
+    source activate sqanti2
 	  python $TAMA_DIR/tama_remove_fragment_models.py -f Tama_$2_mod.bed12 -o $2
 
 	  rm *Tama*
@@ -448,6 +485,10 @@ TAMA_sqanti_filter(){
   cd $8
   awk '{ print $4 }' $1| cut -d ";" -f 2  > tama_retained_pbid.txt
   python $GENERALFUNC/TAMA/tama_sqanti_fastasubset.py $2/$5 $8/tama_retained_pbid.txt $8/$7"_sqantifiltered_tamafiltered_classification.fasta"
+
+  # reinsert the quotation marks around the transcript id, gene id etc as required for recognition by SQANTI2
+  # note, these are removed after processing in R
+  sed 's/transcript_id \([^;]\+\)/transcript_id \"\1\"/g' $7"_sqantitamafiltered.classification.gtf" | sed 's/gene_id \([^;]\+\)/gene_id \"\1\"/g' | sed 's/gene_name \([^;]\+\)/gene_name \"\1\"/g' | sed 's/ref_gene_id \([^;]\+\)/ref_gene_id \"\1\"/g' > $7"_sqantitamafiltered.final.classification.gtf"
 }
 
 
@@ -470,6 +511,12 @@ run_ERCC_analysis(){
     minimap2 -t 30 -ax splice -uf --secondary=no -C5 -O6,24 -B4 $REFERENCE_ERCC/ERCC92.fa $2/$1.clustered.hq.fastq > $1.sam 2> $1.map.log
     samtools sort -O SAM $1.sam > $1.sorted.sam
 
+    htsbox samview -pS $1.sorted.sam > $1.paf
+    awk -F'\t' '{if ($6="*") {print $0}}' $1.paf > $1.allread.paf # all reads
+    awk -F'\t' '{if ($6=="*") {print $0}}' $1.paf > $1.notread.paf
+    awk -F'\t' '{if ($6!="*") {print $0}}' $1.paf > $1.filtered.paf
+    awk -F'\t' '{print $1,$6,$8+1,$2,$4-$3,($4-$3)/$2,$10,($10)/($4-$3),$5,$13,$15,$17}' $1.filtered.paf | sed -e s/"mm:i:"/""/g -e s/"in:i:"/""/g -e s/"dn:i:"/""/g | sed s/" "/"\t"/g > $1"_reads_with_alignment_statistics.txt"
+
     # Cupcake
     coverage_threshold=0.85
     identity_threshold=0.95
@@ -477,23 +524,24 @@ run_ERCC_analysis(){
     source activate cupcake
     head $CUPCAKE/README.md
     collapse_isoforms_by_sam.py -c $coverage_threshold -i $identity_threshold --input $2/$1.clustered.hq.fastq --fq -s $1.sorted.sam --dun-merge-5-shorter -o $1 &>> $1.collapse.log
-    get_abundance_post_collapse.py $1.collapsed $2/$1.polished.cluster_report.csv &>> $1.abundance.log
+    get_abundance_post_collapse.py $1.collapsed $2/$1.clustered.cluster_report.csv &>> $1.abundance.log
 
     # SQANTI
     source activate sqanti2_py3
     export PYTHONPATH=$PYTHONPATH:$SEQUENCE
     prefix=$1.collapsed
     python $SQANTI2_dir/sqanti_qc2.py -v
-    python $SQANTI2_dir/sqanti_qc2.py -t 30 --gtf $prefix.gff $REFERENCE_ERCC/ERCC92.gtf $REFERENCE_ERCC/ERCC92.fa &>> $1.sqanti.qc.log
+    python $SQANTI2_dir/sqanti_qc2.py -t 30 --gtf $prefix.gff $REFERENCE_ERCC/ERCC92.gtf $REFERENCE_ERCC/ERCC92.fa --fl_count $prefix.abundance.txt &>> $1.sqanti.qc.log
     python $SQANTI2_dir/sqanti_filter2.py $prefix"_classification.txt" $prefix"_corrected.fasta" $prefix"_corrected.gtf" -a 0.6 -c 3 &>> $1.sqanti.filter.log
     TAMA_remove_fragments WholeIsoSeq.collapsed_classification.filtered_lite.gtf WholeIsoSeq $3
+    TAMA_remove_fragments WholeIsoSeq.collapsed_corrected.gtf WholeIsoSeq.collapsed $3 # from SQANTI classification not filter
     TAMA_sqanti_filter WholeIsoSeq.bed $3 WholeIsoSeq.collapsed_classification.filtered_lite_classification.txt WholeIsoSeq.collapsed_classification.filtered_lite.gtf WholeIsoSeq.collapsed_classification.filtered_lite.fasta WholeIsoSeq.collapsed_classification.filtered_lite_junctions.txt WholeIsoSeq $3
 
     source deactivate
 }
 
 ################################################################################################
-#************************************* QC [Function 14]
+#************************************* QC [Function 14 - 17]
 # ccs_bam2fasta: convert ccs_bam to fasta
 # ccs_bam2fasta <sample_name> <input_ccs.bam_dir> <output_dir>
 # output file = <sample_name>.ccs.fasta
@@ -517,6 +565,23 @@ ccs_bam2fasta(){
     source deactivate
 }
 
+# lenghts <sample> <prefix.fasta> <input_dir> <output_dir>
+lengths(){
+  # variables
+  sample=$1
+  suffix=$2
+  input_dir=$3
+  output_dir=$4
+
+  echo "Extracting length of Sample $sample"
+  source activate sqanti2_py3
+  CUPCAKE=/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/softwares/Post_Isoseq3/cDNA_Cupcake
+  export PYTHONPATH=$PYTHONPATH:$CUPCAKE/sequence
+  export PATH=$PATH:$CUPCAKE/sequence
+  cd $output_dir
+  get_seq_stats.py $input_dir/$sample$suffix &>> $sample.get_seq.log
+}
+
 # make_file_for_rarefaction <sample_name_prefix> <input_tofu_directory> <input_sqanti_tama_directory> <working_directory>
 make_file_for_rarefaction(){
     source activate cupcake
@@ -527,7 +592,7 @@ make_file_for_rarefaction(){
     prefix=$1.collapsed
   	# make_file_for_subsampling_from_collapsed.py <sample_name_prefix>.input.file <sample_name_prefix>.output.file <sample_name_prefix>.classification.txt
   	python $CUPCAKE_ANNOTATION/make_file_for_subsampling_from_collapsed.py -i $2/$prefix -o $1.subsampling -m2 $3/$1_sqantitamafiltered.classification.txt &>> $1.makefile.log
-    python $CUPCAKE_ANNOTATION/subsample.py --by refgene --min_fl_count 2 --step 1000 $1.subsampling.all.txt > $1.rarefaction.by_refgene.min_fl_2.txt 
+    python $CUPCAKE_ANNOTATION/subsample.py --by refgene --min_fl_count 2 --step 1000 $1.subsampling.all.txt > $1.rarefaction.by_refgene.min_fl_2.txt
     python $CUPCAKE_ANNOTATION/subsample.py --by refisoform --min_fl_count 2 --step 1000 $1.subsampling.all.txt > $1.rarefaction.by_refisoform.min_fl_2.txt
   	python $CUPCAKE_ANNOTATION/subsample_with_category.py --by refisoform --min_fl_count 2 --step 1000 $1.subsampling.all.txt > $1.rarefaction.by_refisoform.min_fl_2.by_category.txt
 
@@ -551,7 +616,7 @@ parse_stats_per_sample(){
 
 
 ################################################################################################
-#************************************* RNA-Seq defined transcriptome [Function 17]
+#************************************* RNA-Seq defined transcriptome [Function 18]
 # RNASeq alone
 # run_stringtie <input_reference_gtf> <input_mapped_dir> <output_stringtie_dir> <output_prefix>
 # input: Sample names taken from working script
@@ -592,4 +657,199 @@ run_stringtie(){
     # note, these are removed after processing in R
     sed 's/transcript_id \([^;]\+\)/transcript_id \"\1\"/g' $output_prefix"_mod.gtf" | sed 's/gene_id \([^;]\+\)/gene_id \"\1\"/g' | sed 's/gene_name \([^;]\+\)/gene_name \"\1\"/g' | sed 's/ref_gene_id \([^;]\+\)/ref_gene_id \"\1\"/g' > $output_prefix"_final.gtf"
 
+}
+
+# run_longshort_gffcompare <longread_gtf> <shortread_gtf> <output_dir> <output_name>
+run_longshort_gffcompare(){
+  # variable
+  longread_gtf=$1
+  shortread_gtf=$2
+  output_dir=$3
+  output_name=$4
+
+  cd $output_dir
+
+  # reinsert the quotation marks around the transcript id, gene id etc as required for recognition by SQANTI2
+  # note, these are removed after processing in R
+  echo "Processing: $longread_gtf"
+  echo "Against: $shortread_gtf"
+  sed 's/transcript_id \([^;]\+\)/transcript_id \"\1\"/g' $longread_gtf | sed 's/gene_id \([^;]\+\)/gene_id \"\1\"/g' | sed 's/gene_name \([^;]\+\)/gene_name \"\1\"/g' | sed 's/ref_gene_id \([^;]\+\)/ref_gene_id \"\1\"/g' > WholeIsoSeq_longread.gtf
+
+  export PATH=$PATH:/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/softwares/gffcompare
+  gffcompare -R -r WholeIsoSeq_longread.gtf -o $output_name $shortread_gtf
+}
+
+
+# run tama merge <isoseq_gtf> <rnaseq_gtf> <isoseq_gtf_name> <rnaseq_gtf_name> <output_dir> <tama_output_name>
+run_tama_merge(){
+
+  source activate sqanti2
+
+  # variables
+  input_gtf1=$1
+  input_gtf2=$2
+  input_gtf1_name=$3
+  input_gtf2_name=$4
+  output_dir=$5
+  tama_output_name=$6
+
+
+  GENERALFUNC=/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/Scripts/General/2_Transcriptome_Annotation/TAMA
+  TAMA=/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/softwares/tama
+
+  # Modify_genomegtf_TAMAinput <input_gtf> <output_name>
+  Modify_genomegtf_TAMAinput(){
+
+    # variables
+    input_gtf=$1
+    output_name=$2
+    output_dir=$3
+    typegtf=$4
+
+    source activate sqanti2
+
+    echo "Preparing $input_gtf for TAMA merge"
+
+    gtfToGenePred $input_gtf $output_dir/$output_name"_annotation.genepred"
+    genePredToBed $output_dir/$output_name"_annotation.genepred" $output_dir/$output_name"_annotation.bed12"
+
+
+    ###################################
+    # change format specifically for tama merge (tab format)
+    ###################################
+    awk -F'\t' '{print $1,$2,$3,$4,"40",$6,$7,$8,"255,0,0",$10,$11,$12}' $output_dir/$output_name"_annotation.bed12"|\
+    sed s/" "/"\t"/g|sed s/",\t"/"\t"/g|sed s/",$"/""/g > $output_dir/Tama_$output_name"_annotation.bed12"
+
+    ###################################
+    # Modify column 4 of tab format to include "gene_id; transcript_id" as specified for TAMA
+    ## WTAC_scripts/assign_gene_id_gene_name_to_isoform_list_for_TAMA_merge.py <list_of_gene_transcript_id_path> <input_bed12_format> <output_bed12_format>
+    ###################################
+    if [ $typegtf == "RNASeq_mousegenome" ]; then
+      TAMA_ref=/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/reference_2019/TAMA_REFERENCE/gene_id_transcript_id_gene_name_mm10vM22_ERCC_SIRV
+      WTAC_scripts=/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/Scripts/Nanopore/WTAC_scripts
+      echo "Converting bed12 with usable bed12 using the genome"
+      echo "$TAMA_ref"
+      # Rscript script.R <input_gtf> <output_file>
+      Rscript $GENERALFUNC/MSTRG_format.R $input_gtf $output_dir/rnaseq_gene_id_MSTRG
+      cat $TAMA_ref $output_dir/rnaseq_gene_id_MSTRG > $output_dir/rnaseq_finalgeneid
+      python $WTAC_scripts/assign_gene_id_gene_name_to_isoform_list_for_TAMA_merge.py $output_dir/rnaseq_finalgeneid $output_dir/Tama_$output_name"_annotation.bed12" $output_dir/Tama_formatted_$output_name"_annotation.bed12"
+    elif [ $typegtf == "Isoseq" ]; then
+      echo "Converting bed12 with usable bed12 using the info from isoseq gtf"
+      #Rscript script.R <name>.bed12 <input_dir>
+      Rscript $GENERALFUNC/TAMA_Merge_Prepare.R Tama_$output_name"_annotation" $output_dir
+    else
+      echo "4th argument required as RNASeq_mousegenome or Isoseq"
+    fi
+  }
+
+
+  # Modify gtf for TAMA input
+  cd $output_dir
+  #Modify_genomegtf_TAMAinput $input_gtf1 $input_gtf1_name $output_dir Isoseq
+  #Modify_genomegtf_TAMAinput $input_gtf2 $input_gtf2_name $output_dir RNASeq_mousegenome
+  #mv Tama_$input_gtf1_name"_annotation_mod.bed12" Tama_formatted_$input_gtf1_name"_annotation.bed12"
+
+  echo "Merging $input_gtf1_name and $input_gtf2_name"
+  ###################################
+  # Create input file.list for Tama Merge input
+  # 1st line: refers to genome input (and therefore genome gff)
+  # 2nd line: refers to sample input (and therefore gff input)
+  # sample_gff = sample name with path directory removed user-defined 2nd argument
+  ###################################
+  echo "$output_dir/Tama_formatted_$input_gtf1_name"_annotation.bed12":no_cap:1,1,1:$input_gtf1_name"|sed s/":"/"\t"/g> $output_dir/file.list
+  echo "$output_dir/Tama_formatted_$input_gtf2_name"_annotation.bed12":no_cap:1,1,1:$input_gtf2_name"|sed s/":"/"\t"/g>>$output_dir/file.list
+  cat $output_dir/file.list
+  python $TAMA/tama_merge.py -f file.list -a 50 -z 50 -m 20 -p $tama_output_name &> $tama_output_name"_tama_merge.log"
+
+  source deactivate
+}
+
+################################################################################################
+echo "#************************************* Iso-Seq vs RNA-Seq defined transcriptome [Function 21]"
+
+# run_counts_isoseqrnaseqtranscriptome <alignmentgtf> <fwd_rnaseq> <rev_rnaseq> <output_name> <output_dir>
+# aim: to align merged rnaseq reads to iso-seq defined or rna-seq defined transcriptome using STAR, followed by featureCounts with the transcript mode
+run_counts_isoseqrnaseqtranscriptome(){
+  # variable
+  mousegtf=$1
+  fwd_rnaseq=$2
+  rev_rnaseq=$3
+  output_name=$4
+  output_dir=$5
+
+  REFERENCE=/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/reference_2019
+  STAR_reference_input_directory=/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/reference_2019/STAR_main
+  source activate sqanti2
+  echo "STAR Version"
+  STAR --version
+
+  cd $output_dir
+  echo "STAR alignment with $fwd_rnaseq and $rev_rnaseq"
+  STAR --runMode alignReads --runThreadN 32 --genomeDir $STAR_reference_input_directory --readFilesIn $fwd_rnaseq $rev_rnaseq --outSAMtype BAM SortedByCoordinate --chimSegmentMin 25 --chimJunctionOverhangMin 20 --chimOutType WithinBAM --chimFilter banGenomicN --chimOutJunctionFormat 1 --twopassMode Basic --twopass1readsN -1
+  mv Aligned.sortedByCoord.out.bam $output_name.sorted.bam
+
+  echo "Featurecounts with transcript mode"
+  featureCounts -T 8 -O -g transcript_id -p -a  $mousegtf -o $output_name.transcript_id.tsv $output_name.sorted.bam 2> $1.featurecounts.log
+}
+
+################################################################################################
+#************************************* Alternative Splicing [Function 22]
+
+# run_suppa2 <input_gtf> <input_class> <output_dir> <output_name>
+# input_gtf: sqanti tama filtered gtf
+# input_class: sqanti tama filtered classification file
+run_suppa2(){
+  # variable
+  input_gtf=$1
+  input_class=$2
+  output_dir=$3
+  output_name=$4
+
+  FUNCTIONS=/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/Scripts/General/2_Transcriptome_Annotation
+
+  source activate sqanti2_py3
+  cd $output_dir
+  suppa.py generateEvents -i $input_gtf -o $output_name --pool-genes -f ioe -e SE MX FL SS RI &>> $output_name"_suppa2.log"
+  python $FUNCTIONS/Suppa2_output_mod_updated.py $output_name $output_dir $input_class &>> $output_name"_suppa2_mod.log"
+}
+
+################################################################################################
+#************************************* Find human MAPT [Function 23]
+
+# find_humanMAPT <cluster_dir> <output_dir> <merged_cluster.fa>
+# cluster_dir = directory containing hq.fasta
+# aim: to grep only the clustered hq reads with human MAPT sequence in all the samples in the clustered directory
+find_humanMAPT(){
+  hMAPT_1=TGGTTAATCACTTAACCTGCTTTTGTCACTCGGCTTTGGCTCGGGACTTCAAAATCAGTGATGGGAGTAAGAGCAAATTTCATCTTTCCAAATTGATGGGTGGGCTAGTAATAAAATATTTAAAAAAAAACATTCAAAAACATGGCCACATCCAACATTTCCTCAGGCAATTCCTTTTGATTCTTTTTTCTTCCCCCTCCATGTA
+  hMAPT_2=AAAATCAGTGATGGGAGTAAGAGCAAATTTCATCTTTCCAAATTGATGGGTGGGCTAGTAATAAAATATTTAAAAAAAAACATTCAAAAACATGGCCACATCCAACATTTCCTCAGGCAATTCCTTTTGATTCTTTTTTCTTCCCCCTCCATGTAGAAGAGGGAGAAGGAGAGGCTCTGAAAGCTGCTTCTGGGGGATTT
+  mMAPT_1=GGGGGGTGGTATTCTGGGATGTGGGTCCCAGGCCTCCCATCCCTCACACAGCCACTGTATCCCCTCTCTCTGTCCTATCATGCCCACGTCTGCCACGAGAGCTAGTCACTGCCGTCCGTACATCACGTCTCACTGTCCTGAGTGCCATGC
+
+  # variables
+  cluster_dir=$1
+  output_dir=$2
+  merged_cluster=$3
+
+  for i in $cluster_dir/*fasta; do
+    echo "Processing with $i"
+    sample=$(basename "$i" | cut -d "." -f 1)
+
+    # grep the reads with the human MAPT1 and human MAPT2 sequences
+    # include just the headers for a count of the number of reads
+    grep -B1 $hMAPT_1 $i > $output_dir/$sample.hMAPT1.clustered.hq.fasta
+    grep "^>" $output_dir/$sample.hMAPT1.clustered.hq.fasta > $output_dir/$sample.hMAPT1.header
+
+    grep -B1 $mMAPT_1 $i > $output_dir/$sample.mMAPT1.clustered.hq.fasta
+    grep "^>" $output_dir/$sample.mMAPT1.clustered.hq.fasta > $output_dir/$sample.mMAPT1.header
+
+    grep -B1 $hMAPT_2 $i > $output_dir/$sample.hMAPT2.clustered.hq.fasta
+    grep "^>" $output_dir/$sample.hMAPT2.clustered.hq.fasta > $output_dir/$sample.hMAPT2.header
+  done
+
+  # Merged Cluster
+  source activate sqanti2_py3
+  GENERALFUNC=/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/Scripts/General/2_Transcriptome_Annotation/IsoSeq_QC
+  #script.py <path/input.fasta> <outputname> <path/outputdir>
+  merged_sample=$(basename "$merged_cluster" | cut -d "." -f 1)
+  python $GENERALFUNC/Find_Human_Mapt.py $merged_cluster $merged_sample $output_dir > $output_dir/$merged_sample.out
+  mv $output_dir/$merged_sample $output_dir/$merged_sample.clustered.hq.fasta
 }
