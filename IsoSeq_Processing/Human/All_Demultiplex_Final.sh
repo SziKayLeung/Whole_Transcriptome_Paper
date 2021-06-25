@@ -24,7 +24,8 @@ REFERENCE=/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/reference_2019
 
 #mkdir $Isoseq3_WKD $PostIsoseq3_WKD $RNASeq_WKD
 #cd $Isoseq3_WKD; mkdir CCS LIMA REFINE CLUSTER MERGED_CLUSTER
-cd $PostIsoseq3_WKD; mkdir MAP TOFU SQANTI2 KALLISTO TAMA SQANTI_TAMA_FILTER
+cd $Isoseq3_WKD/REFINE; mkdir fasta
+cd $PostIsoseq3_WKD; mkdir MAP TOFU SQANTI2 KALLISTO TAMA SQANTI_TAMA_FILTER SUPPA
 cd $PostIsoseq3_WKD/SQANTI2; mkdir GENOME CHESS LNCRNA
 cd $PostIsoseq3_WKD/TAMA; mkdir GENOME CHESS LNCRNA
 cd $PostIsoseq3_WKD/SQANTI_TAMA_FILTER; mkdir GENOME CHESS LNCRNA
@@ -50,6 +51,7 @@ merging_at_refine $Isoseq3_WKD/REFINE $Isoseq3_WKD/MERGED_CLUSTER FetalCTX ${FET
 merging_at_refine $Isoseq3_WKD/REFINE $Isoseq3_WKD/MERGED_CLUSTER FetalHIP ${FETALHIP_SAMPLES_NAMES[@]} 
 merging_at_refine $Isoseq3_WKD/REFINE $Isoseq3_WKD/MERGED_CLUSTER FetalSTR ${FETALSTR_SAMPLES_NAMES[@]} 
 
+refine2fasta $Isoseq3_WKD/REFINE $Isoseq3_WKD/REFINE/fasta AdultCTX1 AdultCTX2 AdultCTX3 AdultCTX4 AdultCTX5 FetalCTX1 FetalCTX2 FetalCTX3 FetalCTX4 FetalCTX5
 
 # 2) run_map_cupcakecollapse <sample_prefix_input/output_name> <isoseq3_input_directory> <mapping_output_directory> <tofu_output_directory>
 for i in HumanCTX AdultCTX FetalCTX FetalSTR FetalHIP; do run_map_cupcakecollapse $i $Isoseq3_WKD/MERGED_CLUSTER $PostIsoseq3_WKD/MAP $PostIsoseq3_WKD/TOFU; done
@@ -93,5 +95,15 @@ for dir in CHESS LNCRNA; do TAMA_remove_fragments $PostIsoseq3_WKD/SQANTI2/$dir/
 # 9) TAMA_sqanti_filter <TAMA_remove_fragments.output> <sqanti_filtered_dir> <sqanti_output_txt> <sqanti_output_gtf> <sqanti_output_fasta> <output_prefix_name> <output_dir>
 sqname=.collapsed_classification.filtered_lite
 for i in HumanCTX AdultCTX FetalCTX FetalSTR FetalHIP; do echo "#************* $i"; TAMA_sqanti_filter $PostIsoseq3_WKD/TAMA/GENOME/$i".bed" $PostIsoseq3_WKD/SQANTI2/GENOME $i$sqname"_classification.txt" $i$sqname".gtf" $i$sqname".fasta" $i$sqname"_junctions.txt" $i $PostIsoseq3_WKD/SQANTI_TAMA_FILTER/GENOME; done
+cd $PostIsoseq3_WKD/SQANTI_TAMA_FILTER/GENOME
+for i in HumanCTX AdultCTX FetalCTX FetalSTR FetalHIP; do
+  echo "Processing $i";
+  sed 's/transcript_id \([^;]\+\)/transcript_id \"\1\"/g' $i"_sqantitamafiltered.classification.gtf" | sed 's/gene_id \([^;]\+\)/gene_id \"\1\"/g' | sed 's/gene_name \([^;]\+\)/gene_name \"\1\"/g' | sed 's/ref_gene_id \([^;]\+\)/ref_gene_id \"\1\"/g' > $i"_sqantitamafiltered.final.classification.gtf";
+done
 
 for dir in CHESS LNCRNA; do TAMA_sqanti_filter $PostIsoseq3_WKD"/TAMA/"$dir"/HumanCTX.bed" $PostIsoseq3_WKD"/SQANTI2/"$dir HumanCTX$sqname"_classification.txt" HumanCTX$sqname".gtf" HumanCTX$sqname".fasta" HumanCTX$sqname"_junctions.txt" HumanCTX $PostIsoseq3_WKD"/SQANTI_TAMA_FILTER/"$dir; done
+
+################################################################################################
+#************************************* Alternative Splicing [Function 14]
+# run_suppa2 <input_gtf> <input_class> <output_dir> <output_name>
+for i in HumanCTX AdultCTX FetalCTX FetalSTR FetalHIP; do run_suppa2 $PostIsoseq3_WKD/SQANTI_TAMA_FILTER/GENOME/$i"_sqantitamafiltered.classification.gtf" $PostIsoseq3_WKD/SQANTI_TAMA_FILTER/GENOME/$i"_sqantitamafiltered.classification.txt" $PostIsoseq3_WKD/SUPPA $i; done

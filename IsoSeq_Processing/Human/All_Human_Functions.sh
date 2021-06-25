@@ -561,3 +561,27 @@ parse_ccs_merged_samples(){
     source deactivate
 }
 
+################################################################################################
+#************************************* Alternative Splicing [Function 14]
+
+# run_suppa2 <input_gtf> <input_class> <output_dir> <output_name>
+# input_gtf: sqanti tama filtered gtf
+# input_class: sqanti tama filtered classification file
+run_suppa2(){
+  # variable
+  input_gtf=$1
+  input_class=$2
+  output_dir=$3
+  output_name=$4
+
+  echo "#******************* $output_name"
+  echo "Processing gtf: $input_gtf"
+  echo "Processing classification file: $input_class"
+
+  FUNCTIONS=/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/Scripts/General/2_Transcriptome_Annotation
+
+  source activate sqanti2_py3
+  cd $output_dir
+  suppa.py generateEvents -i $input_gtf -o $output_name --pool-genes -f ioe -e SE MX FL SS RI &>> $output_name"_suppa2.log"
+  python $FUNCTIONS/Suppa2_output_mod_updated.py $output_name $output_dir $input_class &>> $output_name"_suppa2_mod.log"
+}
