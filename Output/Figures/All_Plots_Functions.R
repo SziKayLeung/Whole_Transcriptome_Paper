@@ -20,6 +20,7 @@ suppressMessages(library(VennDiagram))
 suppressMessages(library(directlabels))
 suppressMessages(library(cowplot))
 suppressMessages(library(wesanderson))
+suppressMessages(library(png))
 
 
 ### Source additional scripts #############################################################################
@@ -36,16 +37,16 @@ mymaintheme <- theme(axis.line = element_line(colour = "black"),
                  panel.grid.minor = element_blank(),
                  panel.border = element_blank(),
                  panel.background = element_blank(),
-                 text=element_text(size=20,  family="ArialMT"),
+                 text=element_text(size=14,  family="ArialMT"),
                  axis.title.x = element_text(vjust=-0.5, colour = "black"),
                  axis.title.y = element_text(vjust=0.5, margin = margin(t = 0, r = 10, b = 0, l = 0)),
                  legend.position = c(.90, 0.95),
                  #legend.justification = c(1,1),
                  legend.box.just = "right",
                  legend.margin = margin(6, 6, 6, 6), 
-                 legend.text = element_text(size = 20,family="ArialMT"),
-                 axis.text.x= element_text(size=15,  family="ArialMT"),
-                 axis.text.y= element_text(size=15,  family="ArialMT"))
+                 legend.text = element_text(size = 10,family="ArialMT"),
+                 axis.text.x= element_text(size=12,  family="ArialMT"),
+                 axis.text.y= element_text(size=12,  family="ArialMT"))
 
 mytheme <- theme(axis.line = element_line(colour = "black"),
                    panel.grid.major = element_blank(),
@@ -110,10 +111,10 @@ density_plot <- function(dat,x.var,y.var, x_lab, y_lab,title){
     geom_point(size = 0.4, alpha = 0.25) +
     scale_fill_distiller(palette=4, direction=1, name = "Density") +
     theme_bw() +
-    labs(x = x_lab, y = y_lab, title = paste(title,"\n\n")) + 
+    labs(x = x_lab, y = y_lab, title = paste(title)) + 
     geom_smooth(method=lm, colour = "black") + 
     mytheme + 
-    theme(legend.position = "none")
+    theme(legend.position = "none") + guides(fill=FALSE)
   
   return(p)
 }
@@ -152,12 +153,12 @@ venn_diagram_plot_twocircles <- function(set1, set2, label_set1, label_set2){
     fill = c(label_colour(label_set1),label_colour(label_set2)),
     
     # Numbers
-    cex = 3,
+    cex = 1,
     fontface = "bold",
     fontfamily = "ArialMT",
     
     # Set names
-    cat.cex = 2,
+    cat.cex = 1,
     cat.default.pos = "outer",
     cat.pos = c(-27, 27),
     cat.dist = c(0.055, 0.055),
@@ -187,12 +188,12 @@ venn_diagram_plot_twocircles_basic <- function(set1, set2, label_set1, label_set
     fill = c(label_colour(label_set1),label_colour(label_set2)),
     
     # Numbers
-    cex = 3,
+    cex = 1,
     fontface = "bold",
     fontfamily = "ArialMT",
     
     # Set names
-    cat.cex = 2,
+    cat.cex = 1,
     cat.default.pos = "outer",
     cat.pos = c(-27, 27),
     cat.dist = c(0.055, 0.055),
@@ -398,7 +399,7 @@ rarefaction_distribution <- function(){
       scale_color_manual(values=c(label_colour(dataset1), label_colour(dataset2)), 
                          labels=c(paste(dataset1,"Cortex"), paste(dataset2, "Cortex")), name = "") + 
       scale_linetype_manual(values=c("longdash","solid")) +
-      theme(legend.position = c(0.8, 0.6), legend.spacing.y = unit(-0.1, "cm"),legend.title = element_blank())
+      theme(legend.position = c(0.8, 0.6), legend.spacing.y = unit(-0.1, "cm"),legend.title = element_blank()) 
     
     return(p)
   }
@@ -416,9 +417,11 @@ rarefaction_distribution <- function(){
       mytheme + 
       scale_y_continuous(labels = ks, limits = c(0, 20000)) + 
       scale_x_continuous(labels = ks, expand = c(0.15, 0)) + 
-      theme(legend.position = "none") +
-      scale_linetype_manual(values=c("solid", "longdash","dotted")) +
-      geom_dl(aes(label = category),  method = list(dl.trans(x = x + 0.5), "last.bumpup", cex = 1.3, hjust = .1))
+      theme(legend.position = c(0.2,0.8)) + 
+      scale_colour_discrete(name = "") +
+      scale_linetype_manual(values=c("solid", "longdash","dotted")) + guides(linetype = FALSE) +
+      legend.text = element_text(size = 10,family="ArialMT")
+      #geom_dl(aes(label = category),  method = list(dl.trans(x = x + 0.5), "last.bumpup", cex = 1.3, hjust = .1))
     
     plot_category[[count]] <- p 
     count = count + 1
@@ -472,6 +475,42 @@ iso_length <- function(class){
   print(paste0("Number of isoforms 2-4kb:", two, "(",round(two/nrow(class),2) *100,"%)"))
   
   return(p)
+}
+
+cpat_plots <- function(cpat_input, species){
+  # coding probability 
+  p1 <- ggplot(cpat_input,aes(x = Coding_prob)) + geom_histogram() + labs(x = "Coding probability (CPAT)", y = "Number of Isoforms (Thousand)") + mytheme + scale_y_continuous(labels = ks)
+  
+  if(species == "Human"){
+    coding = cpat_input %>% filter(Coding_prob >= 0.364)
+  }else if(species == "Mouse"){
+    coding = cpat_input %>% filter(Coding_prob >= 0.44)
+  }else{print("EMPTY")}
+  # orf nucleotide length 
+  p2 <- ggplot(coding,aes(x = ORF)) + geom_histogram(bins = 50) + labs(x = "Nucleotide length (bp)", y = "Number of Isoforms (Thousand)") + mytheme + 
+    scale_y_continuous(labels = ks)
+  
+  return(list(p1,p2))
+}
+
+CPAT_plots_cate <- function(class_input, cpat_input, species){
+  if(species == "Human"){
+    coding = cpat_input %>% filter(Coding_prob >= 0.364)
+  }else if(species == "Mouse"){
+    coding = cpat_input %>% filter(Coding_prob >= 0.44)
+  }
+  else{print("EMPTY")}
+  
+  merged = merge(class_input,cpat_input, by.x = "isoform", by.y = "seq_ID",all.y = TRUE)
+  p <- ggplot(merged, aes(x = ORF, y = structural_category)) + geom_violin() +
+    labs(x = "ORF nucleotide length (bp)", y = "Structural Category") + mytheme + 
+    scale_y_continuous(labels = ks)
+
+  p2 <- ggplot(merged, aes(x = Coding_prob, y = structural_category)) + geom_violin() +
+    labs(x = "ORF nucleotide length (bp)", y = "Structural Category") + mytheme + 
+    scale_y_continuous(labels = ks) 
+  
+  return(list(p,p2))
 }
 
 ### RNASeq ################################################################################
@@ -948,7 +987,7 @@ no_of_isoforms_group <- function(){
     return(p)
   }
   
-  p1 <- plot_distribution("Human","Mouse")
+  p1 <- plot_distribution("Human","Mouse") + mymaintheme + theme(legend.position = c(0.8,0.8))
   p2 <- plot_distribution("Human (Adult)","Human (Fetal)")
   
   return(list(p1,p2))
@@ -992,25 +1031,27 @@ no_of_isoforms_gene <- function(){
 # Plot percentage of isoforms as merged comparison --> sample = "merged" 
 structural_categories_distribution <- function(sample){
   
-  if(sample == "Individual"){
+  if(sample != "Merged"){
     
     ## Individual Plot per Sample 
-    for(i in c("Mouse", "Adult","Fetal", "Human")){
-      p <- ggplot(class.files[[i]], aes(x=structural_category)) +
-        geom_bar(aes(y = (..count..)/sum(..count..) * 100, alpha=coding, fill=structural_category), 
+    dat <- class.files[[sample]]
+    #structural_category <- c("FSM","ISM","NIC","NNC","Fusion","Intergenic","Genic","Antisense")
+    #dat <- dat %>% filter(structural_category != "Genic\nIntron")
+    
+    
+    p <- ggplot(dat, aes(x=structural_category)) +
+        geom_bar(aes(y = (..count..)/sum(..count..) * 100, alpha=coding, fill= structural_category), 
                  color="black", size=0.3, width=0.7) +
         scale_x_discrete(drop=FALSE) + scale_alpha_manual(values=c(1,0.3), 
                                                           name = "", labels = c("Protein-coding", "Non-coding"))+ 
-        labs(x = "", y = "Isoforms (%)") +
+        labs(x = "", y = "Transcripts (%)") +
         mytheme + 
         geom_blank(aes(y=((..count..)/sum(..count..))), stat = "count") +
-        theme(axis.text.x = element_text(angle = 45)) +
-        theme(axis.title.x=element_blank()) +  theme(axis.text.x  = element_text(margin=margin(22,0,0,0), size=15, colour = "black")) +
+        theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
         theme(legend.justification=c(1,1), legend.position=c(1,1)) + 
         guides(fill=FALSE) 
       
-      print(p)
-    }
+      return(p)
   }else{
     if(sample == "Merged"){
       ## Across species
@@ -1084,32 +1125,32 @@ exon_length_isoform_correlation <- function(input_class_files){
   # P5: same plot as P4 but filtered at expression level --> SUPP
   # P6: exon vs number of isoforms (exon defined by representative transcript) --> SUPP
   # P7: same plot as P7 but filtered at expression level --> SUPP
-  p1 <- density_plot(dat1, "length","exons","Transcript length (bp)","Number of exons", 
-                     paste(sample, "Transcript length\nvs Number of Exons (all transcripts)"))
   
-  p2 <- density_plot(dat2, "Max_length","Max_exon", "Transcript length (bases)", "Number of exons",
-                     paste(sample, "Transcript length \nvs Number of Exons (representative transcript per gene)"))
+  # Transcript length\nvs Number of Exons (all transcripts)
+  p1 <- density_plot(dat1, "length","exons","Transcript length (bp)","Number of exons", "")
   
-  p3 <- density_plot(dat3, "Max_length","Max_exon", "Transcript length (bases)", "Number of exons",
-                     paste(sample, "Transcript length\nvs Number of Exons (representative transcript per gene):\nFiltered at 25TPM"))
+  # Transcript length \nvs Number of Exons (representative transcript per gene)
+  p2 <- density_plot(dat2, "Max_length","Max_exon", "Transcript length (bases)", "Number of exons","")
+  
+  # Transcript length\nvs Number of Exons (representative transcript per gene):\nFiltered at 25TPM"
+  p3 <- density_plot(dat3, "Max_length","Max_exon", "Transcript length (bases)", "Number of exons","")
   
   sink(paste0(output_corr_dir,"/",sample,"_exon_length_isoform_correlation.txt"))
   # Transcript length (max representative)\nvs Number of Isoforms
+  # "Transcript length (max representative) vs Number of Isoforms"
   p4 <- density_plot(dat2, "Max_length","Num_of_Isoforms", 
-                     "Gene Length (kb)", "Number of Isoforms", "Transcript length (max representative) vs Number of Isoforms") + 
-    scale_x_continuous(labels = ks) + labs(title="\n\n\n")
+                     "Gene Length (kb)", "Number of Isoforms", "") + scale_x_continuous(labels = ks) 
   
   # Transcript length (max representative)\nvs Number of Isoforms:\nFiltered for high gene expression
-  p5 <- density_plot(dat3, "Max_length","Num_of_Isoforms", 
-                     "Gene Length (kb)", "Number of Isoforms",
-                     " Transcript length (max representative) vs Number of Isoforms:Filtered for high gene expression") + 
-    scale_x_continuous(labels = ks) + labs(title="\n\n\n")
+  p5 <- density_plot(dat3, "Max_length","Num_of_Isoforms", "Gene Length (kb)", "Number of Isoforms","") + 
+    scale_x_continuous(labels = ks)
   
   # Number of Exons (max representative)\nvs Number of Isoforms
-  p6 <- density_plot(dat2, "Max_exon","Num_of_Isoforms", "Number of Exons", "Number of Isoforms","Number of Exons (max representative) vs Number of Isoforms") + labs(title="\n\n\n")
+  p6 <- density_plot(dat2, "Max_exon","Num_of_Isoforms", "Number of Exons", "Number of Isoforms","")
   
   # Number of Exons (max representative)\nvs Number of Isoforms:\nFiltered for high gene expression
-  p7 <- density_plot(dat3, "Max_exon","Num_of_Isoforms", "Number of Exons", "Number of Isoforms","Number of Exons (max representative) vs Number of Isoforms:Filtered for high gene expression") + labs(title="\n\n\n")
+  # "Number of Exons (max representative) vs Number of Isoforms:Filtered for high gene expression"
+  p7 <- density_plot(dat3, "Max_exon","Num_of_Isoforms", "Number of Exons", "Number of Isoforms","") 
   sink()
   
   
@@ -1174,11 +1215,11 @@ all_hist_peaks <- function(type){
     
     # plot 
     x_label <- 
-      if(feature == "diff_to_TSS"){paste("Distance to Annotated Transcription Start Site (bp)")}else{
+      if(feature == "diff_to_TSS"){paste("Distance to Annotated TSS (bp)")}else{
         if(feature == "dist_to_cage_peak"){paste("Distance to Annotated CAGE Peak (bp)")}else{
-          if(feature == "diff_to_TTS"){paste("Distance to Annotated Transcription Termination Site (bp)")}else{
-            if(feature == "diff_to_gene_TTS"){paste("Distance to any Annotated Transcription Termination Site (bp)")}else{
-              if(feature == "diff_to_gene_TSS"){paste("Distance to any Annotated Transcription Start Site (bp)")}else{
+          if(feature == "diff_to_TTS"){paste("Distance to Annotated TTS (bp)")}else{
+            if(feature == "diff_to_gene_TTS"){paste("Distance to any Annotated TTS (bp)")}else{
+              if(feature == "diff_to_gene_TSS"){paste("Distance to any Annotated TSS (bp)")}else{
                 paste("NA")
               }
             }
@@ -1196,7 +1237,7 @@ all_hist_peaks <- function(type){
         labs(x = x_label, 
              y = "Isoforms (%)", 
              title = paste("\n\n")) + 
-        theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
+        theme(axis.text.x = element_text(angle = 90, hjust = 1)) 
       
       return(p)
     } else if (presentation == "merged"){
@@ -1248,6 +1289,7 @@ all_hist_peaks <- function(type){
     
     count = count + 1
   }
+
 
   return(list(cage_plots,tss_plots,tts_plots, cage_plots_merged, tss_plots_merged, tts_plots_merged))
 }
@@ -1309,7 +1351,7 @@ novel_transcripts_annotated_genes_cate <- function(){
       ggplot(., aes(x = structural_category, y = perc, fill = Sample)) + 
       geom_bar(stat = "identity", position = position_dodge()) + 
       theme_bw() + mytheme + 
-      labs(x = "", y = "Novel Transcripts of Annotated Genes (%)", title = "\n\n") + 
+      labs(x = "", y = "Novel Transcripts (%)", title = "\n\n") + 
       theme(legend.justification=c(1,1), legend.position=c(0.95,0.95), legend.title = element_blank()) + 
       scale_fill_manual(values=c(label_colour(dataset1), label_colour(dataset2)), 
                         labels=c(paste(dataset1,"Cortex"), paste(dataset2, "Cortex")), name = "") 
@@ -1396,8 +1438,8 @@ subset_feature <- function(col_name_feature, ylabel, category){
 }
 
 novel_annotated_transcript_expression <- function(corr_output_name){
-  output <- subset_feature("Log_ISOSEQ_TPM", "Iso-Seq Expression of Annotated Genes (Log10 TPM)", "all_novel")
-  split_output <- subset_feature("Log_ISOSEQ_TPM", "Iso-Seq Expression of Annotated Genes (Log10 TPM)", "all_split")
+  output <- subset_feature("Log_ISOSEQ_TPM", "Transcript Expression (Log10 TPM)", "all_novel")
+  split_output <- subset_feature("Log_ISOSEQ_TPM", "Transcript Expression (Log10 TPM)", "all_split")
   
   # mann whitney test
   sink(paste0(output_corr_dir, "/", corr_output_name,".txt"))
@@ -1865,7 +1907,7 @@ human_mouse_suppa2 <- function(type){
     theme_bw() + 
     mytheme + 
     labs(x = "Splicing Events", y = "Number of Genes") + 
-    theme(legend.position = c(.15, 0.85))
+    theme(legend.position = c(.15, 0.8))
   
   
   ########################## Plots by converting mouse ogous gene names to human 
@@ -1981,11 +2023,12 @@ fetal_adult_suppa2 <- function(){
   merge_human$Detected <- factor(merge_human$Detected, levels=c("Common", "Adult Only", "Fetal Only"))
   
   # Note there will be duplicates of genes in the bars 
+
   p2 <- merge_human %>% group_by(Event, Detected) %>% tally() %>% 
     ggplot(., aes(x = Event, fill = Detected, y = n)) + 
     geom_bar(stat = "identity", position = position_dodge()) +
-    scale_fill_manual(values=c("#999999", label_colour("Adult"), label_colour("Fetal"), 
-                               labels=c("Common", "Human (Adult) Cortex Only", "Human (Fetal) Cortex Only"))) + 
+    scale_fill_manual(values=c("#999999", label_colour("Adult"), label_colour("Fetal")), 
+                               labels=c("Common", "Human (Adult) Cortex Only", "Human (Fetal) Cortex Only")) + 
     theme_bw() + 
     labs(x = "Splicing Events", y = "Number of AS Genes", title = "\n\n") + 
     mytheme + 
@@ -1995,7 +2038,7 @@ fetal_adult_suppa2 <- function(){
   
 }
 
-AS_genes_events <- function(dataset1, dataset2){
+AS_genes_events <- function(dataset){
   cbbPalette <- c("#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
   splicing_events <- read.csv(paste0(output_table_dir,"/AS_IR/ALL_SUPPA2_Genes_Output_Updated2.csv"))
   dataset_tally_events <- splicing_events %>% group_by(Sample) %>% tally(n)  
@@ -2008,13 +2051,12 @@ AS_genes_events <- function(dataset1, dataset2){
   print(splicing_events_tally_present)
   splicing_events_tally_present <<- splicing_events_tally_present
   
-  p1 <- splicing_events_tally %>%
-    filter(Sample %in% c(dataset1,dataset2)) %>%
+  p1 <- splicing_events_tally[splicing_events_tally$Sample == dataset,] %>%
     mutate(Sample = paste(Sample, "Cortex")) %>%
     ggplot(., aes(x = Sample, y = perc, fill = reorder(Event, -perc))) + geom_bar(stat = "identity") + 
-    theme_bw() + labs(y = "Splicing Events (%)", x = "", title = "\n\n") + mytheme + 
+    theme_bw() + labs(y = "Splicing Events (%)", x = "") + mytheme + 
     theme(legend.position = "bottom",legend.title = element_blank()) +
-    guides(fill = guide_legend(nrow = 1)) 
+    guides(fill = guide_legend(nrow = 1)) + theme(legend.position="none")
   
   # Number of genes
   total_gene <- class.files %>% bind_rows() %>% group_by(Sample, associated_gene) %>% tally() %>% group_by(Sample) %>% tally()  
@@ -2025,30 +2067,32 @@ AS_genes_events <- function(dataset1, dataset2){
   print(splicing_events_gene_present)
   splicing_events_gene_present <<- splicing_events_gene_present
   
-  p2 <- splicing_events_genes %>%
-    filter(Sample %in% c(dataset1,dataset2)) %>%
+  p2 <- splicing_events_genes[splicing_events_genes$Sample == dataset,] %>%
     mutate(Sample = paste(Sample, "Cortex")) %>%
     ggplot(., aes(x = Sample, y = perc, fill = reorder(Event, -perc),)) + geom_bar(stat = "identity", position = position_dodge()) + 
-    theme_bw() + labs(y = "Genes (%)", x = "", title = "\n\n") + mytheme + 
+    theme_bw() + labs(y = "Genes (%)", x = "") + mytheme + 
     theme(legend.position = "bottom",legend.title = element_blank()) +
-    guides(fill = guide_legend(nrow = 1)) 
+    guides(fill = guide_legend(nrow = 1)) + theme(legend.position="none")
   
   dataset_tally_gene <- splicing_events %>% group_by(Sample) %>% count(associated_gene) %>% tally()
   #nrow((unique(splicing_events[splicing_events$Sample == "Mouse","associated_gene"])))
   splicing_events_number <- splicing_events %>% group_by(Sample, associated_gene) %>% tally() %>% group_by(n, Sample) %>% tally() %>% left_join(dataset_tally_gene, by = "Sample") %>%
     mutate(perc = nn/n.y * 100)  %>% `colnames<-`(c("Number_of_Splicing_Events", "Sample", "Genes", "Total_Genes","perc")) %>% as.data.frame(.) 
   print(splicing_events_number)
+
+  return(list(p1,p2))
+}
+
+AS_genes_events_merged <- function(){
   p3 <- splicing_events_number %>%
     filter(Sample %in% c(dataset1,dataset2)) %>%
     mutate(Sample = paste(Sample, "Cortex")) %>%
     ggplot(., aes(x = Number_of_Splicing_Events, y = perc, fill = Sample)) + 
     geom_bar(stat = "identity", position = position_dodge()) + 
-    theme_bw() + labs(y = "AS Genes (%)", x = "Number of Splicing Events", title = "\n\n") + mytheme + 
+    theme_bw() + labs(y = "AS Genes (%)", x = "Number of Splicing Events") + mytheme + 
     theme(legend.position = c(0.85,0.85), legend.title = element_blank()) + 
     scale_x_continuous(breaks = 1:7) +
     scale_fill_manual(values=c(label_colour(dataset1), label_colour(dataset2)))
-  
-  return(list(p1,p2,p3))
 }
 
 SUPPA2_NumAS_PerGene <- function(){
@@ -2058,7 +2102,7 @@ SUPPA2_NumAS_PerGene <- function(){
   total_num_genes <- num_events_merge %>% group_by(dataset) %>% tally() 
   plot <- num_events_merge %>% group_by(Number.of.Splicing.Events, dataset) %>% tally() %>% 
     left_join(., total_num_genes, by = "dataset") %>%
-    mutate(perc = n.x/n.y) %>%
+    mutate(perc = n.x/n.y * 100) %>%
     mutate(dataset = factor(dataset, levels = c("AdultCTX", "FetalCTX", "HumanCTX","WholeIsoSeq"))) 
   
   plot_fun <- function(plot, d1,d2){
@@ -2069,7 +2113,7 @@ SUPPA2_NumAS_PerGene <- function(){
     theme_bw() + 
     mytheme + 
     labs(x = "Number of Splicing Events", y = "AS Genes (%)") + 
-    scale_x_continuous(breaks = 1:7) + theme(legend.position =c(0.85,0.85))
+    scale_x_continuous(breaks = 1:7) + theme(legend.position =c(0.65,0.85))
     
     if(d1 == "AdultCTX"){
       p <- p + scale_fill_manual(labels = c("Human (Adult) Cortex","Human (Fetal) Cortex"), values = c("#440154FF","#287D8EFF"), name = "")
@@ -2188,8 +2232,8 @@ human_mouse_comparison_num <- function(homology_human_mouse){
   
   # venn diagram of genes between human and mouse using the num_isoform_all datasheet
   # remove novel genes 
-  human_both_gene <- num_isoform_all_includemonoexonic %>% filter(Detected %in% c("Human","Both")) %>% .[!grepl("NOVEL", .$associated_gene),] %>% select(associated_gene)
-  mouse_both_gene <- num_isoform_all_includemonoexonic %>% filter(Detected %in% c("Mouse","Both")) %>% .[!grepl("NOVEL", .$associated_gene),] %>% select(associated_gene)
+  human_both_gene <- num_isoform_all %>% filter(Detected %in% c("Human","Both")) %>% .[!grepl("NOVEL", .$associated_gene),] %>% select(associated_gene)
+  mouse_both_gene <- num_isoform_all %>% filter(Detected %in% c("Mouse","Both")) %>% .[!grepl("NOVEL", .$associated_gene),] %>% select(associated_gene)
   
   # note non-overlapping gene could be homologues that were just not detected in other dataset
   # num_isoform_all[num_isoform_all$Detected == "Mouse" & num_isoform_all$associated_gene %in% homologs_genes$human,]
@@ -2317,12 +2361,12 @@ IR_NMD_run <- function(){
       output=TRUE, 
       print.mode = "raw",
       fill = myCol, 
-      cex = 2,
+      cex = 1,
       fontface = "bold",
       fontfamily = "ArialMT",
       
       # Set names
-      cat.cex = 2,
+      cat.cex = 1,
       cat.fontfamily = "ArialMT",
       
       main = paste0("\n\n"))
@@ -2402,7 +2446,7 @@ NMD_vs_NonNMD <- function(type_class_file){
                 data.frame("Num" = Non_IR_Non_NMD_transcripts_annotated_genes$Log_ISOSEQ_TPM, "Type" = "Non IR-NMD")) %>%
       ggplot(., aes(y = Num, x = Type)) + geom_boxplot() +
       theme_bw() +
-      labs(x = "", y = "Iso-Seq Transcript Expression (Log10 TPM)", title = paste0("\n\n")) + mytheme +
+      labs(x = "", y = "Transcript Expression (Log10 TPM)", title = paste0("\n\n")) + mytheme +
       theme(legend.position = c(.90, 0.90), legend.title = element_blank()) 
     
     plots[[count]] <- p1
@@ -2451,7 +2495,7 @@ lncRNA <- function(){
                  data.frame("Num" = lnc_dat, "Sample" = "lncRNA")) %>%
         ggplot(., aes(y = Num, x = Sample)) + geom_boxplot() +
         theme_bw() +
-        labs(x = "", y = "Iso-Seq Transcript Expression (Log10 TPM)", title = paste0("\n\n")) +
+        labs(x = "", y = "Transcript Expression \n (Log10 TPM)") +
         mytheme + scale_fill_manual(values = wes_palette("Darjeeling2")) +
         theme(legend.position = c(.85, 0.85), legend.title = element_blank())
     }else if(title == "Number of Exons (Annotated Genes only)"){
@@ -2459,7 +2503,7 @@ lncRNA <- function(){
                  data.frame("Num" = lnc_dat, "Sample" = "lncRNA")) %>%
         ggplot(., aes(Num, fill = Sample)) + geom_density(alpha = 0.2) +
         theme_bw() +
-        labs(x = "Number of Exons", y = "Density", title = paste0("\n\n")) +
+        labs(x = "Number of Exons", y = "Density") +
         theme_bw() + 
         mytheme + 
         theme(legend.position = c(.85, 0.85), legend.title = element_blank())
@@ -2468,7 +2512,7 @@ lncRNA <- function(){
                  data.frame("Num" = lnc_dat, "Sample" = "lncRNA")) %>%
         ggplot(., aes(Num, fill = Sample)) + geom_density(alpha = 0.2) +
         theme_bw() +
-        labs(x = "ORF Length (kb)", y = "Density", title = paste0("\n\n")) +
+        labs(x = "ORF Length (kb)", y = "Density") +
         theme_bw() + 
         mytheme + 
         theme(legend.position = c(.85, 0.85), legend.title = element_blank())
@@ -2477,7 +2521,7 @@ lncRNA <- function(){
                  data.frame("Num" = lnc_dat, "Sample" = "lncRNA")) %>%
         ggplot(., aes(y = Num, x = Sample)) + geom_boxplot() +
         theme_bw() +
-        labs(x = "", y = "Number of Isoforms per Gene (Log10)", title = paste0("\n\n")) +
+        labs(x = "", y = "Number of Isoforms \n per Gene (Log10)") +
         theme_bw() + 
         mytheme + 
         theme(legend.position = c(.85, 0.85), legend.title = element_blank())
