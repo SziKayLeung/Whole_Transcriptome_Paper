@@ -290,3 +290,6 @@ FSM <- function(){
 ##### Kallisto
 RNASeq_Def <- read.table("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcriptome/All_Tg4510/RNASeq/KALLISTO/WholeIsoSeq.abundance.tsv", header = T) 
 IsoSeq_Def <- read.table("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcriptome/All_Tg4510/Post_IsoSeq/SQANTI_TAMA_FILTER/GENOME/KALLISTO/WholeIsoSeq.abundance.tsv", header = T) %>% mutate(target_id = word(target_id, c(1), sep = fixed("<")))
+
+## CPAT ORF 
+Human_CPAT <- read.csv("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcriptome/All_Tg4510/Post_IsoSeq/ORF/Human_ORF.csv")
