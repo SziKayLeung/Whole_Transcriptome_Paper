@@ -1,0 +1,37 @@
+
+
+Mann Whitney for Expression of Novel Genes vs Annotated Genes of dataset: Mouse Cortex
+	Wilcoxon rank sum test with continuity correction
+
+data:  Log10_FL_TPM by Transcripts
+W = 2291516, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 1.500103e-73
+
+Mann Whitney for Expression of Novel Genes vs Annotated Genes of dataset: Human (Adult) Cortex
+	Wilcoxon rank sum test with continuity correction
+
+data:  Log10_FL_TPM by Transcripts
+W = 306463, p-value = 1.52e-13
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 1.520179e-13
+
+Mann Whitney for Expression of Novel Genes vs Annotated Genes of dataset: Human (Fetal) Cortex
+	Wilcoxon rank sum test with continuity correction
+
+data:  Log10_FL_TPM by Transcripts
+W = 102312, p-value = 0.001179
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 0.001179301
+
+Mann Whitney for Expression of Novel Genes vs Annotated Genes of dataset: Human Cortex
+	Wilcoxon rank sum test with continuity correction
+
+data:  Log10_FL_TPM by Transcripts
+W = 528392, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 1.71689e-19

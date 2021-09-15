@@ -1,0 +1,36 @@
+Mann Whitney for length of Novel vs Annotated in Annotated Genes of dataset: Mouse 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  length by Transcripts
+W = 236589180, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 2.130213e-42 
+Mann Whitney for length of Novel vs Annotated in Annotated Genes of dataset: Human (Adult) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  length by Transcripts
+W = 43354207, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 4.174935e-25 
+Mann Whitney for length of Novel vs Annotated in Annotated Genes of dataset: Human (Fetal) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  length by Transcripts
+W = 30387684, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 7.755454e-33 
+Mann Whitney for length of Novel vs Annotated in Annotated Genes of dataset: Human 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  length by Transcripts
+W = 110331935, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 4.03818e-25 

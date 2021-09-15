@@ -1,0 +1,64 @@
+[1] ""
+[1] "Correlation betweenMax_lengthandNum_of_Isoforms"
+
+	Pearson's product-moment correlation
+
+data:  dat[[x.var]] and dat[[y.var]]
+t = 30.481, df = 13927, p-value < 2.2e-16
+alternative hypothesis: true correlation is not equal to 0
+95 percent confidence interval:
+ 0.2344466 0.2655842
+sample estimates:
+    cor 
+0.25008 
+
+[1] "corr.value0.250080038564751"
+[1] "p.value1.33144421576249e-197"
+[1] ""
+[1] "Correlation betweenMax_lengthandNum_of_Isoforms"
+
+	Pearson's product-moment correlation
+
+data:  dat[[x.var]] and dat[[y.var]]
+t = 12.301, df = 601, p-value < 2.2e-16
+alternative hypothesis: true correlation is not equal to 0
+95 percent confidence interval:
+ 0.3823251 0.5100597
+sample estimates:
+      cor 
+0.4484794 
+
+[1] "corr.value0.448479413693892"
+[1] "p.value3.558099263981e-31"
+[1] ""
+[1] "Correlation betweenMax_exonandNum_of_Isoforms"
+
+	Pearson's product-moment correlation
+
+data:  dat[[x.var]] and dat[[y.var]]
+t = 30.119, df = 13927, p-value < 2.2e-16
+alternative hypothesis: true correlation is not equal to 0
+95 percent confidence interval:
+ 0.2316331 0.2628168
+sample estimates:
+     cor 
+0.247289 
+
+[1] "corr.value0.24728900919399"
+[1] "p.value4.01847770101201e-193"
+[1] ""
+[1] "Correlation betweenMax_exonandNum_of_Isoforms"
+
+	Pearson's product-moment correlation
+
+data:  dat[[x.var]] and dat[[y.var]]
+t = 13.923, df = 601, p-value < 2.2e-16
+alternative hypothesis: true correlation is not equal to 0
+95 percent confidence interval:
+ 0.4309864 0.5519198
+sample estimates:
+      cor 
+0.4938373 
+
+[1] "corr.value0.493837327776687"
+[1] "p.value2.15703065717251e-38"

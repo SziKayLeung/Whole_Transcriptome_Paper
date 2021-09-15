@@ -1,0 +1,2109 @@
+
+#############################################################
+Statstical Tests for dataset: Mouse 
+#############################################################
+
+
+#############################################################
+Statstical Tests for dataset: Mouse 
+#############################################################
+
+$Mouse
+              isoform    associated_gene structural_category strand                      subcategory Sample
+PB.100.5     PB.100.5               PHF3                 NIC      - combination_of_known_splicesites  Mouse
+PB.1000.10 PB.1000.10            RPS6KC1                 NIC      -   combination_of_known_junctions  Mouse
+PB.1000.11 PB.1000.11            RPS6KC1                 NIC      -   combination_of_known_junctions  Mouse
+PB.1000.17 PB.1000.17            RPS6KC1                 NIC      -                 intron_retention  Mouse
+PB.1000.6   PB.1000.6            RPS6KC1                 FSM      -                       multi-exon  Mouse
+PB.1000.7   PB.1000.7            RPS6KC1                 NNC      -    at_least_one_novel_splicesite  Mouse
+PB.1000.8   PB.1000.8            RPS6KC1                 NNC      -    at_least_one_novel_splicesite  Mouse
+PB.1000.9   PB.1000.9            RPS6KC1                 NNC      -    at_least_one_novel_splicesite  Mouse
+PB.1001.14 PB.1001.14             ANGEL2                 NIC      +   combination_of_known_junctions  Mouse
+PB.1001.19 PB.1001.19             ANGEL2                 NNC      +    at_least_one_novel_splicesite  Mouse
+PB.1001.2   PB.1001.2             ANGEL2                 NNC      +    at_least_one_novel_splicesite  Mouse
+PB.1001.21 PB.1001.21             ANGEL2                 NIC      +   combination_of_known_junctions  Mouse
+PB.1001.3   PB.1001.3             ANGEL2                 NIC      + combination_of_known_splicesites  Mouse
+PB.1001.8   PB.1001.8             ANGEL2                 FSM      +                       multi-exon  Mouse
+PB.1002.1   PB.1002.1              VASH2                 FSM      -                       multi-exon  Mouse
+PB.1002.2   PB.1002.2              VASH2                 FSM      -                       multi-exon  Mouse
+PB.1004.2   PB.1004.2             FLVCR1                 FSM      -                       multi-exon  Mouse
+PB.1004.3   PB.1004.3             FLVCR1                 NNC      -    at_least_one_novel_splicesite  Mouse
+PB.1005.1   PB.1005.1             TATDN3                 NIC      -                 intron_retention  Mouse
+PB.1005.2   PB.1005.2             TATDN3                 FSM      -                       multi-exon  Mouse
+PB.1006.1   PB.1006.1               NSL1                 FSM      +                       multi-exon  Mouse
+PB.1007.1   PB.1007.1               ATF3                 FSM      -                       multi-exon  Mouse
+PB.1008.2   PB.1008.2      D730003I15RIK                 FSM      +                       multi-exon  Mouse
+PB.1009.1   PB.1009.1               NENF                 FSM      -                       multi-exon  Mouse
+PB.1009.2   PB.1009.2               NENF                 NIC      - combination_of_known_splicesites  Mouse
+PB.101.10   PB.101.10             PTP4A1                 FSM      -                       multi-exon  Mouse
+PB.101.12   PB.101.12             PTP4A1                 FSM      -                       multi-exon  Mouse
+PB.101.5     PB.101.5             PTP4A1                 FSM      -                       multi-exon  Mouse
+PB.1010.3   PB.1010.3            TMEM206                 FSM      +                       multi-exon  Mouse
+PB.1011.6   PB.1011.6            PPP2R5A                 FSM      -                       multi-exon  Mouse
+PB.1012.1   PB.1012.1                DTL                 ISM      -                  5prime_fragment  Mouse
+PB.1013.1   PB.1013.1              INTS7                 FSM      +                       multi-exon  Mouse
+PB.1013.11 PB.1013.11              INTS7                 ISM      +                  5prime_fragment  Mouse
+PB.1013.2   PB.1013.2              INTS7                 FSM      +                       multi-exon  Mouse
+PB.1013.7   PB.1013.7              INTS7                 FSM      +                       multi-exon  Mouse
+PB.1013.8   PB.1013.8              INTS7                 NNC      +    at_least_one_novel_splicesite  Mouse
+PB.1013.9   PB.1013.9              INTS7                 NIC      +                 intron_retention  Mouse
+PB.1014.12 PB.1014.12             LPGAT1                 NNC      +    at_least_one_novel_splicesite  Mouse
+PB.1014.3   PB.1014.3             LPGAT1                 FSM      +                       multi-exon  Mouse
+PB.1014.5   PB.1014.5             LPGAT1                 NIC      +   combination_of_known_junctions  Mouse
+PB.1014.9   PB.1014.9             LPGAT1                 ISM      +                  5prime_fragment  Mouse
+PB.1016.1   PB.1016.1            SLC30A1                 FSM      +                       multi-exon  Mouse
+PB.1019.1   PB.1019.1            GM10516                 NIC      + combination_of_known_splicesites  Mouse
+PB.1019.2   PB.1019.2            GM10516                 NNC      +    at_least_one_novel_splicesite  Mouse
+PB.1019.4   PB.1019.4            GM10516                 NNC      +    at_least_one_novel_splicesite  Mouse
+PB.1020.1   PB.1020.1              RCOR3                 ISM      -                  5prime_fragment  Mouse
+PB.1020.10 PB.1020.10              RCOR3                 ISM      -                  3prime_fragment  Mouse
+PB.1020.12 PB.1020.12              RCOR3                 FSM      -                       multi-exon  Mouse
+PB.1020.2   PB.1020.2              RCOR3                 FSM      -                       multi-exon  Mouse
+PB.1021.3   PB.1021.3              KCNH1                 FSM      +                       multi-exon  Mouse
+PB.1021.4   PB.1021.4              KCNH1                 FSM      +                       multi-exon  Mouse
+PB.1021.5   PB.1021.5              KCNH1                 NNC      +    at_least_one_novel_splicesite  Mouse
+PB.1021.8   PB.1021.8              KCNH1                 NNC      +    at_least_one_novel_splicesite  Mouse
+PB.1022.1   PB.1022.1               HHAT                 FSM      -                       multi-exon  Mouse
+PB.1023.1   PB.1023.1            GM15867                 FSM      +                       multi-exon  Mouse
+PB.1024.1   PB.1024.1            SERTAD4                 NNC      -    at_least_one_novel_splicesite  Mouse
+PB.1024.2   PB.1024.2            SERTAD4                 FSM      -                       multi-exon  Mouse
+PB.1025.1   PB.1025.1              SYT14                 NNC      -    at_least_one_novel_splicesite  Mouse
+PB.1026.2   PB.1026.2              DIEXF                 FSM      -                       multi-exon  Mouse
+PB.1027.1   PB.1027.1               IRF6                 FSM      +                       multi-exon  Mouse
+PB.1029.1   PB.1029.1      A130010J15RIK                 FSM      +                       multi-exon  Mouse
+PB.103.2     PB.103.2            KHDRBS2                 FSM      +                       multi-exon  Mouse
+PB.103.3     PB.103.3            KHDRBS2                 FSM      +                       multi-exon  Mouse
+PB.1030.1   PB.1030.1           TRAF3IP3                 ISM      -                  3prime_fragment  Mouse
+PB.1031.1   PB.1031.1            HSD11B1                 FSM      -                       multi-exon  Mouse
+PB.1031.2   PB.1031.2            HSD11B1                 FSM      -                       multi-exon  Mouse
+PB.1032.1   PB.1032.1               G0S2                 FSM      -                       multi-exon  Mouse
+PB.1033.3   PB.1033.3             CAMK1G                 NIC      -   combination_of_known_junctions  Mouse
+PB.1033.7   PB.1033.7             CAMK1G                 FSM      -                       multi-exon  Mouse
+PB.1034.1   PB.1034.1             PLXNA2                 ISM      +                  3prime_fragment  Mouse
+PB.1034.3   PB.1034.3             PLXNA2                 ISM      +                  3prime_fragment  Mouse
+PB.1034.7   PB.1034.7             PLXNA2                 FSM      +                       multi-exon  Mouse
+PB.1036.1   PB.1036.1               CD34                 FSM      +                       multi-exon  Mouse
+PB.1036.2   PB.1036.2               CD34                 FSM      +                       multi-exon  Mouse
+PB.1036.3   PB.1036.3               CD34                 ISM      +                 intron_retention  Mouse
+PB.1039.1   PB.1039.1               CR1L                 NIC      -   combination_of_known_junctions  Mouse
+PB.1039.10 PB.1039.10               CR1L                 NIC      -   combination_of_known_junctions  Mouse
+PB.1039.3   PB.1039.3               CR1L                 FSM      -                       multi-exon  Mouse
+PB.1039.6   PB.1039.6               CR1L                 NIC      -   combination_of_known_junctions  Mouse
+PB.1039.9   PB.1039.9               CR1L                 FSM      -                       multi-exon  Mouse
+PB.104.1     PB.104.1       NOVELGENE_53          Intergenic      -                       multi-exon  Mouse
+PB.105.1     PB.105.1              PRIM2                 FSM      -                       multi-exon  Mouse
+PB.106.3     PB.106.3              RAB23                 FSM      +                       multi-exon  Mouse
+PB.106.5     PB.106.5              RAB23                 FSM      +                       multi-exon  Mouse
+PB.106.6     PB.106.6              RAB23                 NIC      + combination_of_known_splicesites  Mouse
+PB.106.8     PB.106.8              RAB23                 NNC      +    at_least_one_novel_splicesite  Mouse
+PB.106.9     PB.106.9              RAB23                 NNC      +    at_least_one_novel_splicesite  Mouse
+PB.107.1     PB.107.1 NOVELGENE_RAB23_AS           Antisense      -                       multi-exon  Mouse
+PB.109.1     PB.109.1               BAG2                 FSM      -                       multi-exon  Mouse
+PB.109.2     PB.109.2               BAG2                 FSM      -                       multi-exon  Mouse
+PB.11.2       PB.11.2             MRPL15                 NNC      -    at_least_one_novel_splicesite  Mouse
+PB.11.3       PB.11.3             MRPL15                 FSM      -                       multi-exon  Mouse
+PB.11.5       PB.11.5             MRPL15                 NIC      -   combination_of_known_junctions  Mouse
+PB.110.1     PB.110.1             ZFP451                 FSM      -                       multi-exon  Mouse
+PB.110.15   PB.110.15             ZFP451                 FSM      -                       multi-exon  Mouse
+PB.110.3     PB.110.3             ZFP451                 NNC      -    at_least_one_novel_splicesite  Mouse
+PB.110.4     PB.110.4             ZFP451                 NIC      - combination_of_known_splicesites  Mouse
+PB.110.5     PB.110.5             ZFP451                 NIC      - combination_of_known_splicesites  Mouse
+PB.110.7     PB.110.7             ZFP451                 ISM      -                  3prime_fragment  Mouse
+PB.112.10   PB.112.10              BEND6                 FSM      -                       multi-exon  Mouse
+PB.112.15   PB.112.15              BEND6                 NNC      -    at_least_one_novel_splicesite  Mouse
+PB.112.2     PB.112.2              BEND6                 ISM      -                  5prime_fragment  Mouse
+PB.112.4     PB.112.4              BEND6                 FSM      -                       multi-exon  Mouse
+PB.112.5     PB.112.5              BEND6                 NNC      -    at_least_one_novel_splicesite  Mouse
+PB.112.7     PB.112.7              BEND6                 NNC      -    at_least_one_novel_splicesite  Mouse
+PB.112.9     PB.112.9              BEND6                 NIC      -   combination_of_known_junctions  Mouse
+PB.113.12   PB.113.12                DST                 ISM      +                internal_fragment  Mouse
+PB.113.29   PB.113.29                DST                 ISM      +                  5prime_fragment  Mouse
+PB.113.40   PB.113.40                DST                 ISM      +                  5prime_fragment  Mouse
+PB.113.5     PB.113.5                DST                 NIC      +   combination_of_known_junctions  Mouse
+PB.113.6     PB.113.6                DST                 NIC      +   combination_of_known_junctions  Mouse
+PB.115.1     PB.115.1            CCDC115                 FSM      -                       multi-exon  Mouse
+PB.116.1     PB.116.1               IMP4                 FSM      +                       multi-exon  Mouse
+PB.116.10   PB.116.10               IMP4                 NIC      +                 intron_retention  Mouse
+PB.117.1     PB.117.1             PTPN18                 ISM      +                  5prime_fragment  Mouse
+PB.118.1     PB.118.1              AMER3                 FSM      +                       multi-exon  Mouse
+PB.118.2     PB.118.2              AMER3                 NNC      +    at_least_one_novel_splicesite  Mouse
+PB.119.10   PB.119.10            ARHGEF4                 NNC      +    at_least_one_novel_splicesite  Mouse
+PB.119.11   PB.119.11            ARHGEF4                 NNC      +    at_least_one_novel_splicesite  Mouse
+PB.119.13   PB.119.13            ARHGEF4                 NIC      +   combination_of_known_junctions  Mouse
+PB.119.14   PB.119.14            ARHGEF4                 NIC      + combination_of_known_splicesites  Mouse
+PB.119.16   PB.119.16            ARHGEF4                 NNC      +    at_least_one_novel_splicesite  Mouse
+PB.119.17   PB.119.17            ARHGEF4                 NIC      +                 intron_retention  Mouse
+PB.119.18   PB.119.18            ARHGEF4                 NNC      +    at_least_one_novel_splicesite  Mouse
+PB.119.19   PB.119.19            ARHGEF4                 NIC      +                 intron_retention  Mouse
+PB.119.2     PB.119.2            ARHGEF4                 NIC      + combination_of_known_splicesites  Mouse
+PB.119.21   PB.119.21            ARHGEF4                 NIC      +                 intron_retention  Mouse
+PB.119.22   PB.119.22            ARHGEF4                 NNC      +    at_least_one_novel_splicesite  Mouse
+PB.119.23   PB.119.23            ARHGEF4                 NNC      +    at_least_one_novel_splicesite  Mouse
+PB.119.25   PB.119.25            ARHGEF4                 NNC      +    at_least_one_novel_splicesite  Mouse
+PB.119.26   PB.119.26            ARHGEF4                 ISM      +                  3prime_fragment  Mouse
+PB.119.28   PB.119.28            ARHGEF4                 NIC      +                 intron_retention  Mouse
+PB.119.29   PB.119.29            ARHGEF4                 FSM      +                       multi-exon  Mouse
+PB.119.3     PB.119.3            ARHGEF4                 FSM      +                       multi-exon  Mouse
+PB.119.7     PB.119.7            ARHGEF4                 NNC      +    at_least_one_novel_splicesite  Mouse
+PB.119.9     PB.119.9            ARHGEF4                 ISM      +                  3prime_fragment  Mouse
+PB.12.11     PB.12.11              TCEA1                 FSM      +                       multi-exon  Mouse
+PB.12.18     PB.12.18              TCEA1                 NNC      +    at_least_one_novel_splicesite  Mouse
+PB.12.2       PB.12.2             LYPLA1                 FSM      +                       multi-exon  Mouse
+PB.120.10   PB.120.10            FAM168B                 NIC      - combination_of_known_splicesites  Mouse
+PB.120.19   PB.120.19            FAM168B                 NNC      -    at_least_one_novel_splicesite  Mouse
+PB.120.3     PB.120.3            FAM168B                 NNC      -    at_least_one_novel_splicesite  Mouse
+PB.120.4     PB.120.4            FAM168B                 NIC      - combination_of_known_splicesites  Mouse
+PB.120.5     PB.120.5            FAM168B                 NIC      -                 intron_retention  Mouse
+PB.120.7     PB.120.7            FAM168B                 FSM      -                       multi-exon  Mouse
+PB.120.8     PB.120.8            FAM168B                 FSM      -                       multi-exon  Mouse
+PB.120.9     PB.120.9            FAM168B                 FSM      -                       multi-exon  Mouse
+PB.121.1     PB.121.1            PLEKHB2                 FSM      +                       multi-exon  Mouse
+PB.121.10   PB.121.10            PLEKHB2                 NNC      +    at_least_one_novel_splicesite  Mouse
+PB.121.11   PB.121.11            PLEKHB2                 NNC      +                 intron_retention  Mouse
+PB.121.14   PB.121.14            PLEKHB2                 NIC      +                 intron_retention  Mouse
+PB.121.2     PB.121.2            PLEKHB2                 NNC      +                 intron_retention  Mouse
+PB.121.4     PB.121.4            PLEKHB2                 NNC      +                 intron_retention  Mouse
+PB.121.5     PB.121.5            PLEKHB2                 NNC      +                 intron_retention  Mouse
+PB.121.8     PB.121.8            PLEKHB2                 NNC      +                 intron_retention  Mouse
+PB.122.2     PB.122.2             HS6ST1                 FSM      +                       multi-exon  Mouse
+PB.123.10   PB.123.10              UGGT1                 FSM      -                       multi-exon  Mouse
+PB.123.12   PB.123.12              UGGT1                 NIC      -   combination_of_known_junctions  Mouse
+PB.123.2     PB.123.2              UGGT1                 ISM      -                  5prime_fragment  Mouse
+PB.124.1     PB.124.1             NEURL3                 FSM      -                       multi-exon  Mouse
+PB.125.1     PB.125.1             ARID5A                 NIC      +                 intron_retention  Mouse
+PB.125.3     PB.125.3             ARID5A                 FSM      +                       multi-exon  Mouse
+PB.125.4     PB.125.4             ARID5A                 FSM      +                       multi-exon  Mouse
+PB.126.10   PB.126.10             KANSL3                 NIC      -   combination_of_known_junctions  Mouse
+PB.126.11   PB.126.11             KANSL3                 NIC      -   combination_of_known_junctions  Mouse
+PB.126.13   PB.126.13             KANSL3                 NIC      -   combination_of_known_junctions  Mouse
+ [ reached 'max' / getOption("max.print") -- omitted 45273 rows ]
+
+$`Human (Adult)`
+              isoform associated_gene structural_category strand                      subcategory        Sample
+PB.1.1         PB.1.1          WASH7P                 NNC      -                 intron_retention Human (Adult)
+PB.1.4         PB.1.4          WASH7P                 NNC      -                 intron_retention Human (Adult)
+PB.100.3     PB.100.3         DNAJC11                 NIC      -   combination_of_known_junctions Human (Adult)
+PB.100.4     PB.100.4         DNAJC11                 FSM      -                       multi-exon Human (Adult)
+PB.100.8     PB.100.8         DNAJC11                 FSM      -                       multi-exon Human (Adult)
+PB.1003.1   PB.1003.1           NTNG1                 ISM      +                  5prime_fragment Human (Adult)
+PB.1006.1   PB.1006.1         FAM102B                 FSM      +                       multi-exon Human (Adult)
+PB.1007.1   PB.1007.1          HENMT1                 NIC      - combination_of_known_splicesites Human (Adult)
+PB.1007.2   PB.1007.2          HENMT1                 FSM      -                       multi-exon Human (Adult)
+PB.1008.1   PB.1008.1         PRPF38B                 FSM      +                       multi-exon Human (Adult)
+PB.1008.3   PB.1008.3         PRPF38B                 ISM      +                 intron_retention Human (Adult)
+PB.1009.1   PB.1009.1          STXBP3                 FSM      +                       multi-exon Human (Adult)
+PB.101.1     PB.101.1          CAMTA1                 FSM      +                       multi-exon Human (Adult)
+PB.101.2     PB.101.2          CAMTA1                 FSM      +                       multi-exon Human (Adult)
+PB.1010.1   PB.1010.1           GPSM2                 FSM      +                       multi-exon Human (Adult)
+PB.1010.2   PB.1010.2           GPSM2                 NIC      +   combination_of_known_junctions Human (Adult)
+PB.1010.3   PB.1010.3           GPSM2                 NIC      +   combination_of_known_junctions Human (Adult)
+PB.1013.1   PB.1013.1           CLCC1                 FSM      -                       multi-exon Human (Adult)
+PB.1015.2   PB.1015.2           WDR47                 FSM      -                       multi-exon Human (Adult)
+PB.1017.1   PB.1017.1        TMEM167B                 FSM      +                       multi-exon Human (Adult)
+PB.1018.1   PB.1018.1        KIAA1324                 FSM      +                       multi-exon Human (Adult)
+PB.1020.1   PB.1020.1            SARS                 NNC      +    at_least_one_novel_splicesite Human (Adult)
+PB.1020.2   PB.1020.2            SARS                 NIC      +                 intron_retention Human (Adult)
+PB.1020.3   PB.1020.3            SARS                 FSM      +                       multi-exon Human (Adult)
+PB.1020.6   PB.1020.6            SARS                 FSM      +                       multi-exon Human (Adult)
+PB.1020.7   PB.1020.7            SARS                 FSM      +                       multi-exon Human (Adult)
+PB.1020.8   PB.1020.8            SARS                 NIC      +                 intron_retention Human (Adult)
+PB.1020.9   PB.1020.9            SARS                 NIC      +                 intron_retention Human (Adult)
+PB.1022.1   PB.1022.1          CELSR2                 ISM      +                  5prime_fragment Human (Adult)
+PB.1022.13 PB.1022.13          CELSR2                 NIC      +                 intron_retention Human (Adult)
+PB.1022.21 PB.1022.21          CELSR2                 NNC      +    at_least_one_novel_splicesite Human (Adult)
+PB.1022.26 PB.1022.26          CELSR2                 NNC      +    at_least_one_novel_splicesite Human (Adult)
+PB.1023.3   PB.1023.3           PSRC1                 NIC      - combination_of_known_splicesites Human (Adult)
+PB.1023.5   PB.1023.5           PSRC1                 NIC      -                 intron_retention Human (Adult)
+PB.1023.6   PB.1023.6           PSRC1                 FSM      -                       multi-exon Human (Adult)
+PB.1023.7   PB.1023.7           PSRC1                 ISM      -                 intron_retention Human (Adult)
+PB.1023.8   PB.1023.8           PSRC1                 FSM      -                       multi-exon Human (Adult)
+PB.1023.9   PB.1023.9           PSRC1                 NIC      -   combination_of_known_junctions Human (Adult)
+PB.1026.6   PB.1026.6           SORT1                 FSM      -                       multi-exon Human (Adult)
+PB.1027.2   PB.1027.2           PSMA5                 FSM      -                       multi-exon Human (Adult)
+PB.1028.1   PB.1028.1         ATXN7L2                 NIC      +   combination_of_known_junctions Human (Adult)
+PB.1030.4   PB.1030.4          AMIGO1                 FSM      -                       multi-exon Human (Adult)
+PB.1030.8   PB.1030.8          AMIGO1                 FSM      -                       multi-exon Human (Adult)
+PB.1031.1   PB.1031.1           GNAI3                 FSM      +                       multi-exon Human (Adult)
+PB.1032.1   PB.1032.1           AMPD2                 NIC      +   combination_of_known_junctions Human (Adult)
+PB.1032.2   PB.1032.2           AMPD2                 FSM      +                       multi-exon Human (Adult)
+PB.1032.3   PB.1032.3           AMPD2                 FSM      +                       multi-exon Human (Adult)
+PB.1033.1   PB.1033.1           GSTM4                 FSM      +                       multi-exon Human (Adult)
+PB.1034.1   PB.1034.1           GSTM2                 FSM      +                       multi-exon Human (Adult)
+PB.1034.2   PB.1034.2           GSTM2                 NIC      +   combination_of_known_junctions Human (Adult)
+PB.1036.1   PB.1036.1           GSTM5                 FSM      +                       multi-exon Human (Adult)
+PB.1037.1   PB.1037.1           GSTM3                 FSM      -                       multi-exon Human (Adult)
+PB.1037.7   PB.1037.7           GSTM3                 FSM      -                       multi-exon Human (Adult)
+PB.1038.1   PB.1038.1            CSF1                 FSM      +                       multi-exon Human (Adult)
+PB.1039.1   PB.1039.1          AHCYL1                 NNC      +    at_least_one_novel_splicesite Human (Adult)
+PB.1039.10 PB.1039.10          AHCYL1                 NNC      +    at_least_one_novel_splicesite Human (Adult)
+PB.1039.11 PB.1039.11          AHCYL1                 NNC      +    at_least_one_novel_splicesite Human (Adult)
+PB.1039.12 PB.1039.12          AHCYL1                 ISM      +                  5prime_fragment Human (Adult)
+PB.1039.2   PB.1039.2          AHCYL1                 FSM      +                       multi-exon Human (Adult)
+PB.1039.3   PB.1039.3          AHCYL1                 NIC      + combination_of_known_splicesites Human (Adult)
+PB.1039.4   PB.1039.4          AHCYL1                 NIC      + combination_of_known_splicesites Human (Adult)
+PB.1039.7   PB.1039.7          AHCYL1                 NNC      +    at_least_one_novel_splicesite Human (Adult)
+PB.1039.9   PB.1039.9          AHCYL1                 FSM      +                       multi-exon Human (Adult)
+PB.1040.1   PB.1040.1          STRIP1                 FSM      +                       multi-exon Human (Adult)
+PB.1040.3   PB.1040.3          STRIP1                 ISM      +                  3prime_fragment Human (Adult)
+PB.1042.1   PB.1042.1         SLC6A17                 FSM      +                       multi-exon Human (Adult)
+PB.1043.1   PB.1043.1           KCNC4                 FSM      +                       multi-exon Human (Adult)
+PB.1043.2   PB.1043.2           KCNC4                 NIC      + combination_of_known_splicesites Human (Adult)
+PB.1043.3   PB.1043.3           KCNC4                 FSM      +                       multi-exon Human (Adult)
+PB.1043.4   PB.1043.4           KCNC4                 FSM      +                       multi-exon Human (Adult)
+PB.1046.1   PB.1046.1         LAMTOR5                 FSM      -                       multi-exon Human (Adult)
+PB.1046.2   PB.1046.2         LAMTOR5                 FSM      -                       multi-exon Human (Adult)
+PB.1049.1   PB.1049.1            CD53                 FSM      +                       multi-exon Human (Adult)
+PB.105.1     PB.105.1          CAMTA1                 NIC      +   combination_of_known_junctions Human (Adult)
+PB.105.10   PB.105.10          CAMTA1                 ISM      +                  5prime_fragment Human (Adult)
+PB.105.2     PB.105.2          CAMTA1                 NNC      +    at_least_one_novel_splicesite Human (Adult)
+PB.105.3     PB.105.3          CAMTA1                 NNC      +    at_least_one_novel_splicesite Human (Adult)
+PB.105.5     PB.105.5          CAMTA1                 NNC      +    at_least_one_novel_splicesite Human (Adult)
+PB.1051.3   PB.1051.3           LRIF1                 FSM      -                       multi-exon Human (Adult)
+PB.1051.4   PB.1051.4           LRIF1                 FSM      -                       multi-exon Human (Adult)
+PB.1053.1   PB.1053.1           DRAM2                 NIC      -   combination_of_known_junctions Human (Adult)
+PB.1054.2   PB.1054.2           CEPT1                 ISM      +                  3prime_fragment Human (Adult)
+PB.1054.3   PB.1054.3           CEPT1                 FSM      +                       multi-exon Human (Adult)
+PB.1055.1   PB.1055.1          CHI3L2                 FSM      +                       multi-exon Human (Adult)
+PB.1057.1   PB.1057.1            PIFO                 FSM      +                       multi-exon Human (Adult)
+PB.1058.1   PB.1058.1     OVGP1_WDR77              Fusion      -                       multi-exon Human (Adult)
+PB.1058.2   PB.1058.2           WDR77                 FSM      -                       multi-exon Human (Adult)
+PB.1059.1   PB.1059.1          ATP5PB                 FSM      +                       multi-exon Human (Adult)
+PB.1059.4   PB.1059.4          ATP5PB                 FSM      +                       multi-exon Human (Adult)
+PB.106.1     PB.106.1           VAMP3                 FSM      +                       multi-exon Human (Adult)
+PB.1060.1   PB.1060.1           RAP1A                 FSM      +                       multi-exon Human (Adult)
+PB.1061.4   PB.1061.4           INKA2                 FSM      -                       multi-exon Human (Adult)
+PB.1062.1   PB.1062.1           DDX20                 FSM      +                       multi-exon Human (Adult)
+PB.107.1     PB.107.1            PER3                 NIC      +   combination_of_known_junctions Human (Adult)
+PB.107.4     PB.107.4            PER3                 ISM      +                  5prime_fragment Human (Adult)
+PB.1071.1   PB.1071.1       CTTNBP2NL                 FSM      +                       multi-exon Human (Adult)
+PB.1072.2   PB.1072.2           WNT2B                 FSM      +                       multi-exon Human (Adult)
+PB.1075.2   PB.1075.2          CAPZA1                 FSM      +                       multi-exon Human (Adult)
+PB.1075.4   PB.1075.4          CAPZA1                 ISM      +                  5prime_fragment Human (Adult)
+PB.1076.1   PB.1076.1            RHOC                 NIC      -   combination_of_known_junctions Human (Adult)
+PB.1076.2   PB.1076.2            RHOC                 FSM      -                       multi-exon Human (Adult)
+PB.1076.3   PB.1076.3            RHOC                 FSM      -                       multi-exon Human (Adult)
+PB.1077.1   PB.1077.1           PPM1J                 FSM      -                       multi-exon Human (Adult)
+PB.108.1     PB.108.1           PARK7                 FSM      +                       multi-exon Human (Adult)
+PB.108.2     PB.108.2           PARK7                 FSM      +                       multi-exon Human (Adult)
+PB.1080.2   PB.1080.2         SLC16A1                 FSM      -                       multi-exon Human (Adult)
+PB.1085.1   PB.1085.1           MAGI3                 ISM      +                  5prime_fragment Human (Adult)
+PB.1085.2   PB.1085.2           MAGI3                 ISM      +                  5prime_fragment Human (Adult)
+PB.1087.1   PB.1087.1           PHTF1                 ISM      -                  5prime_fragment Human (Adult)
+PB.109.2     PB.109.2          ERRFI1                 FSM      -                       multi-exon Human (Adult)
+PB.1093.1   PB.1093.1           AP4B1                 FSM      -                       multi-exon Human (Adult)
+PB.1093.2   PB.1093.2           AP4B1                 NIC      -                 intron_retention Human (Adult)
+PB.1093.3   PB.1093.3           AP4B1                 FSM      -                       multi-exon Human (Adult)
+PB.1093.4   PB.1093.4           AP4B1                 NIC      - combination_of_known_splicesites Human (Adult)
+PB.1097.1   PB.1097.1            SYT6                 FSM      -                       multi-exon Human (Adult)
+PB.1101.1   PB.1101.1          TRIM33                 ISM      -                  5prime_fragment Human (Adult)
+PB.1101.3   PB.1101.3          TRIM33                 FSM      -                       multi-exon Human (Adult)
+PB.1102.1   PB.1102.1           BCAS2                 FSM      -                       multi-exon Human (Adult)
+PB.1102.2   PB.1102.2           BCAS2                 FSM      -                       multi-exon Human (Adult)
+PB.1103.2   PB.1103.2            NRAS                 FSM      -                       multi-exon Human (Adult)
+PB.1104.29 PB.1104.29           CSDE1                 NIC      - combination_of_known_splicesites Human (Adult)
+PB.1104.5   PB.1104.5           CSDE1                 FSM      -                       multi-exon Human (Adult)
+PB.1104.6   PB.1104.6           CSDE1                 FSM      -                       multi-exon Human (Adult)
+PB.1106.1   PB.1106.1           SIKE1                 FSM      -                       multi-exon Human (Adult)
+PB.1106.2   PB.1106.2           SIKE1                 FSM      -                       multi-exon Human (Adult)
+PB.1111.1   PB.1111.1        SLC22A15                 FSM      +                       multi-exon Human (Adult)
+PB.1112.1   PB.1112.1          ATP1A1                 NNC      +    at_least_one_novel_splicesite Human (Adult)
+PB.1112.10 PB.1112.10          ATP1A1                 NIC      +                 intron_retention Human (Adult)
+PB.1112.2   PB.1112.2          ATP1A1                 FSM      +                       multi-exon Human (Adult)
+PB.1112.5   PB.1112.5          ATP1A1                 FSM      +                       multi-exon Human (Adult)
+PB.1112.6   PB.1112.6          ATP1A1                 NNC      +    at_least_one_novel_splicesite Human (Adult)
+PB.1115.1   PB.1115.1           IGSF3                 ISM      -                  5prime_fragment Human (Adult)
+PB.1117.1   PB.1117.1          PTGFRN                 ISM      +                  5prime_fragment Human (Adult)
+PB.112.1     PB.112.1         SLC45A1                 FSM      +                       multi-exon Human (Adult)
+PB.1121.4   PB.1121.4          MAN1A2                 ISM      +                internal_fragment Human (Adult)
+PB.1126.2   PB.1126.2           GDAP2                 FSM      -                       multi-exon Human (Adult)
+PB.1126.3   PB.1126.3           GDAP2                 FSM      -                       multi-exon Human (Adult)
+PB.113.2     PB.113.2            RERE                 FSM      -                       multi-exon Human (Adult)
+PB.1134.1   PB.1134.1           PHGDH                 FSM      +                       multi-exon Human (Adult)
+PB.1137.1   PB.1137.1          SEC22B                 FSM      -                       multi-exon Human (Adult)
+PB.1148.1   PB.1148.1      AC241952.1                 NNC      -    at_least_one_novel_splicesite Human (Adult)
+PB.1153.1   PB.1153.1       LINC00623                 NNC      +    at_least_one_novel_splicesite Human (Adult)
+PB.1153.2   PB.1153.2       LINC00623                 FSM      +                       multi-exon Human (Adult)
+PB.1158.1   PB.1158.1         SRGAP2C                 FSM      +                       multi-exon Human (Adult)
+PB.1164.1   PB.1164.1      AC239859.6                 NNC      -    at_least_one_novel_splicesite Human (Adult)
+PB.117.2     PB.117.2            ENO1                 NIC      -                 intron_retention Human (Adult)
+PB.117.3     PB.117.3            ENO1                 FSM      -                       multi-exon Human (Adult)
+PB.118.1     PB.118.1          SLC2A5                 FSM      -                       multi-exon Human (Adult)
+PB.1181.3   PB.1181.3         SRGAP2B                 ISM      -                  5prime_fragment Human (Adult)
+PB.1187.1   PB.1187.1          NBPF20                 ISM      -                  5prime_fragment Human (Adult)
+PB.1187.2   PB.1187.2          NBPF20                 NIC      - combination_of_known_splicesites Human (Adult)
+PB.1187.5   PB.1187.5          NBPF20                 NIC      - combination_of_known_splicesites Human (Adult)
+PB.1187.6   PB.1187.6          NBPF20                 ISM      -                internal_fragment Human (Adult)
+PB.1188.1   PB.1188.1          NBPF20                 ISM      -                internal_fragment Human (Adult)
+PB.1189.1   PB.1189.1          NBPF20                 NIC      -   combination_of_known_junctions Human (Adult)
+PB.1189.2   PB.1189.2          NBPF20                 ISM      -                internal_fragment Human (Adult)
+PB.119.1     PB.119.1           SPSB1                 FSM      +                       multi-exon Human (Adult)
+PB.1190.1   PB.1190.1          GPR89A                 FSM      +                       multi-exon Human (Adult)
+PB.1192.2   PB.1192.2          RNF115                 FSM      -                       multi-exon Human (Adult)
+PB.1192.3   PB.1192.3          RNF115                 NIC      - combination_of_known_splicesites Human (Adult)
+PB.1193.3   PB.1193.3          POLR3C                 FSM      +                       multi-exon Human (Adult)
+PB.1194.2   PB.1194.2           PIAS3                 NIC      -                 intron_retention Human (Adult)
+PB.1194.3   PB.1194.3           PIAS3                 NIC      -                 intron_retention Human (Adult)
+PB.1194.4   PB.1194.4           PIAS3                 FSM      -                       multi-exon Human (Adult)
+PB.1195.2   PB.1195.2         ANKRD35                 FSM      -                       multi-exon Human (Adult)
+PB.1196.1   PB.1196.1          PEX11B                 NIC      -   combination_of_known_junctions Human (Adult)
+ [ reached 'max' / getOption("max.print") -- omitted 21210 rows ]
+
+$`Human (Fetal)`
+              isoform associated_gene structural_category strand                      subcategory        Sample
+PB.1.1         PB.1.1          WASH7P                 NNC      -    at_least_one_novel_splicesite Human (Fetal)
+PB.1.2         PB.1.2          WASH7P                 NIC      -                 intron_retention Human (Fetal)
+PB.1.4         PB.1.4          WASH7P                 NNC      -    at_least_one_novel_splicesite Human (Fetal)
+PB.1.5         PB.1.5          WASH7P                 NNC      -    at_least_one_novel_splicesite Human (Fetal)
+PB.10.2       PB.10.2            AGRN                 ISM      +                  5prime_fragment Human (Fetal)
+PB.10.3       PB.10.3            AGRN                 ISM      +                  5prime_fragment Human (Fetal)
+PB.100.1     PB.100.1           DISP3                 FSM      +                       multi-exon Human (Fetal)
+PB.100.2     PB.100.2           DISP3                 NNC      +                 intron_retention Human (Fetal)
+PB.100.4     PB.100.4           DISP3                 ISM      +                  5prime_fragment Human (Fetal)
+PB.1000.1   PB.1000.1            HAX1                 FSM      +                       multi-exon Human (Fetal)
+PB.1001.1   PB.1001.1          CHRNB2                 ISM      +                 intron_retention Human (Fetal)
+PB.1003.2   PB.1003.2            ADAR                 FSM      -                       multi-exon Human (Fetal)
+PB.1003.3   PB.1003.3            ADAR                 FSM      -                       multi-exon Human (Fetal)
+PB.1003.5   PB.1003.5            ADAR                 ISM      -                  3prime_fragment Human (Fetal)
+PB.1003.6   PB.1003.6            ADAR                 ISM      -                  3prime_fragment Human (Fetal)
+PB.1004.2   PB.1004.2           KCNN3                 FSM      -                       multi-exon Human (Fetal)
+PB.1004.3   PB.1004.3           KCNN3                 FSM      -                       multi-exon Human (Fetal)
+PB.1005.1   PB.1005.1            PMVK                 FSM      -                       multi-exon Human (Fetal)
+PB.1006.1   PB.1006.1          PBXIP1                 FSM      -                       multi-exon Human (Fetal)
+PB.1007.1   PB.1007.1           PYGO2                 FSM      -                       multi-exon Human (Fetal)
+PB.1008.1   PB.1008.1           CKS1B                 FSM      +                       multi-exon Human (Fetal)
+PB.1009.1   PB.1009.1           FLAD1                 NIC      +                 intron_retention Human (Fetal)
+PB.1009.2   PB.1009.2           FLAD1                 FSM      +                       multi-exon Human (Fetal)
+PB.1009.3   PB.1009.3           FLAD1                 ISM      +                  3prime_fragment Human (Fetal)
+PB.1009.4   PB.1009.4           FLAD1                 ISM      +                  3prime_fragment Human (Fetal)
+PB.1009.5   PB.1009.5           FLAD1                 NIC      +                 intron_retention Human (Fetal)
+PB.1009.6   PB.1009.6           FLAD1                 NIC      +                 intron_retention Human (Fetal)
+PB.101.1     PB.101.1           FBXO2                 FSM      -                       multi-exon Human (Fetal)
+PB.1010.3   PB.1010.3          ADAM15                 FSM      +                       multi-exon Human (Fetal)
+PB.1010.4   PB.1010.4          ADAM15                 NIC      +   combination_of_known_junctions Human (Fetal)
+PB.1011.1   PB.1011.1           EFNA3                 NIC      +   combination_of_known_junctions Human (Fetal)
+PB.1011.2   PB.1011.2           EFNA3                 FSM      +                       multi-exon Human (Fetal)
+PB.1011.3   PB.1011.3           EFNA3                 ISM      +                 intron_retention Human (Fetal)
+PB.1011.4   PB.1011.4           EFNA3                 ISM      +                 intron_retention Human (Fetal)
+PB.1012.1   PB.1012.1           EFNA1                 FSM      +                       multi-exon Human (Fetal)
+PB.1013.1   PB.1013.1            DPM3                 FSM      -                       multi-exon Human (Fetal)
+PB.1014.1   PB.1014.1         KRTCAP2                 FSM      -                       multi-exon Human (Fetal)
+PB.1015.1   PB.1015.1          TRIM46                 FSM      +                       multi-exon Human (Fetal)
+PB.1015.2   PB.1015.2          TRIM46                 NIC      +   combination_of_known_junctions Human (Fetal)
+PB.1015.3   PB.1015.3          TRIM46                 NIC      +   combination_of_known_junctions Human (Fetal)
+PB.1015.4   PB.1015.4          TRIM46                 NIC      + combination_of_known_splicesites Human (Fetal)
+PB.1016.1   PB.1016.1            MTX1                 FSM      +                       multi-exon Human (Fetal)
+PB.1017.1   PB.1017.1           GBAP1                 NNC      -                 intron_retention Human (Fetal)
+PB.1018.1   PB.1018.1             GBA                 FSM      -                       multi-exon Human (Fetal)
+PB.1018.2   PB.1018.2             GBA                 NIC      -                 intron_retention Human (Fetal)
+PB.1019.1   PB.1019.1         FAM189B                 FSM      -                       multi-exon Human (Fetal)
+PB.102.1     PB.102.1          FBXO44                 NIC      +                 intron_retention Human (Fetal)
+PB.102.2     PB.102.2          FBXO44                 FSM      +                       multi-exon Human (Fetal)
+PB.102.3     PB.102.3          FBXO44                 NIC      +                 intron_retention Human (Fetal)
+PB.102.6     PB.102.6          FBXO44                 FSM      +                       multi-exon Human (Fetal)
+PB.1020.1   PB.1020.1          SCAMP3                 FSM      -                       multi-exon Human (Fetal)
+PB.1021.1   PB.1021.1            CLK2                 NIC      -                 intron_retention Human (Fetal)
+PB.1021.2   PB.1021.2            CLK2                 NIC      -                 intron_retention Human (Fetal)
+PB.1021.3   PB.1021.3            CLK2                 FSM      -                       multi-exon Human (Fetal)
+PB.1022.1   PB.1022.1            HCN3                 NIC      +                 intron_retention Human (Fetal)
+PB.1022.2   PB.1022.2            HCN3                 FSM      +                       multi-exon Human (Fetal)
+PB.1022.3   PB.1022.3            HCN3                 NIC      +                 intron_retention Human (Fetal)
+PB.1023.1   PB.1023.1            FDPS                 FSM      +                       multi-exon Human (Fetal)
+PB.1023.2   PB.1023.2            FDPS                 FSM      +                       multi-exon Human (Fetal)
+PB.1023.3   PB.1023.3            FDPS                 FSM      +                       multi-exon Human (Fetal)
+PB.1023.4   PB.1023.4            FDPS                 NIC      + combination_of_known_splicesites Human (Fetal)
+PB.1023.5   PB.1023.5            FDPS                 NIC      +                 intron_retention Human (Fetal)
+PB.1023.6   PB.1023.6            FDPS                 NIC      +                 intron_retention Human (Fetal)
+PB.1024.1   PB.1024.1           RUSC1                 NIC      +                 intron_retention Human (Fetal)
+PB.1024.2   PB.1024.2           RUSC1                 FSM      +                       multi-exon Human (Fetal)
+PB.1024.5   PB.1024.5           RUSC1                 FSM      +                       multi-exon Human (Fetal)
+PB.1026.8   PB.1026.8           ASH1L                 NNC      -    at_least_one_novel_splicesite Human (Fetal)
+PB.1028.10 PB.1028.10          YY1AP1                 NIC      -   combination_of_known_junctions Human (Fetal)
+PB.1028.2   PB.1028.2          YY1AP1                 NIC      -                 intron_retention Human (Fetal)
+PB.1028.3   PB.1028.3          YY1AP1                 NIC      -                 intron_retention Human (Fetal)
+PB.1028.4   PB.1028.4          YY1AP1                 NNC      -    at_least_one_novel_splicesite Human (Fetal)
+PB.1028.7   PB.1028.7          YY1AP1                 FSM      -                       multi-exon Human (Fetal)
+PB.1028.8   PB.1028.8          YY1AP1                 FSM      -                       multi-exon Human (Fetal)
+PB.1028.9   PB.1028.9          YY1AP1                 FSM      -                       multi-exon Human (Fetal)
+PB.1029.2   PB.1029.2            DAP3                 FSM      +                       multi-exon Human (Fetal)
+PB.1029.3   PB.1029.3            DAP3                 FSM      +                       multi-exon Human (Fetal)
+PB.1029.5   PB.1029.5            DAP3                 NIC      +   combination_of_known_junctions Human (Fetal)
+PB.103.1     PB.103.1           FBXO6                 FSM      +                       multi-exon Human (Fetal)
+PB.1030.3   PB.1030.3           SYT11                 FSM      +                       multi-exon Human (Fetal)
+PB.1030.6   PB.1030.6           SYT11                 ISM      +                 intron_retention Human (Fetal)
+PB.1031.1   PB.1031.1            RIT1                 FSM      -                       multi-exon Human (Fetal)
+PB.1032.1   PB.1032.1           KHDC4                 FSM      -                       multi-exon Human (Fetal)
+PB.1032.2   PB.1032.2           KHDC4                 NIC      -                 intron_retention Human (Fetal)
+PB.1032.3   PB.1032.3           KHDC4                 NIC      -                 intron_retention Human (Fetal)
+PB.1032.4   PB.1032.4           KHDC4                 FSM      -                       multi-exon Human (Fetal)
+PB.1032.5   PB.1032.5           KHDC4                 NIC      -   combination_of_known_junctions Human (Fetal)
+PB.1032.6   PB.1032.6           KHDC4                 NNC      -    at_least_one_novel_splicesite Human (Fetal)
+PB.1032.8   PB.1032.8           KHDC4                 NNC      -                 intron_retention Human (Fetal)
+PB.1032.9   PB.1032.9           KHDC4                 NIC      -                 intron_retention Human (Fetal)
+PB.1033.12 PB.1033.12         ARHGEF2                 ISM      -                  5prime_fragment Human (Fetal)
+PB.1033.16 PB.1033.16         ARHGEF2                 ISM      -                  3prime_fragment Human (Fetal)
+PB.1033.3   PB.1033.3         ARHGEF2                 NIC      -                 intron_retention Human (Fetal)
+PB.1033.4   PB.1033.4         ARHGEF2                 FSM      -                       multi-exon Human (Fetal)
+PB.1033.5   PB.1033.5         ARHGEF2                 FSM      -                       multi-exon Human (Fetal)
+PB.1033.6   PB.1033.6         ARHGEF2                 NIC      -                 intron_retention Human (Fetal)
+PB.1033.7   PB.1033.7         ARHGEF2                 NIC      -                 intron_retention Human (Fetal)
+PB.1033.8   PB.1033.8         ARHGEF2                 NNC      -                 intron_retention Human (Fetal)
+PB.1034.1   PB.1034.1            SSR2                 FSM      -                       multi-exon Human (Fetal)
+PB.1034.2   PB.1034.2            SSR2                 FSM      -                       multi-exon Human (Fetal)
+PB.1035.2   PB.1035.2          UBQLN4                 NNC      -    at_least_one_novel_splicesite Human (Fetal)
+PB.1035.3   PB.1035.3          UBQLN4                 FSM      -                       multi-exon Human (Fetal)
+PB.1035.4   PB.1035.4          UBQLN4                 NNC      -    at_least_one_novel_splicesite Human (Fetal)
+PB.1038.1   PB.1038.1            LMNA                 NNC      +                 intron_retention Human (Fetal)
+PB.1038.5   PB.1038.5            LMNA                 FSM      +                       multi-exon Human (Fetal)
+PB.1039.1   PB.1039.1          SEMA4A                 NIC      + combination_of_known_splicesites Human (Fetal)
+PB.1039.2   PB.1039.2          SEMA4A                 FSM      +                       multi-exon Human (Fetal)
+PB.1039.4   PB.1039.4          SEMA4A                 NNC      +                 intron_retention Human (Fetal)
+PB.1040.1   PB.1040.1        SLC25A44                 FSM      +                       multi-exon Human (Fetal)
+PB.1041.1   PB.1041.1            PMF1                 FSM      +                       multi-exon Human (Fetal)
+PB.1042.1   PB.1042.1            SMG5                 NIC      -                 intron_retention Human (Fetal)
+PB.1042.2   PB.1042.2            SMG5                 FSM      -                       multi-exon Human (Fetal)
+PB.1043.2   PB.1043.2            CCT3                 FSM      -                       multi-exon Human (Fetal)
+PB.1043.3   PB.1043.3            CCT3                 FSM      -                       multi-exon Human (Fetal)
+PB.1044.3   PB.1044.3         C1ORF61                 FSM      -                       multi-exon Human (Fetal)
+PB.1044.6   PB.1044.6         C1ORF61                 FSM      -                       multi-exon Human (Fetal)
+PB.1046.1   PB.1046.1            NAXE                 NNC      +                 intron_retention Human (Fetal)
+PB.1046.4   PB.1046.4            NAXE                 FSM      +                       multi-exon Human (Fetal)
+PB.1047.1   PB.1047.1         GPATCH4                 FSM      -                       multi-exon Human (Fetal)
+PB.1048.1   PB.1048.1            BCAN                 FSM      +                       multi-exon Human (Fetal)
+PB.1048.2   PB.1048.2            BCAN                 FSM      +                       multi-exon Human (Fetal)
+PB.1048.3   PB.1048.3            BCAN                 NNC      +    at_least_one_novel_splicesite Human (Fetal)
+PB.105.1     PB.105.1          MAD2L2                 NNC      -    at_least_one_novel_splicesite Human (Fetal)
+PB.105.2     PB.105.2          MAD2L2                 NIC      -                 intron_retention Human (Fetal)
+PB.105.3     PB.105.3          MAD2L2                 FSM      -                       multi-exon Human (Fetal)
+PB.105.4     PB.105.4          MAD2L2                 FSM      -                       multi-exon Human (Fetal)
+PB.1050.1   PB.1050.1             NES                 FSM      -                       multi-exon Human (Fetal)
+PB.1052.2   PB.1052.2         ISG20L2                 FSM      -                       multi-exon Human (Fetal)
+PB.1053.1   PB.1053.1          MRPL24                 FSM      -                       multi-exon Human (Fetal)
+PB.1054.2   PB.1054.2            HDGF                 FSM      -                       multi-exon Human (Fetal)
+PB.1054.3   PB.1054.3            HDGF                 FSM      -                       multi-exon Human (Fetal)
+PB.1055.1   PB.1055.1            PRCC                 FSM      +                       multi-exon Human (Fetal)
+PB.1055.2   PB.1055.2            PRCC                 NIC      +   combination_of_known_junctions Human (Fetal)
+PB.1056.1   PB.1056.1        ARHGEF11                 ISM      -                  5prime_fragment Human (Fetal)
+PB.1065.1   PB.1065.1           CADM3                 FSM      +                       multi-exon Human (Fetal)
+PB.1065.2   PB.1065.2           CADM3                 FSM      +                       multi-exon Human (Fetal)
+PB.1067.1   PB.1067.1      AL590560.1                 NNC      -                 intron_retention Human (Fetal)
+PB.1067.2   PB.1067.2      AL590560.1                 NIC      -                 intron_retention Human (Fetal)
+PB.1068.1   PB.1068.1          TAGLN2                 FSM      -                       multi-exon Human (Fetal)
+PB.1069.1   PB.1069.1           IGSF9                 FSM      -                       multi-exon Human (Fetal)
+PB.107.2     PB.107.2           CLCN6                 FSM      +                       multi-exon Human (Fetal)
+PB.1071.1   PB.1071.1           IGSF8                 FSM      -                       multi-exon Human (Fetal)
+PB.1071.3   PB.1071.3           IGSF8                 NIC      -                 intron_retention Human (Fetal)
+PB.1071.4   PB.1071.4           IGSF8                 NIC      -                 intron_retention Human (Fetal)
+PB.1071.5   PB.1071.5           IGSF8                 NIC      -                 intron_retention Human (Fetal)
+PB.1071.6   PB.1071.6           IGSF8                 NIC      -                 intron_retention Human (Fetal)
+PB.1071.7   PB.1071.7           IGSF8                 NIC      -   combination_of_known_junctions Human (Fetal)
+PB.1071.8   PB.1071.8           IGSF8                 NNC      -    at_least_one_novel_splicesite Human (Fetal)
+PB.1071.9   PB.1071.9           IGSF8                 NIC      -   combination_of_known_junctions Human (Fetal)
+PB.1072.1   PB.1072.1          ATP1A2                 FSM      +                       multi-exon Human (Fetal)
+PB.1073.1   PB.1073.1           CASQ1                 ISM      +                  5prime_fragment Human (Fetal)
+PB.1074.14 PB.1074.14           PEA15                 ISM      +                 intron_retention Human (Fetal)
+PB.1074.2   PB.1074.2           PEA15                 FSM      +                       multi-exon Human (Fetal)
+PB.1074.3   PB.1074.3           PEA15                 FSM      +                       multi-exon Human (Fetal)
+PB.1074.4   PB.1074.4           PEA15                 NNC      +    at_least_one_novel_splicesite Human (Fetal)
+PB.1074.7   PB.1074.7           PEA15                 FSM      +                       multi-exon Human (Fetal)
+PB.1075.1   PB.1075.1           DCAF8                 FSM      -                       multi-exon Human (Fetal)
+PB.1075.2   PB.1075.2           DCAF8                 FSM      -                       multi-exon Human (Fetal)
+PB.1075.3   PB.1075.3           DCAF8                 FSM      -                       multi-exon Human (Fetal)
+PB.1076.1   PB.1076.1           PEX19                 FSM      -                       multi-exon Human (Fetal)
+PB.1076.2   PB.1076.2           PEX19                 FSM      -                       multi-exon Human (Fetal)
+PB.1076.4   PB.1076.4           PEX19                 NIC      -                 intron_retention Human (Fetal)
+PB.1077.2   PB.1077.2            COPA                 NIC      -   combination_of_known_junctions Human (Fetal)
+PB.1077.5   PB.1077.5            COPA                 FSM      -                       multi-exon Human (Fetal)
+PB.1077.7   PB.1077.7            COPA                 ISM      -                  5prime_fragment Human (Fetal)
+PB.1077.8   PB.1077.8            COPA                 FSM      -                       multi-exon Human (Fetal)
+PB.1078.1   PB.1078.1           NCSTN                 FSM      +                       multi-exon Human (Fetal)
+ [ reached 'max' / getOption("max.print") -- omitted 17907 rows ]
+
+$Human
+              isoform associated_gene structural_category strand                      subcategory Sample
+PB.1.1         PB.1.1          WASH7P                 NNC      -                 intron_retention  Human
+PB.1.10       PB.1.10          WASH7P                 NIC      -                 intron_retention  Human
+PB.1.12       PB.1.12          WASH7P                 NNC      -    at_least_one_novel_splicesite  Human
+PB.1.13       PB.1.13          WASH7P                 NNC      -                 intron_retention  Human
+PB.1.8         PB.1.8          WASH7P                 NNC      -    at_least_one_novel_splicesite  Human
+PB.100.1     PB.100.1            CHD5                 ISM      -                  5prime_fragment  Human
+PB.100.2     PB.100.2            CHD5                 ISM      -                  5prime_fragment  Human
+PB.100.7     PB.100.7            CHD5                 ISM      -                  5prime_fragment  Human
+PB.1012.1   PB.1012.1           ACADM                 FSM      +                       multi-exon  Human
+PB.1012.2   PB.1012.2           ACADM                 NIC      +                 intron_retention  Human
+PB.1012.3   PB.1012.3           ACADM                 FSM      +                       multi-exon  Human
+PB.1012.7   PB.1012.7           ACADM                 NIC      +                 intron_retention  Human
+PB.1012.8   PB.1012.8           ACADM                 NIC      +   combination_of_known_junctions  Human
+PB.1012.9   PB.1012.9           ACADM                 NIC      +   combination_of_known_junctions  Human
+PB.1013.1   PB.1013.1         RABGGTB                 FSM      +                       multi-exon  Human
+PB.1013.3   PB.1013.3         RABGGTB                 NIC      +                 intron_retention  Human
+PB.102.1     PB.102.1           RPL22                 NIC      -                 intron_retention  Human
+PB.102.3     PB.102.3           RPL22                 FSM      -                       multi-exon  Human
+PB.102.4     PB.102.4           RPL22                 FSM      -                       multi-exon  Human
+PB.1028.1   PB.1028.1      ST6GALNAC3                 ISM      +                  5prime_fragment  Human
+PB.1029.2   PB.1029.2      ST6GALNAC5                 FSM      +                       multi-exon  Human
+PB.103.3     PB.103.3            ICMT                 FSM      -                       multi-exon  Human
+PB.103.4     PB.103.4            ICMT                 FSM      -                       multi-exon  Human
+PB.1032.2   PB.1032.2            PIGK                 FSM      -                       multi-exon  Human
+PB.1033.1   PB.1033.1   NOVELGENE_833          Intergenic      +                       multi-exon  Human
+PB.1034.1   PB.1034.1             AK5                 FSM      +                       multi-exon  Human
+PB.1034.11 PB.1034.11             AK5                 NNC      +    at_least_one_novel_splicesite  Human
+PB.1034.2   PB.1034.2             AK5                 NIC      + combination_of_known_splicesites  Human
+PB.1034.3   PB.1034.3             AK5                 NIC      +   combination_of_known_junctions  Human
+PB.1034.6   PB.1034.6             AK5                 NIC      +   combination_of_known_junctions  Human
+PB.1035.10 PB.1035.10      AC118549.1                 ISM      -                  3prime_fragment  Human
+PB.1035.11 PB.1035.11      AC118549.1                 ISM      -                  3prime_fragment  Human
+PB.1035.4   PB.1035.4      AC118549.1                 ISM      -                  5prime_fragment  Human
+PB.1036.15 PB.1036.15           USP33                 FSM      -                       multi-exon  Human
+PB.1036.17 PB.1036.17           USP33                 NIC      -   combination_of_known_junctions  Human
+PB.1036.18 PB.1036.18           USP33                 NIC      -                 intron_retention  Human
+PB.1036.2   PB.1036.2           USP33                 NIC      -   combination_of_known_junctions  Human
+PB.1036.4   PB.1036.4           USP33                 NIC      -   combination_of_known_junctions  Human
+PB.1037.1   PB.1037.1           MIGA1                 FSM      +                       multi-exon  Human
+PB.1038.15 PB.1038.15           FUBP1                 NIC      -   combination_of_known_junctions  Human
+PB.1038.16 PB.1038.16           FUBP1                 NIC      -   combination_of_known_junctions  Human
+PB.1038.3   PB.1038.3           FUBP1                 NIC      -                 intron_retention  Human
+PB.1038.4   PB.1038.4           FUBP1                 NIC      -                 intron_retention  Human
+PB.1038.6   PB.1038.6           FUBP1                 NIC      -   combination_of_known_junctions  Human
+PB.1039.13 PB.1039.13          DNAJB4                 FSM      +                       multi-exon  Human
+PB.1039.3   PB.1039.3          DNAJB4                 FSM      +                       multi-exon  Human
+PB.1039.5   PB.1039.5          DNAJB4                 NIC      +   combination_of_known_junctions  Human
+PB.104.2     PB.104.2          GPR153                 FSM      -                       multi-exon  Human
+PB.104.3     PB.104.3          GPR153                 ISM      -                  5prime_fragment  Human
+PB.1040.1   PB.1040.1           GIPC2                 FSM      +                       multi-exon  Human
+PB.1042.1   PB.1042.1           IFI44                 NIC      +   combination_of_known_junctions  Human
+PB.1044.1   PB.1044.1          ADGRL4                 FSM      -                       multi-exon  Human
+PB.105.1     PB.105.1           ACOT7                 FSM      -                       multi-exon  Human
+PB.105.2     PB.105.2           ACOT7                 FSM      -                       multi-exon  Human
+PB.105.3     PB.105.3           ACOT7                 FSM      -                       multi-exon  Human
+PB.1056.1   PB.1056.1          ADGRL2                 ISM      +                  5prime_fragment  Human
+PB.1056.3   PB.1056.3          ADGRL2                 NIC      + combination_of_known_splicesites  Human
+PB.1061.15 PB.1061.15           TTLL7                 ISM      -                  3prime_fragment  Human
+PB.1061.16 PB.1061.16           TTLL7                 NIC      - combination_of_known_splicesites  Human
+PB.1061.17 PB.1061.17           TTLL7                 NNC      -    at_least_one_novel_splicesite  Human
+PB.1061.18 PB.1061.18           TTLL7                 NIC      - combination_of_known_splicesites  Human
+PB.1061.19 PB.1061.19           TTLL7                 ISM      -                  3prime_fragment  Human
+PB.1061.23 PB.1061.23           TTLL7                 ISM      -                  3prime_fragment  Human
+PB.1061.24 PB.1061.24           TTLL7                 NIC      -                 intron_retention  Human
+PB.1063.11 PB.1063.11          PRKACB                 NIC      +   combination_of_known_junctions  Human
+PB.1063.12 PB.1063.12          PRKACB                 NIC      +   combination_of_known_junctions  Human
+PB.1063.13 PB.1063.13          PRKACB                 NIC      +   combination_of_known_junctions  Human
+PB.1063.15 PB.1063.15          PRKACB                 ISM      +                  5prime_fragment  Human
+PB.1063.2   PB.1063.2          PRKACB                 FSM      +                       multi-exon  Human
+PB.1063.6   PB.1063.6          PRKACB                 FSM      +                       multi-exon  Human
+PB.1063.7   PB.1063.7          PRKACB                 FSM      +                       multi-exon  Human
+PB.1063.9   PB.1063.9          PRKACB                 NIC      +   combination_of_known_junctions  Human
+PB.1065.1   PB.1065.1          SAMD13                 FSM      +                       multi-exon  Human
+PB.1065.2   PB.1065.2          SAMD13                 FSM      +                       multi-exon  Human
+PB.1066.1   PB.1066.1            RPF1                 FSM      +                       multi-exon  Human
+PB.1068.1   PB.1068.1            GNG5                 FSM      -                       multi-exon  Human
+PB.1068.3   PB.1068.3       CTBS_GNG5              Fusion      -                       multi-exon  Human
+PB.1068.5   PB.1068.5            CTBS                 FSM      -                       multi-exon  Human
+PB.1069.2   PB.1069.2          SSX2IP                 NNC      -    at_least_one_novel_splicesite  Human
+PB.1069.5   PB.1069.5          SSX2IP                 FSM      -                       multi-exon  Human
+PB.1069.7   PB.1069.7          SSX2IP                 NIC      -   combination_of_known_junctions  Human
+PB.107.1     PB.107.1        TNFRSF25                 FSM      -                       multi-exon  Human
+PB.1073.1   PB.1073.1         C1ORF52                 FSM      -                       multi-exon  Human
+PB.1073.2   PB.1073.2         C1ORF52                 FSM      -                       multi-exon  Human
+PB.1074.1   PB.1074.1           BCL10                 FSM      -                       multi-exon  Human
+PB.1075.2   PB.1075.2           DDAH1                 FSM      -                       multi-exon  Human
+PB.1075.7   PB.1075.7           DDAH1                 FSM      -                       multi-exon  Human
+PB.1075.9   PB.1075.9           DDAH1                 NNC      -    at_least_one_novel_splicesite  Human
+PB.1076.2   PB.1076.2            CCN1                 NIC      +                 intron_retention  Human
+PB.1076.3   PB.1076.3            CCN1                 FSM      +                       multi-exon  Human
+PB.1078.1   PB.1078.1          ZNHIT6                 FSM      -                       multi-exon  Human
+PB.1078.3   PB.1078.3          ZNHIT6                 ISM      -                 intron_retention  Human
+PB.108.1     PB.108.1         PLEKHG5                 FSM      -                       multi-exon  Human
+PB.108.2     PB.108.2         PLEKHG5                 NNC      -    at_least_one_novel_splicesite  Human
+PB.108.3     PB.108.3         PLEKHG5                 FSM      -                       multi-exon  Human
+PB.108.5     PB.108.5         PLEKHG5                 FSM      -                       multi-exon  Human
+PB.1084.1   PB.1084.1           ODF2L                 FSM      -                       multi-exon  Human
+PB.1085.1   PB.1085.1         SH3GLB1                 FSM      +                       multi-exon  Human
+PB.1085.3   PB.1085.3         SH3GLB1                 FSM      +                       multi-exon  Human
+PB.1086.1   PB.1086.1         SELENOF                 FSM      -                       multi-exon  Human
+PB.1086.4   PB.1086.4         SELENOF                 FSM      -                       multi-exon  Human
+PB.1086.5   PB.1086.5         SELENOF                 NNC      -                 intron_retention  Human
+PB.1087.2   PB.1087.2          HS2ST1                 FSM      +                       multi-exon  Human
+PB.1089.1   PB.1089.1       LINC01140                 FSM      +                       multi-exon  Human
+PB.1089.2   PB.1089.2       LINC01140                 FSM      +                       multi-exon  Human
+PB.1090.10 PB.1090.10            LMO4                 FSM      +                       multi-exon  Human
+PB.1090.11 PB.1090.11            LMO4                 ISM      +                  3prime_fragment  Human
+PB.1090.18 PB.1090.18            LMO4                 NNC      +    at_least_one_novel_splicesite  Human
+PB.1090.7   PB.1090.7            LMO4                 FSM      +                       multi-exon  Human
+PB.1097.11 PB.1097.11            PKN2                 FSM      +                       multi-exon  Human
+PB.1097.2   PB.1097.2            PKN2                 FSM      +                       multi-exon  Human
+PB.1099.1   PB.1099.1           GTF2B                 FSM      -                       multi-exon  Human
+PB.110.2     PB.110.2          ZBTB48                 NIC      + combination_of_known_splicesites  Human
+PB.110.3     PB.110.3          ZBTB48                 FSM      +                       multi-exon  Human
+PB.1101.1   PB.1101.1           KYAT3                 FSM      -                       multi-exon  Human
+PB.1101.2   PB.1101.2           KYAT3                 FSM      -                       multi-exon  Human
+PB.1101.4   PB.1101.4          RBMXL1                 FSM      -                       multi-exon  Human
+PB.1101.5   PB.1101.5          RBMXL1                 FSM      -                       multi-exon  Human
+PB.1103.1   PB.1103.1            GBP1                 FSM      -                       multi-exon  Human
+PB.1103.2   PB.1103.2            GBP1                 FSM      -                       multi-exon  Human
+PB.1104.1   PB.1104.1            GBP2                 FSM      -                       multi-exon  Human
+PB.1105.1   PB.1105.1            GBP4                 FSM      -                       multi-exon  Human
+PB.1106.4   PB.1106.4          LRRC8B                 FSM      +                       multi-exon  Human
+PB.1107.1   PB.1107.1       LRRC8C-DT                 FSM      -                       multi-exon  Human
+PB.1108.2   PB.1108.2          LRRC8C                 FSM      +                       multi-exon  Human
+PB.111.3     PB.111.3          KLHL21                 FSM      -                       multi-exon  Human
+PB.1111.2   PB.1111.2          LRRC8D                 NNC      +    at_least_one_novel_splicesite  Human
+PB.1111.3   PB.1111.3          LRRC8D                 FSM      +                       multi-exon  Human
+PB.1111.6   PB.1111.6          LRRC8D                 FSM      +                       multi-exon  Human
+PB.1114.2   PB.1114.2          ZNF326                 NIC      +                 intron_retention  Human
+PB.1114.3   PB.1114.3          ZNF326                 FSM      +                       multi-exon  Human
+PB.1114.5   PB.1114.5          ZNF326                 FSM      +                       multi-exon  Human
+PB.1116.1   PB.1116.1       LINC02609                 FSM      -                       multi-exon  Human
+PB.1117.1   PB.1117.1          ZNF644                 NNC      -                 intron_retention  Human
+PB.1117.2   PB.1117.2          ZNF644                 FSM      -                       multi-exon  Human
+PB.1117.3   PB.1117.3          ZNF644                 NIC      - combination_of_known_splicesites  Human
+PB.1117.4   PB.1117.4          ZNF644                 FSM      -                       multi-exon  Human
+PB.1117.6   PB.1117.6          ZNF644                 NIC      -                 intron_retention  Human
+PB.112.1     PB.112.1           PHF13                 FSM      +                       multi-exon  Human
+PB.1120.2   PB.1120.2            CDC7                 FSM      +                       multi-exon  Human
+PB.1125.1   PB.1125.1          TGFBR3                 ISM      -                  5prime_fragment  Human
+PB.1128.1   PB.1128.1           EPHX4                 FSM      +                       multi-exon  Human
+PB.1128.4   PB.1128.4           EPHX4                 NIC      + combination_of_known_splicesites  Human
+PB.1129.3   PB.1129.3   NOVELGENE_930          Intergenic      -                       multi-exon  Human
+PB.113.1     PB.113.1           THAP3                 NIC      +   combination_of_known_junctions  Human
+PB.113.3     PB.113.3           THAP3                 ISM      +                  5prime_fragment  Human
+PB.113.5     PB.113.5           THAP3                 NNC      +    at_least_one_novel_splicesite  Human
+PB.1130.1   PB.1130.1           BTBD8                 FSM      +                       multi-exon  Human
+PB.1131.1   PB.1131.1           BTBD8                 ISM      +                 intron_retention  Human
+PB.1131.3   PB.1131.3           BTBD8                 FSM      +                       multi-exon  Human
+PB.1133.1   PB.1133.1            GLMN                 FSM      -                       multi-exon  Human
+PB.1133.3   PB.1133.3            GLMN                 NIC      -   combination_of_known_junctions  Human
+PB.1134.2   PB.1134.2           RPAP2                 FSM      +                       multi-exon  Human
+PB.114.10   PB.114.10         DNAJC11                 FSM      -                       multi-exon  Human
+PB.114.3     PB.114.3         DNAJC11                 NIC      -   combination_of_known_junctions  Human
+PB.114.9     PB.114.9         DNAJC11                 FSM      -                       multi-exon  Human
+PB.1142.1   PB.1142.1            EVI5                 ISM      -                  3prime_fragment  Human
+PB.1143.11 PB.1143.11            RPL5                 FSM      +                       multi-exon  Human
+PB.1143.2   PB.1143.2            RPL5                 NIC      +                 intron_retention  Human
+PB.1143.3   PB.1143.3            RPL5                 FSM      +                       multi-exon  Human
+PB.1143.6   PB.1143.6            RPL5                 FSM      +                       multi-exon  Human
+PB.1144.5   PB.1144.5          DIPK1A                 NNC      -    at_least_one_novel_splicesite  Human
+PB.1144.6   PB.1144.6          DIPK1A                 FSM      -                       multi-exon  Human
+PB.1145.2   PB.1145.2            MTF2                 NIC      +                 intron_retention  Human
+PB.1145.4   PB.1145.4            MTF2                 ISM      +                  3prime_fragment  Human
+PB.1145.6   PB.1145.6            MTF2                 ISM      +                  3prime_fragment  Human
+ [ reached 'max' / getOption("max.print") -- omitted 31705 rows ]
+
+
+#############################################################
+Statstical Tests for dataset: Mouse 
+#############################################################
+
+Test on Expression of NMD transcripts vs Non-NMD transcripts in Annotated genes
+Expression of NMD Transcripts in Annotated genes (IsoSeq TPM)
+ mean =  11.21577 s.d. = 84.95428 
+Expression of Non-NMD Transcripts in Annotated genes (IsoSeq TPM) 
+ mean =  23.1199 s.d. = 143.1172
+	Wilcoxon rank sum test with continuity correction
+
+data:  NMD_transcripts_annotated_genes$ISOSEQ_TPM and non_NMD_transcripts_annotated_genes$ISOSEQ_TPM
+W = 87232108, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+[1] 6.151906e-156
+Test on Expression of IR-NMD transcripts vs IR, but no NMD transcripts in Annotated genes or NMD, but no IR
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  IR_NMD_transcripts_annotated_genes$ISOSEQ_TPM and c(IR_Non_NMD_transcripts_annotated_genes$ISOSEQ_TPM, Non_IR_NMD_transcripts_annotated_genes$ISOSEQ_TPM)
+W = 7497494, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+[1] 1.674151e-42
+
+#############################################################
+Statstical Tests for dataset: Adult 
+#############################################################
+
+Test on Expression of NMD transcripts vs Non-NMD transcripts in Annotated genes
+Expression of NMD Transcripts in Annotated genes (IsoSeq TPM)
+ mean =  24.64465 s.d. = 89.42727 
+Expression of Non-NMD Transcripts in Annotated genes (IsoSeq TPM) 
+ mean =  47.57653 s.d. = 424.3966
+	Wilcoxon rank sum test with continuity correction
+
+data:  NMD_transcripts_annotated_genes$ISOSEQ_TPM and non_NMD_transcripts_annotated_genes$ISOSEQ_TPM
+W = 16611720, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+[1] 4.508167e-59
+Test on Expression of IR-NMD transcripts vs IR, but no NMD transcripts in Annotated genes or NMD, but no IR
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  IR_NMD_transcripts_annotated_genes$ISOSEQ_TPM and c(IR_Non_NMD_transcripts_annotated_genes$ISOSEQ_TPM, Non_IR_NMD_transcripts_annotated_genes$ISOSEQ_TPM)
+W = 1062400, p-value = 4.244e-09
+alternative hypothesis: true location shift is not equal to 0
+
+[1] 4.243918e-09
+
+#############################################################
+Statstical Tests for dataset: Fetal 
+#############################################################
+
+Test on Expression of NMD transcripts vs Non-NMD transcripts in Annotated genes
+Expression of NMD Transcripts in Annotated genes (IsoSeq TPM)
+ mean =  32.17018 s.d. = 120.3369 
+Expression of Non-NMD Transcripts in Annotated genes (IsoSeq TPM) 
+ mean =  57.06824 s.d. = 239.9079
+	Wilcoxon rank sum test with continuity correction
+
+data:  NMD_transcripts_annotated_genes$ISOSEQ_TPM and non_NMD_transcripts_annotated_genes$ISOSEQ_TPM
+W = 12889633, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+[1] 5.259364e-67
+Test on Expression of IR-NMD transcripts vs IR, but no NMD transcripts in Annotated genes or NMD, but no IR
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  IR_NMD_transcripts_annotated_genes$ISOSEQ_TPM and c(IR_Non_NMD_transcripts_annotated_genes$ISOSEQ_TPM, Non_IR_NMD_transcripts_annotated_genes$ISOSEQ_TPM)
+W = 1293254, p-value = 1.236e-07
+alternative hypothesis: true location shift is not equal to 0
+
+[1] 1.235738e-07
+
+#############################################################
+Statstical Tests for dataset: Human 
+#############################################################
+
+Test on Expression of NMD transcripts vs Non-NMD transcripts in Annotated genes
+Expression of NMD Transcripts in Annotated genes (IsoSeq TPM)
+ mean =  15.21914 s.d. = 62.99447 
+Expression of Non-NMD Transcripts in Annotated genes (IsoSeq TPM) 
+ mean =  33.13787 s.d. = 261.345
+	Wilcoxon rank sum test with continuity correction
+
+data:  NMD_transcripts_annotated_genes$ISOSEQ_TPM and non_NMD_transcripts_annotated_genes$ISOSEQ_TPM
+W = 44028846, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+[1] 3.592839e-114
+Test on Expression of IR-NMD transcripts vs IR, but no NMD transcripts in Annotated genes or NMD, but no IR
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  IR_NMD_transcripts_annotated_genes$ISOSEQ_TPM and c(IR_Non_NMD_transcripts_annotated_genes$ISOSEQ_TPM, Non_IR_NMD_transcripts_annotated_genes$ISOSEQ_TPM)
+W = 4771064, p-value = 3.81e-12
+alternative hypothesis: true location shift is not equal to 0
+
+[1] 3.810046e-12
+                                                                          Mouse Human (Adult) Human (Fetal)
+number of IR_transcripts identified as predicted NMD (coding)              2341           812          1018
+number of IR_transcripts not identified as predicted NMD (coding)          4112          1469          1631
+number of those IR-NMD transcripts classified as annotated                   52            17            20
+number of those IR-NMD transcripts classified as novel                     2289           795           998
+IR_transcripts (coding)                                                    6453          2281          2649
+NMD transcripts                                                   6014 (12.96%) 2337 (10.62%) 2222 (11.95%)
+Genes associated with IR_NMD transcripts                           1380 (9.53%)   552 (5.02%)   663 (6.86%)
+Genes associated with IR_transcripts (coding)                              3203          1354          1508
+Genes of NMD transcripts                                          2945 (20.34%) 1437 (13.08%)  1362 (14.1%)
+% of IR_NMD transcripts out of total NMD transcripts                      38.93         34.75         45.81
+% of IR_NMD transcripts out of total IR transcripts (coding)              36.28          35.6         38.43
+Number of NMD transcripts not intron retained                              3673          1525          1204
+Genes associated with mutually exclusive transcripts                277 (1.91%)    80 (0.73%)    71 (0.73%)
+                                                                          Human
+number of IR_transcripts identified as predicted NMD (coding)              1930
+number of IR_transcripts not identified as predicted NMD (coding)          3053
+number of those IR-NMD transcripts classified as annotated                   40
+number of those IR-NMD transcripts classified as novel                     1890
+IR_transcripts (coding)                                                    4983
+NMD transcripts                                                   4370 (13.35%)
+Genes associated with IR_NMD transcripts                           1104 (8.55%)
+Genes associated with IR_transcripts (coding)                              2435
+Genes of NMD transcripts                                          2323 (17.99%)
+% of IR_NMD transcripts out of total NMD transcripts                      44.16
+% of IR_NMD transcripts out of total IR transcripts (coding)              38.73
+Number of NMD transcripts not intron retained                              2440
+Genes associated with mutually exclusive transcripts                163 (1.26%)
+  Sample   gene_expression num_genes_IR_transcript
+1  Adult total_num_genes.x                     218
+2  Fetal total_num_genes.x                     265
+3  Human total_num_genes.x                     297
+4  Mouse total_num_genes.x                     336
+5  Adult total_num_genes.y                    1204
+6  Fetal total_num_genes.y                    1324
+7  Human total_num_genes.y                    2269
+8  Mouse total_num_genes.y                    3039
+
+
+Mann Whitney for intron rentetion rate in gene expression between adult vs fetal:
+	Wilcoxon rank sum test with continuity correction
+
+data:  IR_gene_expression$Adult$Log10_FL_TPM and IR_gene_expression$Fetal$Log10_FL_TPM
+W = 1012082, p-value = 7.705e-07
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 7.704642e-07[1] "Fetal vs Adult"
+[1] "Correlation betweenFetalandAdult"
+
+	Pearson's product-moment correlation
+
+data:  dat[[x.var]] and dat[[y.var]]
+t = 22.302, df = 741, p-value < 2.2e-16
+alternative hypothesis: true correlation is not equal to 0
+95 percent confidence interval:
+ 0.5886565 0.6749104
+sample estimates:
+      cor 
+0.6337493 
+
+[1] "corr.value0.633749271566654"
+[1] "p.value1.0696136081638e-84"
+Number of unique AS genes in Fetal 4231Number of unique AS genes in Adult 4963Number of homologous genes listed between human and mouse: 17042 
+Number of mismatching gene names between human and mouse: 1845 
+Number of genes from human homologous list present in mouse genome, thus removed for conversion 267 
+Number of genes from mouse homologous list present in human genome, thus removed for conversion 282 
+Number of unique associated genes with splicing events in Human: 7117 
+Number of unique associated genes with splicing events in Mouse: 9129 
+Working with homologous genes; Converting mouse genes to human equivalent genes 
+Number of homologous genes listed between human and mouse: 17042 
+Number of mismatching gene names between human and mouse: 1845 
+Number of genes from human homologous list present in mouse genome, thus removed for conversion 267 
+Number of genes from mouse homologous list present in human genome, thus removed for conversion 282 
+Number of homologous genes listed between human and mouse: 17042 
+Number of mismatching gene names between human and mouse: 1845 
+Number of genes from human homologous list present in mouse genome, thus removed for conversion 267 
+Number of genes from mouse homologous list present in human genome, thus removed for conversion 282 
+Number of unique associated genes with splicing events in Human: 7117 
+Number of unique associated genes with splicing events in Mouse: 9129 
+Working with homologous genes; Converting mouse genes to human equivalent genes 
+Number of homologous genes listed between human and mouse: 17042 
+Number of mismatching gene names between human and mouse: 1845 
+Number of genes from human homologous list present in mouse genome, thus removed for conversion 267 
+Number of genes from mouse homologous list present in human genome, thus removed for conversion 282 
+Number of splicing events: 
+[38;5;246m# A tibble: 7 × 5[39m
+[38;5;246m# Groups:   Event [7][39m
+  Event Human         `Human (Adult)` `Human (Fetal)` Mouse         
+  [3m[38;5;246m<fct>[39m[23m [3m[38;5;246m<chr>[39m[23m         [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<chr>[39m[23m         
+[38;5;250m1[39m A3    1707 (6.49%)  1057 (7.15%)    737 (6.16%)     3217 (7.99%)  
+[38;5;250m2[39m A5    915 (3.48%)   561 (3.79%)     380 (3.18%)     1883 (4.68%)  
+[38;5;250m3[39m AF    8456 (32.16%) 5364 (36.26%)   3504 (29.31%)   12853 (31.93%)
+[38;5;250m4[39m AL    3883 (14.77%) 2163 (14.62%)   1800 (15.06%)   6182 (15.36%) 
+[38;5;250m5[39m IR    5231 (19.89%) 2383 (16.11%)   2783 (23.28%)   6803 (16.9%)  
+[38;5;250m6[39m MX    328 (1.25%)   142 (0.96%)     109 (0.91%)     625 (1.55%)   
+[38;5;250m7[39m SE    5776 (21.97%) 3123 (21.11%)   2642 (22.1%)    8686 (21.58%) 
+Number of splicing genes: 
+[38;5;246m# A tibble: 7 × 5[39m
+[38;5;246m# Groups:   Event [7][39m
+  Event Human         `Human (Adult)` `Human (Fetal)` Mouse        
+  [3m[38;5;246m<fct>[39m[23m [3m[38;5;246m<chr>[39m[23m         [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<chr>[39m[23m        
+[38;5;250m1[39m A3    1045 (8.06%)  677 (6.14%)     521 (5.38%)     1754 (11.94%)
+[38;5;250m2[39m A5    604 (4.66%)   408 (3.7%)      281 (2.9%)      1134 (7.72%) 
+[38;5;250m3[39m AF    4879 (37.63%) 3357 (30.46%)   2451 (25.32%)   6476 (44.1%) 
+[38;5;250m4[39m AL    2920 (22.52%) 1749 (15.87%)   1469 (15.18%)   4262 (29.02%)
+[38;5;250m5[39m IR    2566 (19.79%) 1422 (12.9%)    1589 (16.42%)   3375 (22.98%)
+[38;5;250m6[39m MX    256 (1.97%)   116 (1.05%)     88 (0.91%)      434 (2.96%)  
+[38;5;250m7[39m SE    3446 (26.58%) 2093 (18.99%)   1830 (18.91%)   4570 (31.12%)
+   Number_of_Splicing_Events        Sample Genes Total_Genes        perc
+1                          1         Human  2318        7117 32.56990305
+2                          1 Human (Adult)  1997        4963 40.23775942
+3                          1 Human (Fetal)  1722        4231 40.69959820
+4                          1         Mouse  7315       13088 55.89089242
+5                          2         Human  2319        7117 32.58395391
+6                          2 Human (Adult)  1659        4963 33.42736248
+7                          2 Human (Fetal)  1445        4231 34.15268258
+8                          2         Mouse  3393       13088 25.92451100
+9                          3         Human  1500        7117 21.07629619
+10                         3 Human (Adult)   858        4963 17.28793069
+11                         3 Human (Fetal)   726        4231 17.15906405
+12                         3         Mouse  1724       13088 13.17237164
+13                         4         Human   698        7117  9.80750316
+14                         4 Human (Adult)   334        4963  6.72980052
+15                         4 Human (Fetal)   261        4231  6.16875443
+16                         4         Mouse   548       13088  4.18704156
+17                         5         Human   228        7117  3.20359702
+18                         5 Human (Adult)    95        4963  1.91416482
+19                         5 Human (Fetal)    67        4231  1.58354999
+20                         5         Mouse   108       13088  0.82518337
+21                         6         Human    50        7117  0.70254321
+22                         6 Human (Adult)    18        4963  0.36268386
+23                         6 Human (Fetal)    10        4231  0.23635074
+24                         7         Human     4        7117  0.05620346
+25                         7 Human (Adult)     2        4963  0.04029821
+Number of splicing events: 
+[38;5;246m# A tibble: 7 × 5[39m
+[38;5;246m# Groups:   Event [7][39m
+  Event Human         `Human (Adult)` `Human (Fetal)` Mouse         
+  [3m[38;5;246m<fct>[39m[23m [3m[38;5;246m<chr>[39m[23m         [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<chr>[39m[23m         
+[38;5;250m1[39m A3    1707 (6.49%)  1057 (7.15%)    737 (6.16%)     3217 (7.99%)  
+[38;5;250m2[39m A5    915 (3.48%)   561 (3.79%)     380 (3.18%)     1883 (4.68%)  
+[38;5;250m3[39m AF    8456 (32.16%) 5364 (36.26%)   3504 (29.31%)   12853 (31.93%)
+[38;5;250m4[39m AL    3883 (14.77%) 2163 (14.62%)   1800 (15.06%)   6182 (15.36%) 
+[38;5;250m5[39m IR    5231 (19.89%) 2383 (16.11%)   2783 (23.28%)   6803 (16.9%)  
+[38;5;250m6[39m MX    328 (1.25%)   142 (0.96%)     109 (0.91%)     625 (1.55%)   
+[38;5;250m7[39m SE    5776 (21.97%) 3123 (21.11%)   2642 (22.1%)    8686 (21.58%) 
+Number of splicing genes: 
+[38;5;246m# A tibble: 7 × 5[39m
+[38;5;246m# Groups:   Event [7][39m
+  Event Human         `Human (Adult)` `Human (Fetal)` Mouse        
+  [3m[38;5;246m<fct>[39m[23m [3m[38;5;246m<chr>[39m[23m         [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<chr>[39m[23m        
+[38;5;250m1[39m A3    1045 (8.06%)  677 (6.14%)     521 (5.38%)     1754 (11.94%)
+[38;5;250m2[39m A5    604 (4.66%)   408 (3.7%)      281 (2.9%)      1134 (7.72%) 
+[38;5;250m3[39m AF    4879 (37.63%) 3357 (30.46%)   2451 (25.32%)   6476 (44.1%) 
+[38;5;250m4[39m AL    2920 (22.52%) 1749 (15.87%)   1469 (15.18%)   4262 (29.02%)
+[38;5;250m5[39m IR    2566 (19.79%) 1422 (12.9%)    1589 (16.42%)   3375 (22.98%)
+[38;5;250m6[39m MX    256 (1.97%)   116 (1.05%)     88 (0.91%)      434 (2.96%)  
+[38;5;250m7[39m SE    3446 (26.58%) 2093 (18.99%)   1830 (18.91%)   4570 (31.12%)
+   Number_of_Splicing_Events        Sample Genes Total_Genes        perc
+1                          1         Human  2318        7117 32.56990305
+2                          1 Human (Adult)  1997        4963 40.23775942
+3                          1 Human (Fetal)  1722        4231 40.69959820
+4                          1         Mouse  7315       13088 55.89089242
+5                          2         Human  2319        7117 32.58395391
+6                          2 Human (Adult)  1659        4963 33.42736248
+7                          2 Human (Fetal)  1445        4231 34.15268258
+8                          2         Mouse  3393       13088 25.92451100
+9                          3         Human  1500        7117 21.07629619
+10                         3 Human (Adult)   858        4963 17.28793069
+11                         3 Human (Fetal)   726        4231 17.15906405
+12                         3         Mouse  1724       13088 13.17237164
+13                         4         Human   698        7117  9.80750316
+14                         4 Human (Adult)   334        4963  6.72980052
+15                         4 Human (Fetal)   261        4231  6.16875443
+16                         4         Mouse   548       13088  4.18704156
+17                         5         Human   228        7117  3.20359702
+18                         5 Human (Adult)    95        4963  1.91416482
+19                         5 Human (Fetal)    67        4231  1.58354999
+20                         5         Mouse   108       13088  0.82518337
+21                         6         Human    50        7117  0.70254321
+22                         6 Human (Adult)    18        4963  0.36268386
+23                         6 Human (Fetal)    10        4231  0.23635074
+24                         7         Human     4        7117  0.05620346
+25                         7 Human (Adult)     2        4963  0.04029821
+Number of splicing events: 
+[38;5;246m# A tibble: 7 × 5[39m
+[38;5;246m# Groups:   Event [7][39m
+  Event Human         `Human (Adult)` `Human (Fetal)` Mouse         
+  [3m[38;5;246m<fct>[39m[23m [3m[38;5;246m<chr>[39m[23m         [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<chr>[39m[23m         
+[38;5;250m1[39m A3    1707 (6.49%)  1057 (7.15%)    737 (6.16%)     3217 (7.99%)  
+[38;5;250m2[39m A5    915 (3.48%)   561 (3.79%)     380 (3.18%)     1883 (4.68%)  
+[38;5;250m3[39m AF    8456 (32.16%) 5364 (36.26%)   3504 (29.31%)   12853 (31.93%)
+[38;5;250m4[39m AL    3883 (14.77%) 2163 (14.62%)   1800 (15.06%)   6182 (15.36%) 
+[38;5;250m5[39m IR    5231 (19.89%) 2383 (16.11%)   2783 (23.28%)   6803 (16.9%)  
+[38;5;250m6[39m MX    328 (1.25%)   142 (0.96%)     109 (0.91%)     625 (1.55%)   
+[38;5;250m7[39m SE    5776 (21.97%) 3123 (21.11%)   2642 (22.1%)    8686 (21.58%) 
+Number of splicing genes: 
+[38;5;246m# A tibble: 7 × 5[39m
+[38;5;246m# Groups:   Event [7][39m
+  Event Human         `Human (Adult)` `Human (Fetal)` Mouse        
+  [3m[38;5;246m<fct>[39m[23m [3m[38;5;246m<chr>[39m[23m         [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<chr>[39m[23m        
+[38;5;250m1[39m A3    1045 (8.06%)  677 (6.14%)     521 (5.38%)     1754 (11.94%)
+[38;5;250m2[39m A5    604 (4.66%)   408 (3.7%)      281 (2.9%)      1134 (7.72%) 
+[38;5;250m3[39m AF    4879 (37.63%) 3357 (30.46%)   2451 (25.32%)   6476 (44.1%) 
+[38;5;250m4[39m AL    2920 (22.52%) 1749 (15.87%)   1469 (15.18%)   4262 (29.02%)
+[38;5;250m5[39m IR    2566 (19.79%) 1422 (12.9%)    1589 (16.42%)   3375 (22.98%)
+[38;5;250m6[39m MX    256 (1.97%)   116 (1.05%)     88 (0.91%)      434 (2.96%)  
+[38;5;250m7[39m SE    3446 (26.58%) 2093 (18.99%)   1830 (18.91%)   4570 (31.12%)
+   Number_of_Splicing_Events        Sample Genes Total_Genes        perc
+1                          1         Human  2318        7117 32.56990305
+2                          1 Human (Adult)  1997        4963 40.23775942
+3                          1 Human (Fetal)  1722        4231 40.69959820
+4                          1         Mouse  7315       13088 55.89089242
+5                          2         Human  2319        7117 32.58395391
+6                          2 Human (Adult)  1659        4963 33.42736248
+7                          2 Human (Fetal)  1445        4231 34.15268258
+8                          2         Mouse  3393       13088 25.92451100
+9                          3         Human  1500        7117 21.07629619
+10                         3 Human (Adult)   858        4963 17.28793069
+11                         3 Human (Fetal)   726        4231 17.15906405
+12                         3         Mouse  1724       13088 13.17237164
+13                         4         Human   698        7117  9.80750316
+14                         4 Human (Adult)   334        4963  6.72980052
+15                         4 Human (Fetal)   261        4231  6.16875443
+16                         4         Mouse   548       13088  4.18704156
+17                         5         Human   228        7117  3.20359702
+18                         5 Human (Adult)    95        4963  1.91416482
+19                         5 Human (Fetal)    67        4231  1.58354999
+20                         5         Mouse   108       13088  0.82518337
+21                         6         Human    50        7117  0.70254321
+22                         6 Human (Adult)    18        4963  0.36268386
+23                         6 Human (Fetal)    10        4231  0.23635074
+24                         7         Human     4        7117  0.05620346
+25                         7 Human (Adult)     2        4963  0.04029821
+Number of splicing events: 
+[38;5;246m# A tibble: 7 × 5[39m
+[38;5;246m# Groups:   Event [7][39m
+  Event Human         `Human (Adult)` `Human (Fetal)` Mouse         
+  [3m[38;5;246m<fct>[39m[23m [3m[38;5;246m<chr>[39m[23m         [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<chr>[39m[23m         
+[38;5;250m1[39m A3    1707 (6.49%)  1057 (7.15%)    737 (6.16%)     3217 (7.99%)  
+[38;5;250m2[39m A5    915 (3.48%)   561 (3.79%)     380 (3.18%)     1883 (4.68%)  
+[38;5;250m3[39m AF    8456 (32.16%) 5364 (36.26%)   3504 (29.31%)   12853 (31.93%)
+[38;5;250m4[39m AL    3883 (14.77%) 2163 (14.62%)   1800 (15.06%)   6182 (15.36%) 
+[38;5;250m5[39m IR    5231 (19.89%) 2383 (16.11%)   2783 (23.28%)   6803 (16.9%)  
+[38;5;250m6[39m MX    328 (1.25%)   142 (0.96%)     109 (0.91%)     625 (1.55%)   
+[38;5;250m7[39m SE    5776 (21.97%) 3123 (21.11%)   2642 (22.1%)    8686 (21.58%) 
+Number of splicing genes: 
+[38;5;246m# A tibble: 7 × 5[39m
+[38;5;246m# Groups:   Event [7][39m
+  Event Human         `Human (Adult)` `Human (Fetal)` Mouse        
+  [3m[38;5;246m<fct>[39m[23m [3m[38;5;246m<chr>[39m[23m         [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<chr>[39m[23m        
+[38;5;250m1[39m A3    1045 (8.06%)  677 (6.14%)     521 (5.38%)     1754 (11.94%)
+[38;5;250m2[39m A5    604 (4.66%)   408 (3.7%)      281 (2.9%)      1134 (7.72%) 
+[38;5;250m3[39m AF    4879 (37.63%) 3357 (30.46%)   2451 (25.32%)   6476 (44.1%) 
+[38;5;250m4[39m AL    2920 (22.52%) 1749 (15.87%)   1469 (15.18%)   4262 (29.02%)
+[38;5;250m5[39m IR    2566 (19.79%) 1422 (12.9%)    1589 (16.42%)   3375 (22.98%)
+[38;5;250m6[39m MX    256 (1.97%)   116 (1.05%)     88 (0.91%)      434 (2.96%)  
+[38;5;250m7[39m SE    3446 (26.58%) 2093 (18.99%)   1830 (18.91%)   4570 (31.12%)
+   Number_of_Splicing_Events        Sample Genes Total_Genes        perc
+1                          1         Human  2318        7117 32.56990305
+2                          1 Human (Adult)  1997        4963 40.23775942
+3                          1 Human (Fetal)  1722        4231 40.69959820
+4                          1         Mouse  7315       13088 55.89089242
+5                          2         Human  2319        7117 32.58395391
+6                          2 Human (Adult)  1659        4963 33.42736248
+7                          2 Human (Fetal)  1445        4231 34.15268258
+8                          2         Mouse  3393       13088 25.92451100
+9                          3         Human  1500        7117 21.07629619
+10                         3 Human (Adult)   858        4963 17.28793069
+11                         3 Human (Fetal)   726        4231 17.15906405
+12                         3         Mouse  1724       13088 13.17237164
+13                         4         Human   698        7117  9.80750316
+14                         4 Human (Adult)   334        4963  6.72980052
+15                         4 Human (Fetal)   261        4231  6.16875443
+16                         4         Mouse   548       13088  4.18704156
+17                         5         Human   228        7117  3.20359702
+18                         5 Human (Adult)    95        4963  1.91416482
+19                         5 Human (Fetal)    67        4231  1.58354999
+20                         5         Mouse   108       13088  0.82518337
+21                         6         Human    50        7117  0.70254321
+22                         6 Human (Adult)    18        4963  0.36268386
+23                         6 Human (Fetal)    10        4231  0.23635074
+24                         7         Human     4        7117  0.05620346
+25                         7 Human (Adult)     2        4963  0.04029821
+Total unique ERCCs: 57 (61.96%)[1] ""
+[1] "Correlation betweenlog2_amount_of_ERCCandlog2_FL_reads"
+
+	Pearson's product-moment correlation
+
+data:  dat[[x.var]] and dat[[y.var]]
+t = 38.684, df = 55, p-value < 2.2e-16
+alternative hypothesis: true correlation is not equal to 0
+95 percent confidence interval:
+ 0.9697003 0.9894697
+sample estimates:
+      cor 
+0.9821146 
+
+[1] "corr.value0.982114577145876"
+[1] "p.value1.41942390401904e-41"
+Number of homologous genes listed between human and mouse: 17042 
+Number of mismatching gene names between human and mouse: 1845 
+Number of genes from human homologous list present in mouse genome, thus removed for conversion 267 
+Number of genes from mouse homologous list present in human genome, thus removed for conversion 282 
+Number of homologous genes listed between human and mouse: 17042 
+Number of mismatching gene names between human and mouse: 1845 
+Number of genes from human homologous list present in mouse genome, thus removed for conversion 267 
+Number of genes from mouse homologous list present in human genome, thus removed for conversion 282 
+Number of homologous genes listed between human and mouse: 17042 
+Number of mismatching gene names between human and mouse: 1845 
+Number of genes from human homologous list present in mouse genome, thus removed for conversion 267 
+Number of genes from mouse homologous list present in human genome, thus removed for conversion 282 
+                                               human_homologs mouse_homologs fetal adult
+Number of IR transcripts                                 4532           6213  2783  2383
+Number of Genes associated with IR transcripts           2225           3051  1589  1422
+Statstical Tests for number of IR transcripts in adult vs fetal:
+
+	Fisher's Exact Test for Count Data
+
+data:  dat
+p-value < 2.2e-16
+alternative hypothesis: true odds ratio is not equal to 1
+95 percent confidence interval:
+ 1.367736 1.539172
+sample estimates:
+odds ratio 
+  1.450839 
+
+[1] 1.056775e-35
+
+#############################################################
+Statstical Tests for dataset: Mouse 
+#############################################################
+
+Test on Expression of NMD transcripts vs Non-NMD transcripts in Annotated genes
+Expression of NMD Transcripts in Annotated genes (IsoSeq TPM)
+ mean =  11.21577 s.d. = 84.95428 
+Expression of Non-NMD Transcripts in Annotated genes (IsoSeq TPM) 
+ mean =  23.1199 s.d. = 143.1172
+	Wilcoxon rank sum test with continuity correction
+
+data:  NMD_transcripts_annotated_genes$ISOSEQ_TPM and non_NMD_transcripts_annotated_genes$ISOSEQ_TPM
+W = 87232108, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+[1] 6.151906e-156
+Test on Expression of IR-NMD transcripts vs IR, but no NMD transcripts in Annotated genes or NMD, but no IR
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  IR_NMD_transcripts_annotated_genes$ISOSEQ_TPM and c(IR_Non_NMD_transcripts_annotated_genes$ISOSEQ_TPM, Non_IR_NMD_transcripts_annotated_genes$ISOSEQ_TPM)
+W = 7497494, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+[1] 1.674151e-42
+
+#############################################################
+Statstical Tests for dataset: Adult 
+#############################################################
+
+Test on Expression of NMD transcripts vs Non-NMD transcripts in Annotated genes
+Expression of NMD Transcripts in Annotated genes (IsoSeq TPM)
+ mean =  24.64465 s.d. = 89.42727 
+Expression of Non-NMD Transcripts in Annotated genes (IsoSeq TPM) 
+ mean =  47.57653 s.d. = 424.3966
+	Wilcoxon rank sum test with continuity correction
+
+data:  NMD_transcripts_annotated_genes$ISOSEQ_TPM and non_NMD_transcripts_annotated_genes$ISOSEQ_TPM
+W = 16611720, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+[1] 4.508167e-59
+Test on Expression of IR-NMD transcripts vs IR, but no NMD transcripts in Annotated genes or NMD, but no IR
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  IR_NMD_transcripts_annotated_genes$ISOSEQ_TPM and c(IR_Non_NMD_transcripts_annotated_genes$ISOSEQ_TPM, Non_IR_NMD_transcripts_annotated_genes$ISOSEQ_TPM)
+W = 1062400, p-value = 4.244e-09
+alternative hypothesis: true location shift is not equal to 0
+
+[1] 4.243918e-09
+
+#############################################################
+Statstical Tests for dataset: Fetal 
+#############################################################
+
+Test on Expression of NMD transcripts vs Non-NMD transcripts in Annotated genes
+Expression of NMD Transcripts in Annotated genes (IsoSeq TPM)
+ mean =  32.17018 s.d. = 120.3369 
+Expression of Non-NMD Transcripts in Annotated genes (IsoSeq TPM) 
+ mean =  57.06824 s.d. = 239.9079
+	Wilcoxon rank sum test with continuity correction
+
+data:  NMD_transcripts_annotated_genes$ISOSEQ_TPM and non_NMD_transcripts_annotated_genes$ISOSEQ_TPM
+W = 12889633, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+[1] 5.259364e-67
+Test on Expression of IR-NMD transcripts vs IR, but no NMD transcripts in Annotated genes or NMD, but no IR
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  IR_NMD_transcripts_annotated_genes$ISOSEQ_TPM and c(IR_Non_NMD_transcripts_annotated_genes$ISOSEQ_TPM, Non_IR_NMD_transcripts_annotated_genes$ISOSEQ_TPM)
+W = 1293254, p-value = 1.236e-07
+alternative hypothesis: true location shift is not equal to 0
+
+[1] 1.235738e-07
+
+#############################################################
+Statstical Tests for dataset: Human 
+#############################################################
+
+Test on Expression of NMD transcripts vs Non-NMD transcripts in Annotated genes
+Expression of NMD Transcripts in Annotated genes (IsoSeq TPM)
+ mean =  15.21914 s.d. = 62.99447 
+Expression of Non-NMD Transcripts in Annotated genes (IsoSeq TPM) 
+ mean =  33.13787 s.d. = 261.345
+	Wilcoxon rank sum test with continuity correction
+
+data:  NMD_transcripts_annotated_genes$ISOSEQ_TPM and non_NMD_transcripts_annotated_genes$ISOSEQ_TPM
+W = 44028846, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+[1] 3.592839e-114
+Test on Expression of IR-NMD transcripts vs IR, but no NMD transcripts in Annotated genes or NMD, but no IR
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  IR_NMD_transcripts_annotated_genes$ISOSEQ_TPM and c(IR_Non_NMD_transcripts_annotated_genes$ISOSEQ_TPM, Non_IR_NMD_transcripts_annotated_genes$ISOSEQ_TPM)
+W = 4771064, p-value = 3.81e-12
+alternative hypothesis: true location shift is not equal to 0
+
+[1] 3.810046e-12
+                                                                          Mouse Human (Adult) Human (Fetal)         Human
+number of IR_transcripts identified as predicted NMD (coding)              2341           812          1018          1930
+number of IR_transcripts not identified as predicted NMD (coding)          4112          1469          1631          3053
+number of those IR-NMD transcripts classified as annotated                   52            17            20            40
+number of those IR-NMD transcripts classified as novel                     2289           795           998          1890
+IR_transcripts (coding)                                                    6453          2281          2649          4983
+NMD transcripts                                                   6014 (12.96%) 2337 (10.62%) 2222 (11.95%) 4370 (13.35%)
+Genes associated with IR_NMD transcripts                           1380 (9.53%)   552 (5.02%)   663 (6.86%)  1104 (8.55%)
+Genes associated with IR_transcripts (coding)                              3203          1354          1508          2435
+Genes of NMD transcripts                                          2945 (20.34%) 1437 (13.08%)  1362 (14.1%) 2323 (17.99%)
+% of IR_NMD transcripts out of total NMD transcripts                      38.93         34.75         45.81         44.16
+% of IR_NMD transcripts out of total IR transcripts (coding)              36.28          35.6         38.43         38.73
+Number of NMD transcripts not intron retained                              3673          1525          1204          2440
+Genes associated with mutually exclusive transcripts                277 (1.91%)    80 (0.73%)    71 (0.73%)   163 (1.26%)
+  Sample   gene_expression num_genes_IR_transcript
+1  Adult total_num_genes.x                     218
+2  Fetal total_num_genes.x                     265
+3  Human total_num_genes.x                     297
+4  Mouse total_num_genes.x                     336
+5  Adult total_num_genes.y                    1204
+6  Fetal total_num_genes.y                    1324
+7  Human total_num_genes.y                    2269
+8  Mouse total_num_genes.y                    3039
+
+
+Mann Whitney for intron rentetion rate in gene expression between adult vs fetal:
+	Wilcoxon rank sum test with continuity correction
+
+data:  IR_gene_expression$Adult$Log10_FL_TPM and IR_gene_expression$Fetal$Log10_FL_TPM
+W = 1012082, p-value = 7.705e-07
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 7.704642e-07[1] "Fetal vs Adult"
+[1] "Correlation betweenFetalandAdult"
+
+	Pearson's product-moment correlation
+
+data:  dat[[x.var]] and dat[[y.var]]
+t = 22.302, df = 741, p-value < 2.2e-16
+alternative hypothesis: true correlation is not equal to 0
+95 percent confidence interval:
+ 0.5886565 0.6749104
+sample estimates:
+      cor 
+0.6337493 
+
+[1] "corr.value0.633749271566654"
+[1] "p.value1.0696136081638e-84"
+Number of unique AS genes in Fetal 4231Number of unique AS genes in Adult 4963Number of homologous genes listed between human and mouse: 17042 
+Number of mismatching gene names between human and mouse: 1845 
+Number of genes from human homologous list present in mouse genome, thus removed for conversion 267 
+Number of genes from mouse homologous list present in human genome, thus removed for conversion 282 
+Number of unique associated genes with splicing events in Human: 7117 
+Number of unique associated genes with splicing events in Mouse: 9129 
+Working with homologous genes; Converting mouse genes to human equivalent genes 
+Number of homologous genes listed between human and mouse: 17042 
+Number of mismatching gene names between human and mouse: 1845 
+Number of genes from human homologous list present in mouse genome, thus removed for conversion 267 
+Number of genes from mouse homologous list present in human genome, thus removed for conversion 282 
+Number of homologous genes listed between human and mouse: 17042 
+Number of mismatching gene names between human and mouse: 1845 
+Number of genes from human homologous list present in mouse genome, thus removed for conversion 267 
+Number of genes from mouse homologous list present in human genome, thus removed for conversion 282 
+Number of unique associated genes with splicing events in Human: 7117 
+Number of unique associated genes with splicing events in Mouse: 9129 
+Working with homologous genes; Converting mouse genes to human equivalent genes 
+Number of homologous genes listed between human and mouse: 17042 
+Number of mismatching gene names between human and mouse: 1845 
+Number of genes from human homologous list present in mouse genome, thus removed for conversion 267 
+Number of genes from mouse homologous list present in human genome, thus removed for conversion 282 
+Number of splicing events: 
+[38;5;246m# A tibble: 7 × 5[39m
+[38;5;246m# Groups:   Event [7][39m
+  Event Human         `Human (Adult)` `Human (Fetal)` Mouse         
+  [3m[38;5;246m<fct>[39m[23m [3m[38;5;246m<chr>[39m[23m         [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<chr>[39m[23m         
+[38;5;250m1[39m A3    1707 (6.49%)  1057 (7.15%)    737 (6.16%)     3217 (7.99%)  
+[38;5;250m2[39m A5    915 (3.48%)   561 (3.79%)     380 (3.18%)     1883 (4.68%)  
+[38;5;250m3[39m AF    8456 (32.16%) 5364 (36.26%)   3504 (29.31%)   12853 (31.93%)
+[38;5;250m4[39m AL    3883 (14.77%) 2163 (14.62%)   1800 (15.06%)   6182 (15.36%) 
+[38;5;250m5[39m IR    5231 (19.89%) 2383 (16.11%)   2783 (23.28%)   6803 (16.9%)  
+[38;5;250m6[39m MX    328 (1.25%)   142 (0.96%)     109 (0.91%)     625 (1.55%)   
+[38;5;250m7[39m SE    5776 (21.97%) 3123 (21.11%)   2642 (22.1%)    8686 (21.58%) 
+Number of splicing genes: 
+[38;5;246m# A tibble: 7 × 5[39m
+[38;5;246m# Groups:   Event [7][39m
+  Event Human         `Human (Adult)` `Human (Fetal)` Mouse        
+  [3m[38;5;246m<fct>[39m[23m [3m[38;5;246m<chr>[39m[23m         [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<chr>[39m[23m        
+[38;5;250m1[39m A3    1045 (8.06%)  677 (6.14%)     521 (5.38%)     1754 (11.94%)
+[38;5;250m2[39m A5    604 (4.66%)   408 (3.7%)      281 (2.9%)      1134 (7.72%) 
+[38;5;250m3[39m AF    4879 (37.63%) 3357 (30.46%)   2451 (25.32%)   6476 (44.1%) 
+[38;5;250m4[39m AL    2920 (22.52%) 1749 (15.87%)   1469 (15.18%)   4262 (29.02%)
+[38;5;250m5[39m IR    2566 (19.79%) 1422 (12.9%)    1589 (16.42%)   3375 (22.98%)
+[38;5;250m6[39m MX    256 (1.97%)   116 (1.05%)     88 (0.91%)      434 (2.96%)  
+[38;5;250m7[39m SE    3446 (26.58%) 2093 (18.99%)   1830 (18.91%)   4570 (31.12%)
+   Number_of_Splicing_Events        Sample Genes Total_Genes        perc
+1                          1         Human  2318        7117 32.56990305
+2                          1 Human (Adult)  1997        4963 40.23775942
+3                          1 Human (Fetal)  1722        4231 40.69959820
+4                          1         Mouse  7315       13088 55.89089242
+5                          2         Human  2319        7117 32.58395391
+6                          2 Human (Adult)  1659        4963 33.42736248
+7                          2 Human (Fetal)  1445        4231 34.15268258
+8                          2         Mouse  3393       13088 25.92451100
+9                          3         Human  1500        7117 21.07629619
+10                         3 Human (Adult)   858        4963 17.28793069
+11                         3 Human (Fetal)   726        4231 17.15906405
+12                         3         Mouse  1724       13088 13.17237164
+13                         4         Human   698        7117  9.80750316
+14                         4 Human (Adult)   334        4963  6.72980052
+15                         4 Human (Fetal)   261        4231  6.16875443
+16                         4         Mouse   548       13088  4.18704156
+17                         5         Human   228        7117  3.20359702
+18                         5 Human (Adult)    95        4963  1.91416482
+19                         5 Human (Fetal)    67        4231  1.58354999
+20                         5         Mouse   108       13088  0.82518337
+21                         6         Human    50        7117  0.70254321
+22                         6 Human (Adult)    18        4963  0.36268386
+23                         6 Human (Fetal)    10        4231  0.23635074
+24                         7         Human     4        7117  0.05620346
+25                         7 Human (Adult)     2        4963  0.04029821
+Number of splicing events: 
+[38;5;246m# A tibble: 7 × 5[39m
+[38;5;246m# Groups:   Event [7][39m
+  Event Human         `Human (Adult)` `Human (Fetal)` Mouse         
+  [3m[38;5;246m<fct>[39m[23m [3m[38;5;246m<chr>[39m[23m         [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<chr>[39m[23m         
+[38;5;250m1[39m A3    1707 (6.49%)  1057 (7.15%)    737 (6.16%)     3217 (7.99%)  
+[38;5;250m2[39m A5    915 (3.48%)   561 (3.79%)     380 (3.18%)     1883 (4.68%)  
+[38;5;250m3[39m AF    8456 (32.16%) 5364 (36.26%)   3504 (29.31%)   12853 (31.93%)
+[38;5;250m4[39m AL    3883 (14.77%) 2163 (14.62%)   1800 (15.06%)   6182 (15.36%) 
+[38;5;250m5[39m IR    5231 (19.89%) 2383 (16.11%)   2783 (23.28%)   6803 (16.9%)  
+[38;5;250m6[39m MX    328 (1.25%)   142 (0.96%)     109 (0.91%)     625 (1.55%)   
+[38;5;250m7[39m SE    5776 (21.97%) 3123 (21.11%)   2642 (22.1%)    8686 (21.58%) 
+Number of splicing genes: 
+[38;5;246m# A tibble: 7 × 5[39m
+[38;5;246m# Groups:   Event [7][39m
+  Event Human         `Human (Adult)` `Human (Fetal)` Mouse        
+  [3m[38;5;246m<fct>[39m[23m [3m[38;5;246m<chr>[39m[23m         [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<chr>[39m[23m        
+[38;5;250m1[39m A3    1045 (8.06%)  677 (6.14%)     521 (5.38%)     1754 (11.94%)
+[38;5;250m2[39m A5    604 (4.66%)   408 (3.7%)      281 (2.9%)      1134 (7.72%) 
+[38;5;250m3[39m AF    4879 (37.63%) 3357 (30.46%)   2451 (25.32%)   6476 (44.1%) 
+[38;5;250m4[39m AL    2920 (22.52%) 1749 (15.87%)   1469 (15.18%)   4262 (29.02%)
+[38;5;250m5[39m IR    2566 (19.79%) 1422 (12.9%)    1589 (16.42%)   3375 (22.98%)
+[38;5;250m6[39m MX    256 (1.97%)   116 (1.05%)     88 (0.91%)      434 (2.96%)  
+[38;5;250m7[39m SE    3446 (26.58%) 2093 (18.99%)   1830 (18.91%)   4570 (31.12%)
+   Number_of_Splicing_Events        Sample Genes Total_Genes        perc
+1                          1         Human  2318        7117 32.56990305
+2                          1 Human (Adult)  1997        4963 40.23775942
+3                          1 Human (Fetal)  1722        4231 40.69959820
+4                          1         Mouse  7315       13088 55.89089242
+5                          2         Human  2319        7117 32.58395391
+6                          2 Human (Adult)  1659        4963 33.42736248
+7                          2 Human (Fetal)  1445        4231 34.15268258
+8                          2         Mouse  3393       13088 25.92451100
+9                          3         Human  1500        7117 21.07629619
+10                         3 Human (Adult)   858        4963 17.28793069
+11                         3 Human (Fetal)   726        4231 17.15906405
+12                         3         Mouse  1724       13088 13.17237164
+13                         4         Human   698        7117  9.80750316
+14                         4 Human (Adult)   334        4963  6.72980052
+15                         4 Human (Fetal)   261        4231  6.16875443
+16                         4         Mouse   548       13088  4.18704156
+17                         5         Human   228        7117  3.20359702
+18                         5 Human (Adult)    95        4963  1.91416482
+19                         5 Human (Fetal)    67        4231  1.58354999
+20                         5         Mouse   108       13088  0.82518337
+21                         6         Human    50        7117  0.70254321
+22                         6 Human (Adult)    18        4963  0.36268386
+23                         6 Human (Fetal)    10        4231  0.23635074
+24                         7         Human     4        7117  0.05620346
+25                         7 Human (Adult)     2        4963  0.04029821
+Number of splicing events: 
+[38;5;246m# A tibble: 7 × 5[39m
+[38;5;246m# Groups:   Event [7][39m
+  Event Human         `Human (Adult)` `Human (Fetal)` Mouse         
+  [3m[38;5;246m<fct>[39m[23m [3m[38;5;246m<chr>[39m[23m         [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<chr>[39m[23m         
+[38;5;250m1[39m A3    1707 (6.49%)  1057 (7.15%)    737 (6.16%)     3217 (7.99%)  
+[38;5;250m2[39m A5    915 (3.48%)   561 (3.79%)     380 (3.18%)     1883 (4.68%)  
+[38;5;250m3[39m AF    8456 (32.16%) 5364 (36.26%)   3504 (29.31%)   12853 (31.93%)
+[38;5;250m4[39m AL    3883 (14.77%) 2163 (14.62%)   1800 (15.06%)   6182 (15.36%) 
+[38;5;250m5[39m IR    5231 (19.89%) 2383 (16.11%)   2783 (23.28%)   6803 (16.9%)  
+[38;5;250m6[39m MX    328 (1.25%)   142 (0.96%)     109 (0.91%)     625 (1.55%)   
+[38;5;250m7[39m SE    5776 (21.97%) 3123 (21.11%)   2642 (22.1%)    8686 (21.58%) 
+Number of splicing genes: 
+[38;5;246m# A tibble: 7 × 5[39m
+[38;5;246m# Groups:   Event [7][39m
+  Event Human         `Human (Adult)` `Human (Fetal)` Mouse        
+  [3m[38;5;246m<fct>[39m[23m [3m[38;5;246m<chr>[39m[23m         [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<chr>[39m[23m        
+[38;5;250m1[39m A3    1045 (8.06%)  677 (6.14%)     521 (5.38%)     1754 (11.94%)
+[38;5;250m2[39m A5    604 (4.66%)   408 (3.7%)      281 (2.9%)      1134 (7.72%) 
+[38;5;250m3[39m AF    4879 (37.63%) 3357 (30.46%)   2451 (25.32%)   6476 (44.1%) 
+[38;5;250m4[39m AL    2920 (22.52%) 1749 (15.87%)   1469 (15.18%)   4262 (29.02%)
+[38;5;250m5[39m IR    2566 (19.79%) 1422 (12.9%)    1589 (16.42%)   3375 (22.98%)
+[38;5;250m6[39m MX    256 (1.97%)   116 (1.05%)     88 (0.91%)      434 (2.96%)  
+[38;5;250m7[39m SE    3446 (26.58%) 2093 (18.99%)   1830 (18.91%)   4570 (31.12%)
+   Number_of_Splicing_Events        Sample Genes Total_Genes        perc
+1                          1         Human  2318        7117 32.56990305
+2                          1 Human (Adult)  1997        4963 40.23775942
+3                          1 Human (Fetal)  1722        4231 40.69959820
+4                          1         Mouse  7315       13088 55.89089242
+5                          2         Human  2319        7117 32.58395391
+6                          2 Human (Adult)  1659        4963 33.42736248
+7                          2 Human (Fetal)  1445        4231 34.15268258
+8                          2         Mouse  3393       13088 25.92451100
+9                          3         Human  1500        7117 21.07629619
+10                         3 Human (Adult)   858        4963 17.28793069
+11                         3 Human (Fetal)   726        4231 17.15906405
+12                         3         Mouse  1724       13088 13.17237164
+13                         4         Human   698        7117  9.80750316
+14                         4 Human (Adult)   334        4963  6.72980052
+15                         4 Human (Fetal)   261        4231  6.16875443
+16                         4         Mouse   548       13088  4.18704156
+17                         5         Human   228        7117  3.20359702
+18                         5 Human (Adult)    95        4963  1.91416482
+19                         5 Human (Fetal)    67        4231  1.58354999
+20                         5         Mouse   108       13088  0.82518337
+21                         6         Human    50        7117  0.70254321
+22                         6 Human (Adult)    18        4963  0.36268386
+23                         6 Human (Fetal)    10        4231  0.23635074
+24                         7         Human     4        7117  0.05620346
+25                         7 Human (Adult)     2        4963  0.04029821
+Number of splicing events: 
+[38;5;246m# A tibble: 7 × 5[39m
+[38;5;246m# Groups:   Event [7][39m
+  Event Human         `Human (Adult)` `Human (Fetal)` Mouse         
+  [3m[38;5;246m<fct>[39m[23m [3m[38;5;246m<chr>[39m[23m         [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<chr>[39m[23m         
+[38;5;250m1[39m A3    1707 (6.49%)  1057 (7.15%)    737 (6.16%)     3217 (7.99%)  
+[38;5;250m2[39m A5    915 (3.48%)   561 (3.79%)     380 (3.18%)     1883 (4.68%)  
+[38;5;250m3[39m AF    8456 (32.16%) 5364 (36.26%)   3504 (29.31%)   12853 (31.93%)
+[38;5;250m4[39m AL    3883 (14.77%) 2163 (14.62%)   1800 (15.06%)   6182 (15.36%) 
+[38;5;250m5[39m IR    5231 (19.89%) 2383 (16.11%)   2783 (23.28%)   6803 (16.9%)  
+[38;5;250m6[39m MX    328 (1.25%)   142 (0.96%)     109 (0.91%)     625 (1.55%)   
+[38;5;250m7[39m SE    5776 (21.97%) 3123 (21.11%)   2642 (22.1%)    8686 (21.58%) 
+Number of splicing genes: 
+[38;5;246m# A tibble: 7 × 5[39m
+[38;5;246m# Groups:   Event [7][39m
+  Event Human         `Human (Adult)` `Human (Fetal)` Mouse        
+  [3m[38;5;246m<fct>[39m[23m [3m[38;5;246m<chr>[39m[23m         [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<chr>[39m[23m        
+[38;5;250m1[39m A3    1045 (8.06%)  677 (6.14%)     521 (5.38%)     1754 (11.94%)
+[38;5;250m2[39m A5    604 (4.66%)   408 (3.7%)      281 (2.9%)      1134 (7.72%) 
+[38;5;250m3[39m AF    4879 (37.63%) 3357 (30.46%)   2451 (25.32%)   6476 (44.1%) 
+[38;5;250m4[39m AL    2920 (22.52%) 1749 (15.87%)   1469 (15.18%)   4262 (29.02%)
+[38;5;250m5[39m IR    2566 (19.79%) 1422 (12.9%)    1589 (16.42%)   3375 (22.98%)
+[38;5;250m6[39m MX    256 (1.97%)   116 (1.05%)     88 (0.91%)      434 (2.96%)  
+[38;5;250m7[39m SE    3446 (26.58%) 2093 (18.99%)   1830 (18.91%)   4570 (31.12%)
+   Number_of_Splicing_Events        Sample Genes Total_Genes        perc
+1                          1         Human  2318        7117 32.56990305
+2                          1 Human (Adult)  1997        4963 40.23775942
+3                          1 Human (Fetal)  1722        4231 40.69959820
+4                          1         Mouse  7315       13088 55.89089242
+5                          2         Human  2319        7117 32.58395391
+6                          2 Human (Adult)  1659        4963 33.42736248
+7                          2 Human (Fetal)  1445        4231 34.15268258
+8                          2         Mouse  3393       13088 25.92451100
+9                          3         Human  1500        7117 21.07629619
+10                         3 Human (Adult)   858        4963 17.28793069
+11                         3 Human (Fetal)   726        4231 17.15906405
+12                         3         Mouse  1724       13088 13.17237164
+13                         4         Human   698        7117  9.80750316
+14                         4 Human (Adult)   334        4963  6.72980052
+15                         4 Human (Fetal)   261        4231  6.16875443
+16                         4         Mouse   548       13088  4.18704156
+17                         5         Human   228        7117  3.20359702
+18                         5 Human (Adult)    95        4963  1.91416482
+19                         5 Human (Fetal)    67        4231  1.58354999
+20                         5         Mouse   108       13088  0.82518337
+21                         6         Human    50        7117  0.70254321
+22                         6 Human (Adult)    18        4963  0.36268386
+23                         6 Human (Fetal)    10        4231  0.23635074
+24                         7         Human     4        7117  0.05620346
+25                         7 Human (Adult)     2        4963  0.04029821
+Total unique ERCCs: 57 (61.96%)[1] ""
+[1] "Correlation betweenlog2_amount_of_ERCCandlog2_FL_reads"
+
+	Pearson's product-moment correlation
+
+data:  dat[[x.var]] and dat[[y.var]]
+t = 38.684, df = 55, p-value < 2.2e-16
+alternative hypothesis: true correlation is not equal to 0
+95 percent confidence interval:
+ 0.9697003 0.9894697
+sample estimates:
+      cor 
+0.9821146 
+
+[1] "corr.value0.982114577145876"
+[1] "p.value1.41942390401904e-41"
+RStudioGD 
+        2 
+                                                                          Mouse Human (Adult) Human (Fetal)         Human
+number of IR_transcripts identified as predicted NMD (coding)              2341           812          1018          1930
+number of IR_transcripts not identified as predicted NMD (coding)          4112          1469          1631          3053
+number of those IR-NMD transcripts classified as annotated                   52            17            20            40
+number of those IR-NMD transcripts classified as novel                     2289           795           998          1890
+IR_transcripts (coding)                                                    6453          2281          2649          4983
+NMD transcripts                                                   6014 (12.96%) 2337 (10.62%) 2222 (11.95%) 4370 (13.35%)
+Genes associated with IR_NMD transcripts                           1380 (9.53%)   552 (5.02%)   663 (6.86%)  1104 (8.55%)
+Genes associated with IR_transcripts (coding)                              3203          1354          1508          2435
+Genes of NMD transcripts                                          2945 (20.34%) 1437 (13.08%)  1362 (14.1%) 2323 (17.99%)
+% of IR_NMD transcripts out of total NMD transcripts                      38.93         34.75         45.81         44.16
+% of IR_NMD transcripts out of total IR transcripts (coding)              36.28          35.6         38.43         38.73
+Number of NMD transcripts not intron retained                              3673          1525          1204          2440
+Genes associated with mutually exclusive transcripts                277 (1.91%)    80 (0.73%)    71 (0.73%)   163 (1.26%)
+                                                                          Mouse Human (Adult) Human (Fetal)         Human
+number of IR_transcripts identified as predicted NMD (coding)              2341           812          1018          1930
+number of IR_transcripts not identified as predicted NMD (coding)          4112          1469          1631          3053
+number of those IR-NMD transcripts classified as annotated                   52            17            20            40
+number of those IR-NMD transcripts classified as novel                     2289           795           998          1890
+IR_transcripts (coding)                                                    6453          2281          2649          4983
+NMD transcripts                                                   6014 (12.96%) 2337 (10.62%) 2222 (11.95%) 4370 (13.35%)
+Genes associated with IR_NMD transcripts                           1380 (9.53%)   552 (5.02%)   663 (6.86%)  1104 (8.55%)
+Genes associated with IR_transcripts (coding)                              3203          1354          1508          2435
+Genes of NMD transcripts                                          2945 (20.34%) 1437 (13.08%)  1362 (14.1%) 2323 (17.99%)
+% of IR_NMD transcripts out of total NMD transcripts                      38.93         34.75         45.81         44.16
+% of IR_NMD transcripts out of total IR transcripts (coding)              36.28          35.6         38.43         38.73
+Number of NMD transcripts not intron retained                              3673          1525          1204          2440
+Genes associated with mutually exclusive transcripts                277 (1.91%)    80 (0.73%)    71 (0.73%)   163 (1.26%)
+
+#############################################################
+Statstical Tests for dataset: Mouse 
+#############################################################
+
+Test on Expression of NMD transcripts vs Non-NMD transcripts in Annotated genes
+Expression of NMD Transcripts in Annotated genes (IsoSeq TPM)
+ mean =  11.21577 s.d. = 84.95428 
+Expression of Non-NMD Transcripts in Annotated genes (IsoSeq TPM) 
+ mean =  23.1199 s.d. = 143.1172
+	Wilcoxon rank sum test with continuity correction
+
+data:  NMD_transcripts_annotated_genes$ISOSEQ_TPM and non_NMD_transcripts_annotated_genes$ISOSEQ_TPM
+W = 87232108, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+[1] 6.151906e-156
+Test on Expression of IR-NMD transcripts vs IR, but no NMD transcripts in Annotated genes or NMD, but no IR
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  IR_NMD_transcripts_annotated_genes$ISOSEQ_TPM and c(IR_Non_NMD_transcripts_annotated_genes$ISOSEQ_TPM, Non_IR_NMD_transcripts_annotated_genes$ISOSEQ_TPM)
+W = 7497494, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+[1] 1.674151e-42
+
+#############################################################
+Statstical Tests for dataset: Adult 
+#############################################################
+
+Test on Expression of NMD transcripts vs Non-NMD transcripts in Annotated genes
+Expression of NMD Transcripts in Annotated genes (IsoSeq TPM)
+ mean =  24.64465 s.d. = 89.42727 
+Expression of Non-NMD Transcripts in Annotated genes (IsoSeq TPM) 
+ mean =  47.57653 s.d. = 424.3966
+	Wilcoxon rank sum test with continuity correction
+
+data:  NMD_transcripts_annotated_genes$ISOSEQ_TPM and non_NMD_transcripts_annotated_genes$ISOSEQ_TPM
+W = 16611720, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+[1] 4.508167e-59
+Test on Expression of IR-NMD transcripts vs IR, but no NMD transcripts in Annotated genes or NMD, but no IR
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  IR_NMD_transcripts_annotated_genes$ISOSEQ_TPM and c(IR_Non_NMD_transcripts_annotated_genes$ISOSEQ_TPM, Non_IR_NMD_transcripts_annotated_genes$ISOSEQ_TPM)
+W = 1062400, p-value = 4.244e-09
+alternative hypothesis: true location shift is not equal to 0
+
+[1] 4.243918e-09
+
+#############################################################
+Statstical Tests for dataset: Fetal 
+#############################################################
+
+Test on Expression of NMD transcripts vs Non-NMD transcripts in Annotated genes
+Expression of NMD Transcripts in Annotated genes (IsoSeq TPM)
+ mean =  32.17018 s.d. = 120.3369 
+Expression of Non-NMD Transcripts in Annotated genes (IsoSeq TPM) 
+ mean =  57.06824 s.d. = 239.9079
+	Wilcoxon rank sum test with continuity correction
+
+data:  NMD_transcripts_annotated_genes$ISOSEQ_TPM and non_NMD_transcripts_annotated_genes$ISOSEQ_TPM
+W = 12889633, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+[1] 5.259364e-67
+Test on Expression of IR-NMD transcripts vs IR, but no NMD transcripts in Annotated genes or NMD, but no IR
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  IR_NMD_transcripts_annotated_genes$ISOSEQ_TPM and c(IR_Non_NMD_transcripts_annotated_genes$ISOSEQ_TPM, Non_IR_NMD_transcripts_annotated_genes$ISOSEQ_TPM)
+W = 1293254, p-value = 1.236e-07
+alternative hypothesis: true location shift is not equal to 0
+
+[1] 1.235738e-07
+
+#############################################################
+Statstical Tests for dataset: Human 
+#############################################################
+
+Test on Expression of NMD transcripts vs Non-NMD transcripts in Annotated genes
+Expression of NMD Transcripts in Annotated genes (IsoSeq TPM)
+ mean =  15.21914 s.d. = 62.99447 
+Expression of Non-NMD Transcripts in Annotated genes (IsoSeq TPM) 
+ mean =  33.13787 s.d. = 261.345
+	Wilcoxon rank sum test with continuity correction
+
+data:  NMD_transcripts_annotated_genes$ISOSEQ_TPM and non_NMD_transcripts_annotated_genes$ISOSEQ_TPM
+W = 44028846, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+[1] 3.592839e-114
+Test on Expression of IR-NMD transcripts vs IR, but no NMD transcripts in Annotated genes or NMD, but no IR
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  IR_NMD_transcripts_annotated_genes$ISOSEQ_TPM and c(IR_Non_NMD_transcripts_annotated_genes$ISOSEQ_TPM, Non_IR_NMD_transcripts_annotated_genes$ISOSEQ_TPM)
+W = 4771064, p-value = 3.81e-12
+alternative hypothesis: true location shift is not equal to 0
+
+[1] 3.810046e-12
+RStudioGD 
+        2 
+
+#############################################################
+Statstical Tests for dataset: Mouse 
+#############################################################
+
+Test on Expression of NMD transcripts vs Non-NMD transcripts in Annotated genes
+Expression of NMD Transcripts in Annotated genes (IsoSeq TPM)
+ mean =  11.21577 s.d. = 84.95428 
+Expression of Non-NMD Transcripts in Annotated genes (IsoSeq TPM) 
+ mean =  23.1199 s.d. = 143.1172
+	Wilcoxon rank sum test with continuity correction
+
+data:  NMD_transcripts_annotated_genes$ISOSEQ_TPM and non_NMD_transcripts_annotated_genes$ISOSEQ_TPM
+W = 87232108, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+[1] 6.151906e-156
+Test on Expression of IR-NMD transcripts vs IR, but no NMD transcripts in Annotated genes or NMD, but no IR
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  IR_NMD_transcripts_annotated_genes$ISOSEQ_TPM and c(IR_Non_NMD_transcripts_annotated_genes$ISOSEQ_TPM, Non_IR_NMD_transcripts_annotated_genes$ISOSEQ_TPM)
+W = 7497494, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+[1] 1.674151e-42
+
+#############################################################
+Statstical Tests for dataset: Adult 
+#############################################################
+
+Test on Expression of NMD transcripts vs Non-NMD transcripts in Annotated genes
+Expression of NMD Transcripts in Annotated genes (IsoSeq TPM)
+ mean =  24.64465 s.d. = 89.42727 
+Expression of Non-NMD Transcripts in Annotated genes (IsoSeq TPM) 
+ mean =  47.57653 s.d. = 424.3966
+	Wilcoxon rank sum test with continuity correction
+
+data:  NMD_transcripts_annotated_genes$ISOSEQ_TPM and non_NMD_transcripts_annotated_genes$ISOSEQ_TPM
+W = 16611720, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+[1] 4.508167e-59
+Test on Expression of IR-NMD transcripts vs IR, but no NMD transcripts in Annotated genes or NMD, but no IR
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  IR_NMD_transcripts_annotated_genes$ISOSEQ_TPM and c(IR_Non_NMD_transcripts_annotated_genes$ISOSEQ_TPM, Non_IR_NMD_transcripts_annotated_genes$ISOSEQ_TPM)
+W = 1062400, p-value = 4.244e-09
+alternative hypothesis: true location shift is not equal to 0
+
+[1] 4.243918e-09
+
+#############################################################
+Statstical Tests for dataset: Fetal 
+#############################################################
+
+Test on Expression of NMD transcripts vs Non-NMD transcripts in Annotated genes
+Expression of NMD Transcripts in Annotated genes (IsoSeq TPM)
+ mean =  32.17018 s.d. = 120.3369 
+Expression of Non-NMD Transcripts in Annotated genes (IsoSeq TPM) 
+ mean =  57.06824 s.d. = 239.9079
+	Wilcoxon rank sum test with continuity correction
+
+data:  NMD_transcripts_annotated_genes$ISOSEQ_TPM and non_NMD_transcripts_annotated_genes$ISOSEQ_TPM
+W = 12889633, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+[1] 5.259364e-67
+Test on Expression of IR-NMD transcripts vs IR, but no NMD transcripts in Annotated genes or NMD, but no IR
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  IR_NMD_transcripts_annotated_genes$ISOSEQ_TPM and c(IR_Non_NMD_transcripts_annotated_genes$ISOSEQ_TPM, Non_IR_NMD_transcripts_annotated_genes$ISOSEQ_TPM)
+W = 1293254, p-value = 1.236e-07
+alternative hypothesis: true location shift is not equal to 0
+
+[1] 1.235738e-07
+
+#############################################################
+Statstical Tests for dataset: Human 
+#############################################################
+
+Test on Expression of NMD transcripts vs Non-NMD transcripts in Annotated genes
+Expression of NMD Transcripts in Annotated genes (IsoSeq TPM)
+ mean =  15.21914 s.d. = 62.99447 
+Expression of Non-NMD Transcripts in Annotated genes (IsoSeq TPM) 
+ mean =  33.13787 s.d. = 261.345
+	Wilcoxon rank sum test with continuity correction
+
+data:  NMD_transcripts_annotated_genes$ISOSEQ_TPM and non_NMD_transcripts_annotated_genes$ISOSEQ_TPM
+W = 44028846, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+[1] 3.592839e-114
+Test on Expression of IR-NMD transcripts vs IR, but no NMD transcripts in Annotated genes or NMD, but no IR
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  IR_NMD_transcripts_annotated_genes$ISOSEQ_TPM and c(IR_Non_NMD_transcripts_annotated_genes$ISOSEQ_TPM, Non_IR_NMD_transcripts_annotated_genes$ISOSEQ_TPM)
+W = 4771064, p-value = 3.81e-12
+alternative hypothesis: true location shift is not equal to 0
+
+[1] 3.810046e-12
+                                                                          Mouse Human (Adult) Human (Fetal)         Human
+number of IR_transcripts identified as predicted NMD (coding)              2341           812          1018          1930
+number of IR_transcripts not identified as predicted NMD (coding)          4112          1469          1631          3053
+number of those IR-NMD transcripts classified as annotated                   52            17            20            40
+number of those IR-NMD transcripts classified as novel                     2289           795           998          1890
+IR_transcripts (coding)                                                    6453          2281          2649          4983
+NMD transcripts                                                   6014 (12.96%) 2337 (10.62%) 2222 (11.95%) 4370 (13.35%)
+Genes associated with IR_NMD transcripts                           1380 (9.53%)   552 (5.02%)   663 (6.86%)  1104 (8.55%)
+Genes associated with IR_transcripts (coding)                              3203          1354          1508          2435
+Genes of NMD transcripts                                          2945 (20.34%) 1437 (13.08%)  1362 (14.1%) 2323 (17.99%)
+% of IR_NMD transcripts out of total NMD transcripts                      38.93         34.75         45.81         44.16
+% of IR_NMD transcripts out of total IR transcripts (coding)              36.28          35.6         38.43         38.73
+Number of NMD transcripts not intron retained                              3673          1525          1204          2440
+Genes associated with mutually exclusive transcripts                277 (1.91%)    80 (0.73%)    71 (0.73%)   163 (1.26%)
+  Sample   gene_expression num_genes_IR_transcript
+1  Adult total_num_genes.x                     218
+2  Fetal total_num_genes.x                     265
+3  Human total_num_genes.x                     297
+4  Mouse total_num_genes.x                     336
+5  Adult total_num_genes.y                    1204
+6  Fetal total_num_genes.y                    1324
+7  Human total_num_genes.y                    2269
+8  Mouse total_num_genes.y                    3039
+
+
+Mann Whitney for intron rentetion rate in gene expression between adult vs fetal:
+	Wilcoxon rank sum test with continuity correction
+
+data:  IR_gene_expression$Adult$Log10_FL_TPM and IR_gene_expression$Fetal$Log10_FL_TPM
+W = 1012082, p-value = 7.705e-07
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 7.704642e-07[1] "Fetal vs Adult"
+[1] "Correlation betweenFetalandAdult"
+
+	Pearson's product-moment correlation
+
+data:  dat[[x.var]] and dat[[y.var]]
+t = 22.302, df = 741, p-value < 2.2e-16
+alternative hypothesis: true correlation is not equal to 0
+95 percent confidence interval:
+ 0.5886565 0.6749104
+sample estimates:
+      cor 
+0.6337493 
+
+[1] "corr.value0.633749271566654"
+[1] "p.value1.0696136081638e-84"
+Number of unique AS genes in Fetal 4231Number of unique AS genes in Adult 4963Number of homologous genes listed between human and mouse: 17042 
+Number of mismatching gene names between human and mouse: 1845 
+Number of genes from human homologous list present in mouse genome, thus removed for conversion 267 
+Number of genes from mouse homologous list present in human genome, thus removed for conversion 282 
+Number of unique associated genes with splicing events in Human: 7117 
+Number of unique associated genes with splicing events in Mouse: 9129 
+Working with homologous genes; Converting mouse genes to human equivalent genes 
+Number of homologous genes listed between human and mouse: 17042 
+Number of mismatching gene names between human and mouse: 1845 
+Number of genes from human homologous list present in mouse genome, thus removed for conversion 267 
+Number of genes from mouse homologous list present in human genome, thus removed for conversion 282 
+Number of homologous genes listed between human and mouse: 17042 
+Number of mismatching gene names between human and mouse: 1845 
+Number of genes from human homologous list present in mouse genome, thus removed for conversion 267 
+Number of genes from mouse homologous list present in human genome, thus removed for conversion 282 
+Number of unique associated genes with splicing events in Human: 7117 
+Number of unique associated genes with splicing events in Mouse: 9129 
+Working with homologous genes; Converting mouse genes to human equivalent genes 
+Number of homologous genes listed between human and mouse: 17042 
+Number of mismatching gene names between human and mouse: 1845 
+Number of genes from human homologous list present in mouse genome, thus removed for conversion 267 
+Number of genes from mouse homologous list present in human genome, thus removed for conversion 282 
+Number of splicing events: 
+[38;5;246m# A tibble: 7 × 5[39m
+[38;5;246m# Groups:   Event [7][39m
+  Event Human         `Human (Adult)` `Human (Fetal)` Mouse         
+  [3m[38;5;246m<fct>[39m[23m [3m[38;5;246m<chr>[39m[23m         [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<chr>[39m[23m         
+[38;5;250m1[39m A3    1707 (6.49%)  1057 (7.15%)    737 (6.16%)     3217 (7.99%)  
+[38;5;250m2[39m A5    915 (3.48%)   561 (3.79%)     380 (3.18%)     1883 (4.68%)  
+[38;5;250m3[39m AF    8456 (32.16%) 5364 (36.26%)   3504 (29.31%)   12853 (31.93%)
+[38;5;250m4[39m AL    3883 (14.77%) 2163 (14.62%)   1800 (15.06%)   6182 (15.36%) 
+[38;5;250m5[39m IR    5231 (19.89%) 2383 (16.11%)   2783 (23.28%)   6803 (16.9%)  
+[38;5;250m6[39m MX    328 (1.25%)   142 (0.96%)     109 (0.91%)     625 (1.55%)   
+[38;5;250m7[39m SE    5776 (21.97%) 3123 (21.11%)   2642 (22.1%)    8686 (21.58%) 
+Number of splicing genes: 
+[38;5;246m# A tibble: 7 × 5[39m
+[38;5;246m# Groups:   Event [7][39m
+  Event Human         `Human (Adult)` `Human (Fetal)` Mouse        
+  [3m[38;5;246m<fct>[39m[23m [3m[38;5;246m<chr>[39m[23m         [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<chr>[39m[23m        
+[38;5;250m1[39m A3    1045 (8.06%)  677 (6.14%)     521 (5.38%)     1754 (11.94%)
+[38;5;250m2[39m A5    604 (4.66%)   408 (3.7%)      281 (2.9%)      1134 (7.72%) 
+[38;5;250m3[39m AF    4879 (37.63%) 3357 (30.46%)   2451 (25.32%)   6476 (44.1%) 
+[38;5;250m4[39m AL    2920 (22.52%) 1749 (15.87%)   1469 (15.18%)   4262 (29.02%)
+[38;5;250m5[39m IR    2566 (19.79%) 1422 (12.9%)    1589 (16.42%)   3375 (22.98%)
+[38;5;250m6[39m MX    256 (1.97%)   116 (1.05%)     88 (0.91%)      434 (2.96%)  
+[38;5;250m7[39m SE    3446 (26.58%) 2093 (18.99%)   1830 (18.91%)   4570 (31.12%)
+   Number_of_Splicing_Events        Sample Genes Total_Genes        perc
+1                          1         Human  2318        7117 32.56990305
+2                          1 Human (Adult)  1997        4963 40.23775942
+3                          1 Human (Fetal)  1722        4231 40.69959820
+4                          1         Mouse  7315       13088 55.89089242
+5                          2         Human  2319        7117 32.58395391
+6                          2 Human (Adult)  1659        4963 33.42736248
+7                          2 Human (Fetal)  1445        4231 34.15268258
+8                          2         Mouse  3393       13088 25.92451100
+9                          3         Human  1500        7117 21.07629619
+10                         3 Human (Adult)   858        4963 17.28793069
+11                         3 Human (Fetal)   726        4231 17.15906405
+12                         3         Mouse  1724       13088 13.17237164
+13                         4         Human   698        7117  9.80750316
+14                         4 Human (Adult)   334        4963  6.72980052
+15                         4 Human (Fetal)   261        4231  6.16875443
+16                         4         Mouse   548       13088  4.18704156
+17                         5         Human   228        7117  3.20359702
+18                         5 Human (Adult)    95        4963  1.91416482
+19                         5 Human (Fetal)    67        4231  1.58354999
+20                         5         Mouse   108       13088  0.82518337
+21                         6         Human    50        7117  0.70254321
+22                         6 Human (Adult)    18        4963  0.36268386
+23                         6 Human (Fetal)    10        4231  0.23635074
+24                         7         Human     4        7117  0.05620346
+25                         7 Human (Adult)     2        4963  0.04029821
+Number of splicing events: 
+[38;5;246m# A tibble: 7 × 5[39m
+[38;5;246m# Groups:   Event [7][39m
+  Event Human         `Human (Adult)` `Human (Fetal)` Mouse         
+  [3m[38;5;246m<fct>[39m[23m [3m[38;5;246m<chr>[39m[23m         [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<chr>[39m[23m         
+[38;5;250m1[39m A3    1707 (6.49%)  1057 (7.15%)    737 (6.16%)     3217 (7.99%)  
+[38;5;250m2[39m A5    915 (3.48%)   561 (3.79%)     380 (3.18%)     1883 (4.68%)  
+[38;5;250m3[39m AF    8456 (32.16%) 5364 (36.26%)   3504 (29.31%)   12853 (31.93%)
+[38;5;250m4[39m AL    3883 (14.77%) 2163 (14.62%)   1800 (15.06%)   6182 (15.36%) 
+[38;5;250m5[39m IR    5231 (19.89%) 2383 (16.11%)   2783 (23.28%)   6803 (16.9%)  
+[38;5;250m6[39m MX    328 (1.25%)   142 (0.96%)     109 (0.91%)     625 (1.55%)   
+[38;5;250m7[39m SE    5776 (21.97%) 3123 (21.11%)   2642 (22.1%)    8686 (21.58%) 
+Number of splicing genes: 
+[38;5;246m# A tibble: 7 × 5[39m
+[38;5;246m# Groups:   Event [7][39m
+  Event Human         `Human (Adult)` `Human (Fetal)` Mouse        
+  [3m[38;5;246m<fct>[39m[23m [3m[38;5;246m<chr>[39m[23m         [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<chr>[39m[23m        
+[38;5;250m1[39m A3    1045 (8.06%)  677 (6.14%)     521 (5.38%)     1754 (11.94%)
+[38;5;250m2[39m A5    604 (4.66%)   408 (3.7%)      281 (2.9%)      1134 (7.72%) 
+[38;5;250m3[39m AF    4879 (37.63%) 3357 (30.46%)   2451 (25.32%)   6476 (44.1%) 
+[38;5;250m4[39m AL    2920 (22.52%) 1749 (15.87%)   1469 (15.18%)   4262 (29.02%)
+[38;5;250m5[39m IR    2566 (19.79%) 1422 (12.9%)    1589 (16.42%)   3375 (22.98%)
+[38;5;250m6[39m MX    256 (1.97%)   116 (1.05%)     88 (0.91%)      434 (2.96%)  
+[38;5;250m7[39m SE    3446 (26.58%) 2093 (18.99%)   1830 (18.91%)   4570 (31.12%)
+   Number_of_Splicing_Events        Sample Genes Total_Genes        perc
+1                          1         Human  2318        7117 32.56990305
+2                          1 Human (Adult)  1997        4963 40.23775942
+3                          1 Human (Fetal)  1722        4231 40.69959820
+4                          1         Mouse  7315       13088 55.89089242
+5                          2         Human  2319        7117 32.58395391
+6                          2 Human (Adult)  1659        4963 33.42736248
+7                          2 Human (Fetal)  1445        4231 34.15268258
+8                          2         Mouse  3393       13088 25.92451100
+9                          3         Human  1500        7117 21.07629619
+10                         3 Human (Adult)   858        4963 17.28793069
+11                         3 Human (Fetal)   726        4231 17.15906405
+12                         3         Mouse  1724       13088 13.17237164
+13                         4         Human   698        7117  9.80750316
+14                         4 Human (Adult)   334        4963  6.72980052
+15                         4 Human (Fetal)   261        4231  6.16875443
+16                         4         Mouse   548       13088  4.18704156
+17                         5         Human   228        7117  3.20359702
+18                         5 Human (Adult)    95        4963  1.91416482
+19                         5 Human (Fetal)    67        4231  1.58354999
+20                         5         Mouse   108       13088  0.82518337
+21                         6         Human    50        7117  0.70254321
+22                         6 Human (Adult)    18        4963  0.36268386
+23                         6 Human (Fetal)    10        4231  0.23635074
+24                         7         Human     4        7117  0.05620346
+25                         7 Human (Adult)     2        4963  0.04029821
+Number of splicing events: 
+[38;5;246m# A tibble: 7 × 5[39m
+[38;5;246m# Groups:   Event [7][39m
+  Event Human         `Human (Adult)` `Human (Fetal)` Mouse         
+  [3m[38;5;246m<fct>[39m[23m [3m[38;5;246m<chr>[39m[23m         [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<chr>[39m[23m         
+[38;5;250m1[39m A3    1707 (6.49%)  1057 (7.15%)    737 (6.16%)     3217 (7.99%)  
+[38;5;250m2[39m A5    915 (3.48%)   561 (3.79%)     380 (3.18%)     1883 (4.68%)  
+[38;5;250m3[39m AF    8456 (32.16%) 5364 (36.26%)   3504 (29.31%)   12853 (31.93%)
+[38;5;250m4[39m AL    3883 (14.77%) 2163 (14.62%)   1800 (15.06%)   6182 (15.36%) 
+[38;5;250m5[39m IR    5231 (19.89%) 2383 (16.11%)   2783 (23.28%)   6803 (16.9%)  
+[38;5;250m6[39m MX    328 (1.25%)   142 (0.96%)     109 (0.91%)     625 (1.55%)   
+[38;5;250m7[39m SE    5776 (21.97%) 3123 (21.11%)   2642 (22.1%)    8686 (21.58%) 
+Number of splicing genes: 
+[38;5;246m# A tibble: 7 × 5[39m
+[38;5;246m# Groups:   Event [7][39m
+  Event Human         `Human (Adult)` `Human (Fetal)` Mouse        
+  [3m[38;5;246m<fct>[39m[23m [3m[38;5;246m<chr>[39m[23m         [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<chr>[39m[23m        
+[38;5;250m1[39m A3    1045 (8.06%)  677 (6.14%)     521 (5.38%)     1754 (11.94%)
+[38;5;250m2[39m A5    604 (4.66%)   408 (3.7%)      281 (2.9%)      1134 (7.72%) 
+[38;5;250m3[39m AF    4879 (37.63%) 3357 (30.46%)   2451 (25.32%)   6476 (44.1%) 
+[38;5;250m4[39m AL    2920 (22.52%) 1749 (15.87%)   1469 (15.18%)   4262 (29.02%)
+[38;5;250m5[39m IR    2566 (19.79%) 1422 (12.9%)    1589 (16.42%)   3375 (22.98%)
+[38;5;250m6[39m MX    256 (1.97%)   116 (1.05%)     88 (0.91%)      434 (2.96%)  
+[38;5;250m7[39m SE    3446 (26.58%) 2093 (18.99%)   1830 (18.91%)   4570 (31.12%)
+   Number_of_Splicing_Events        Sample Genes Total_Genes        perc
+1                          1         Human  2318        7117 32.56990305
+2                          1 Human (Adult)  1997        4963 40.23775942
+3                          1 Human (Fetal)  1722        4231 40.69959820
+4                          1         Mouse  7315       13088 55.89089242
+5                          2         Human  2319        7117 32.58395391
+6                          2 Human (Adult)  1659        4963 33.42736248
+7                          2 Human (Fetal)  1445        4231 34.15268258
+8                          2         Mouse  3393       13088 25.92451100
+9                          3         Human  1500        7117 21.07629619
+10                         3 Human (Adult)   858        4963 17.28793069
+11                         3 Human (Fetal)   726        4231 17.15906405
+12                         3         Mouse  1724       13088 13.17237164
+13                         4         Human   698        7117  9.80750316
+14                         4 Human (Adult)   334        4963  6.72980052
+15                         4 Human (Fetal)   261        4231  6.16875443
+16                         4         Mouse   548       13088  4.18704156
+17                         5         Human   228        7117  3.20359702
+18                         5 Human (Adult)    95        4963  1.91416482
+19                         5 Human (Fetal)    67        4231  1.58354999
+20                         5         Mouse   108       13088  0.82518337
+21                         6         Human    50        7117  0.70254321
+22                         6 Human (Adult)    18        4963  0.36268386
+23                         6 Human (Fetal)    10        4231  0.23635074
+24                         7         Human     4        7117  0.05620346
+25                         7 Human (Adult)     2        4963  0.04029821
+Number of splicing events: 
+[38;5;246m# A tibble: 7 × 5[39m
+[38;5;246m# Groups:   Event [7][39m
+  Event Human         `Human (Adult)` `Human (Fetal)` Mouse         
+  [3m[38;5;246m<fct>[39m[23m [3m[38;5;246m<chr>[39m[23m         [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<chr>[39m[23m         
+[38;5;250m1[39m A3    1707 (6.49%)  1057 (7.15%)    737 (6.16%)     3217 (7.99%)  
+[38;5;250m2[39m A5    915 (3.48%)   561 (3.79%)     380 (3.18%)     1883 (4.68%)  
+[38;5;250m3[39m AF    8456 (32.16%) 5364 (36.26%)   3504 (29.31%)   12853 (31.93%)
+[38;5;250m4[39m AL    3883 (14.77%) 2163 (14.62%)   1800 (15.06%)   6182 (15.36%) 
+[38;5;250m5[39m IR    5231 (19.89%) 2383 (16.11%)   2783 (23.28%)   6803 (16.9%)  
+[38;5;250m6[39m MX    328 (1.25%)   142 (0.96%)     109 (0.91%)     625 (1.55%)   
+[38;5;250m7[39m SE    5776 (21.97%) 3123 (21.11%)   2642 (22.1%)    8686 (21.58%) 
+Number of splicing genes: 
+[38;5;246m# A tibble: 7 × 5[39m
+[38;5;246m# Groups:   Event [7][39m
+  Event Human         `Human (Adult)` `Human (Fetal)` Mouse        
+  [3m[38;5;246m<fct>[39m[23m [3m[38;5;246m<chr>[39m[23m         [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<chr>[39m[23m        
+[38;5;250m1[39m A3    1045 (8.06%)  677 (6.14%)     521 (5.38%)     1754 (11.94%)
+[38;5;250m2[39m A5    604 (4.66%)   408 (3.7%)      281 (2.9%)      1134 (7.72%) 
+[38;5;250m3[39m AF    4879 (37.63%) 3357 (30.46%)   2451 (25.32%)   6476 (44.1%) 
+[38;5;250m4[39m AL    2920 (22.52%) 1749 (15.87%)   1469 (15.18%)   4262 (29.02%)
+[38;5;250m5[39m IR    2566 (19.79%) 1422 (12.9%)    1589 (16.42%)   3375 (22.98%)
+[38;5;250m6[39m MX    256 (1.97%)   116 (1.05%)     88 (0.91%)      434 (2.96%)  
+[38;5;250m7[39m SE    3446 (26.58%) 2093 (18.99%)   1830 (18.91%)   4570 (31.12%)
+   Number_of_Splicing_Events        Sample Genes Total_Genes        perc
+1                          1         Human  2318        7117 32.56990305
+2                          1 Human (Adult)  1997        4963 40.23775942
+3                          1 Human (Fetal)  1722        4231 40.69959820
+4                          1         Mouse  7315       13088 55.89089242
+5                          2         Human  2319        7117 32.58395391
+6                          2 Human (Adult)  1659        4963 33.42736248
+7                          2 Human (Fetal)  1445        4231 34.15268258
+8                          2         Mouse  3393       13088 25.92451100
+9                          3         Human  1500        7117 21.07629619
+10                         3 Human (Adult)   858        4963 17.28793069
+11                         3 Human (Fetal)   726        4231 17.15906405
+12                         3         Mouse  1724       13088 13.17237164
+13                         4         Human   698        7117  9.80750316
+14                         4 Human (Adult)   334        4963  6.72980052
+15                         4 Human (Fetal)   261        4231  6.16875443
+16                         4         Mouse   548       13088  4.18704156
+17                         5         Human   228        7117  3.20359702
+18                         5 Human (Adult)    95        4963  1.91416482
+19                         5 Human (Fetal)    67        4231  1.58354999
+20                         5         Mouse   108       13088  0.82518337
+21                         6         Human    50        7117  0.70254321
+22                         6 Human (Adult)    18        4963  0.36268386
+23                         6 Human (Fetal)    10        4231  0.23635074
+24                         7         Human     4        7117  0.05620346
+25                         7 Human (Adult)     2        4963  0.04029821
+Total unique ERCCs: 57 (61.96%)[1] ""
+[1] "Correlation betweenlog2_amount_of_ERCCandlog2_FL_reads"
+
+	Pearson's product-moment correlation
+
+data:  dat[[x.var]] and dat[[y.var]]
+t = 38.684, df = 55, p-value < 2.2e-16
+alternative hypothesis: true correlation is not equal to 0
+95 percent confidence interval:
+ 0.9697003 0.9894697
+sample estimates:
+      cor 
+0.9821146 
+
+[1] "corr.value0.982114577145876"
+[1] "p.value1.41942390401904e-41"
+   [1] NNC        NIC        NNC        NNC        NNC        FSM        ISM        ISM        ISM        FSM        NIC        FSM        NIC        NIC        NIC       
+  [16] FSM        NIC        NIC        FSM        FSM        ISM        FSM        FSM        FSM        FSM        FSM        Intergenic FSM        NNC        NIC       
+  [31] NIC        NIC        ISM        ISM        ISM        FSM        NIC        NIC        NIC        NIC        FSM        NIC        NIC        NIC        NIC       
+  [46] NIC        FSM        FSM        NIC        FSM        ISM        FSM        NIC        FSM        FSM        FSM        FSM        ISM        NIC        ISM       
+  [61] NIC        NNC        NIC        ISM        ISM        NIC        FSM        NIC        NIC        NIC        ISM        FSM        FSM        FSM        NIC       
+  [76] FSM        FSM        FSM        FSM        Fusion     FSM        NNC        FSM        NIC        FSM        FSM        FSM        FSM        FSM        FSM       
+  [91] NNC        NIC        FSM        FSM        ISM        FSM        NNC        FSM        FSM        FSM        FSM        FSM        FSM        FSM        NNC       
+ [106] FSM        FSM        FSM        FSM        ISM        NNC        FSM        FSM        FSM        FSM        FSM        NIC        FSM        FSM        FSM       
+ [121] FSM        FSM        FSM        FSM        FSM        FSM        FSM        FSM        FSM        FSM        NNC        FSM        FSM        FSM        NIC       
+ [136] FSM        FSM        FSM        NNC        FSM        NIC        FSM        NIC        FSM        FSM        ISM        FSM        NIC        Intergenic NIC       
+ [151] ISM        NNC        FSM        ISM        FSM        FSM        NIC        FSM        FSM        NIC        FSM        ISM        FSM        NIC        FSM       
+ [166] FSM        NNC        FSM        NIC        ISM        ISM        FSM        FSM        FSM        NNC        FSM        FSM        FSM        FSM        NIC       
+ [181] ISM        ISM        FSM        ISM        FSM        FSM        FSM        FSM        FSM        FSM        NNC        FSM        NIC        FSM        FSM       
+ [196] NIC        FSM        FSM        FSM        FSM        FSM        FSM        FSM        ISM        NNC        FSM        FSM        FSM        FSM        NNC       
+ [211] NNC        FSM        FSM        FSM        FSM        NIC        FSM        FSM        FSM        NNC        FSM        FSM        FSM        ISM        NIC       
+ [226] ISM        NNC        NNC        NNC        NNC        FSM        NIC        ISM        FSM        NIC        FSM        NIC        FSM        FSM        NNC       
+ [241] FSM        FSM        FSM        FSM        NNC        NIC        NIC        FSM        NNC        FSM        FSM        NIC        ISM        FSM        FSM       
+ [256] Fusion     FSM        FSM        ISM        NIC        FSM        FSM        FSM        FSM        FSM        FSM        FSM        FSM        FSM        FSM       
+ [271] NIC        ISM        FSM        FSM        FSM        FSM        FSM        NIC        NIC        NIC        ISM        FSM        FSM        FSM        NIC       
+ [286] NIC        FSM        NIC        NIC        FSM        FSM        NIC        FSM        FSM        NIC        NIC        NNC        NIC        NNC        FSM       
+ [301] FSM        ISM        NNC        NNC        NIC        NNC        FSM        NIC        NIC        ISM        NIC        NIC        FSM        ISM        FSM       
+ [316] FSM        NIC        NIC        NIC        NIC        NIC        FSM        FSM        FSM        NNC        NIC        FSM        FSM        FSM        FSM       
+ [331] FSM        NIC        ISM        FSM        FSM        FSM        FSM        FSM        NIC        NNC        NIC        NNC        FSM        NNC        FSM       
+ [346] NIC        NIC        ISM        NNC        NIC        NIC        FSM        NIC        ISM        FSM        FSM        FSM        NIC        FSM        FSM       
+ [361] FSM        FSM        FSM        FSM        FSM        FSM        FSM        FSM        FSM        FSM        NNC        FSM        ISM        ISM        NIC       
+ [376] NIC        FSM        FSM        FSM        Fusion     FSM        NNC        FSM        FSM        FSM        FSM        ISM        FSM        FSM        NIC       
+ [391] NIC        FSM        NIC        FSM        FSM        FSM        ISM        ISM        NIC        FSM        FSM        NIC        NIC        FSM        FSM       
+ [406] ISM        ISM        ISM        FSM        FSM        NIC        FSM        NIC        NIC        FSM        FSM        FSM        FSM        NIC        FSM       
+ [421] FSM        FSM        FSM        NNC        FSM        NIC        FSM        FSM        NIC        FSM        FSM        NIC        NIC        FSM        FSM       
+ [436] FSM        ISM        FSM        NIC        FSM        FSM        FSM        FSM        NIC        NIC        FSM        FSM        FSM        FSM        FSM       
+ [451] ISM        FSM        FSM        FSM        NIC        FSM        FSM        NNC        FSM        FSM        NNC        FSM        ISM        FSM        NIC       
+ [466] NNC        NNC        FSM        FSM        FSM        NIC        FSM        FSM        FSM        NNC        NNC        NIC        FSM        NIC        NNC       
+ [481] NIC        FSM        FSM        FSM        FSM        Fusion     NIC        NNC        ISM        FSM        FSM        ISM        ISM        ISM        NIC       
+ [496] ISM        ISM        NIC        Intergenic FSM        ISM        ISM        FSM        NNC        FSM        NIC        NIC        FSM        NNC        NNC       
+ [511] FSM        NIC        NNC        FSM        NIC        FSM        NIC        ISM        NIC        FSM        NIC        FSM        NIC        NNC        ISM       
+ [526] FSM        FSM        FSM        FSM        Intergenic FSM        ISM        NIC        ISM        NIC        ISM        ISM        FSM        Intergenic NNC       
+ [541] FSM        NIC        FSM        ISM        NIC        ISM        ISM        NIC        FSM        FSM        FSM        FSM        FSM        FSM        FSM       
+ [556] NNC        NIC        NIC        FSM        FSM        NIC        FSM        ISM        NIC        ISM        ISM        ISM        NIC        FSM        ISM       
+ [571] FSM        ISM        NIC        ISM        ISM        ISM        NIC        ISM        NNC        ISM        FSM        NNC        NNC        FSM        NNC       
+ [586] NNC        NNC        NNC        ISM        ISM        NNC        FSM        NIC        NIC        NNC        FSM        FSM        FSM        FSM        FSM       
+ [601] FSM        NIC        NNC        FSM        FSM        FSM        FSM        NIC        FSM        FSM        NIC        FSM        FSM        FSM        FSM       
+ [616] FSM        FSM        FSM        FSM        FSM        ISM        FSM        FSM        Fusion     FSM        NIC        FSM        FSM        FSM        FSM       
+ [631] FSM        FSM        FSM        FSM        FSM        FSM        FSM        FSM        FSM        FSM        FSM        FSM        FSM        FSM        NIC       
+ [646] FSM        NNC        FSM        ISM        NNC        FSM        FSM        NIC        NIC        FSM        FSM        FSM        FSM        NIC        FSM       
+ [661] NNC        FSM        NIC        NIC        FSM        NIC        FSM        FSM        NNC        NIC        FSM        NIC        FSM        NIC        NNC       
+ [676] FSM        FSM        FSM        NIC        NIC        NIC        NIC        FSM        FSM        FSM        NIC        NIC        NNC        NIC        NIC       
+ [691] FSM        NIC        FSM        FSM        FSM        NIC        NIC        FSM        NIC        ISM        FSM        FSM        FSM        FSM        FSM       
+ [706] NNC        NIC        FSM        NIC        NNC        NNC        NNC        ISM        NIC        NNC        NNC        NNC        NNC        NIC        FSM       
+ [721] FSM        FSM        FSM        NIC        NIC        FSM        ISM        NIC        FSM        NNC        NNC        NNC        FSM        FSM        FSM       
+ [736] FSM        ISM        FSM        NNC        FSM        FSM        FSM        FSM        FSM        FSM        NIC        NIC        NIC        FSM        FSM       
+ [751] FSM        FSM        FSM        NIC        FSM        FSM        NIC        NIC        FSM        NNC        NIC        NNC        NNC        NIC        FSM       
+ [766] ISM        ISM        ISM        FSM        FSM        FSM        FSM        ISM        ISM        FSM        FSM        FSM        FSM        FSM        FSM       
+ [781] NIC        NIC        FSM        NIC        NIC        FSM        NIC        FSM        NNC        FSM        NIC        NIC        FSM        NIC        FSM       
+ [796] NIC        NIC        ISM        ISM        FSM        NIC        NIC        NIC        NIC        NIC        FSM        NIC        FSM        FSM        FSM       
+ [811] FSM        NIC        FSM        FSM        ISM        ISM        FSM        FSM        FSM        NIC        FSM        FSM        NIC        ISM        NIC       
+ [826] NIC        NIC        NIC        NIC        NIC        FSM        ISM        FSM        NNC        FSM        FSM        NIC        FSM        FSM        FSM       
+ [841] NIC        FSM        NIC        NIC        ISM        ISM        NIC        NIC        FSM        FSM        NIC        NIC        NIC        FSM        ISM       
+ [856] ISM        ISM        FSM        FSM        FSM        FSM        FSM        FSM        FSM        FSM        NIC        NIC        NIC        NNC        FSM       
+ [871] FSM        NIC        NIC        FSM        FSM        FSM        NIC        FSM        ISM        FSM        NIC        ISM        NNC        FSM        NIC       
+ [886] NIC        NIC        FSM        FSM        FSM        NIC        NIC        FSM        NIC        FSM        FSM        NNC        FSM        NIC        NIC       
+ [901] NNC        ISM        NNC        NIC        FSM        FSM        ISM        FSM        NNC        ISM        NIC        NIC        FSM        FSM        NIC       
+ [916] NIC        NIC        NIC        FSM        FSM        NNC        FSM        FSM        NIC        NIC        NNC        ISM        ISM        ISM        ISM       
+ [931] ISM        ISM        FSM        NNC        FSM        NNC        NIC        FSM        NIC        NIC        NIC        FSM        NIC        NNC        NIC       
+ [946] NIC        FSM        NIC        NIC        NIC        NIC        NNC        ISM        ISM        ISM        NIC        FSM        FSM        FSM        NIC       
+ [961] FSM        NIC        FSM        NIC        FSM        NIC        NNC        NNC        NIC        NIC        FSM        NIC        FSM        FSM        FSM       
+ [976] NNC        NNC        FSM        FSM        NIC        NNC        ISM        FSM        NIC        NIC        NNC        FSM        NIC        FSM        NNC       
+ [991] FSM        FSM        NIC        NIC        NIC        NIC        NIC        NIC        FSM        NIC       
+ [ reached getOption("max.print") -- omitted 31802 entries ]
+Levels: FSM < ISM < NIC < NNC < Genic\nGenomic < Antisense < Fusion < Intergenic < Genic\nIntron
+[1] "hello"

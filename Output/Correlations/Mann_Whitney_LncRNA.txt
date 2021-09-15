@@ -1,0 +1,1072 @@
+#############################################################
+Statstical Tests for dataset: Mouse 
+#############################################################
+
+Transcripts Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 35201722, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 8.243411e-98 
+Number of Exons (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 45605081, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 0 
+Non-Coding Transcripts Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 688573, p-value = 1.482e-06
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 1.482168e-06 
+Coding Transcripts Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 11808106, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 1.757763e-16 
+Transcript Expression (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 31618662, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 5.668657e-40 
+ORF Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 17496352, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 8.332767e-195 
+Number of Isoforms per Gene 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 7397380, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 5.759306e-107 
+#############################################################
+Statstical Tests for dataset: Adult 
+#############################################################
+
+Transcripts Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 9546202, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 3.460411e-29 
+Number of Exons (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 13425658, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 1.845121e-259 
+Non-Coding Transcripts Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 184870, p-value = 1.075e-06
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 1.07521e-06 
+Coding Transcripts Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 3376838, p-value = 0.01867
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 0.01867125 
+Transcript Expression (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 9634848, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 1.42477e-33 
+ORF Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 5690530, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 1.084866e-134 
+Number of Isoforms per Gene 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 3648133, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 2.743006e-39 
+#############################################################
+Statstical Tests for dataset: Fetal 
+#############################################################
+
+Transcripts Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 5440376, p-value = 1.943e-06
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 1.943089e-06 
+Number of Exons (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 8588860, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 5.899501e-204 
+Non-Coding Transcripts Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 111782, p-value = 0.00229
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 0.002289979 
+Coding Transcripts Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 1994110, p-value = 0.8714
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 0.871396 
+Transcript Expression (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 5653706, p-value = 2.298e-11
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 2.297977e-11 
+ORF Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 3693608, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 4.795794e-108 
+Number of Isoforms per Gene 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 2107774, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 1.877929e-18 
+#############################################################
+Statstical Tests for dataset: Human 
+#############################################################
+
+Transcripts Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 22796902, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 3.2201e-34 
+Number of Exons (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 33083736, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 0 
+Non-Coding Transcripts Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 499678, p-value = 4.561e-06
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 4.56136e-06 
+Coding Transcripts Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 8486704, p-value = 0.0003733
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 0.0003733191 
+Transcript Expression (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 22719930, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 9.438371e-35 
+ORF Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 14083140, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 3.123483e-221 
+Number of Isoforms per Gene 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 6629574, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 1.209261e-80 
+#############################################################
+Statstical Tests for dataset: Mouse 
+#############################################################
+
+Transcripts Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 35201722, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 8.243411e-98 
+Number of Exons (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 45605081, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 0 
+Non-Coding Transcripts Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 688573, p-value = 1.482e-06
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 1.482168e-06 
+Coding Transcripts Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 11808106, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 1.757763e-16 
+Transcript Expression (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 31618662, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 5.668657e-40 
+ORF Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 17496352, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 8.332767e-195 
+Number of Isoforms per Gene 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 7397380, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 5.759306e-107 
+#############################################################
+Statstical Tests for dataset: Adult 
+#############################################################
+
+Transcripts Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 9546202, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 3.460411e-29 
+Number of Exons (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 13425658, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 1.845121e-259 
+Non-Coding Transcripts Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 184870, p-value = 1.075e-06
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 1.07521e-06 
+Coding Transcripts Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 3376838, p-value = 0.01867
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 0.01867125 
+Transcript Expression (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 9634848, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 1.42477e-33 
+ORF Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 5690530, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 1.084866e-134 
+Number of Isoforms per Gene 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 3648133, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 2.743006e-39 
+#############################################################
+Statstical Tests for dataset: Fetal 
+#############################################################
+
+Transcripts Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 5440376, p-value = 1.943e-06
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 1.943089e-06 
+Number of Exons (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 8588860, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 5.899501e-204 
+Non-Coding Transcripts Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 111782, p-value = 0.00229
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 0.002289979 
+Coding Transcripts Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 1994110, p-value = 0.8714
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 0.871396 
+Transcript Expression (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 5653706, p-value = 2.298e-11
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 2.297977e-11 
+ORF Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 3693608, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 4.795794e-108 
+Number of Isoforms per Gene 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 2107774, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 1.877929e-18 
+#############################################################
+Statstical Tests for dataset: Human 
+#############################################################
+
+Transcripts Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 22796902, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 3.2201e-34 
+Number of Exons (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 33083736, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 0 
+Non-Coding Transcripts Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 499678, p-value = 4.561e-06
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 4.56136e-06 
+Coding Transcripts Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 8486704, p-value = 0.0003733
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 0.0003733191 
+Transcript Expression (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 22719930, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 9.438371e-35 
+ORF Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 14083140, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 3.123483e-221 
+Number of Isoforms per Gene 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 6629574, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 1.209261e-80 
+#############################################################
+Statstical Tests for dataset: Mouse 
+#############################################################
+
+Transcripts Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 35201722, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 8.243411e-98 
+Number of Exons (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 45605081, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 0 
+Non-Coding Transcripts Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 688573, p-value = 1.482e-06
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 1.482168e-06 
+Coding Transcripts Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 11808106, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 1.757763e-16 
+Transcript Expression (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 31618662, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 5.668657e-40 
+ORF Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 17496352, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 8.332767e-195 
+Number of Isoforms per Gene 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 7397380, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 5.759306e-107 
+#############################################################
+Statstical Tests for dataset: Adult 
+#############################################################
+
+Transcripts Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 9546202, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 3.460411e-29 
+Number of Exons (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 13425658, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 1.845121e-259 
+Non-Coding Transcripts Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 184870, p-value = 1.075e-06
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 1.07521e-06 
+Coding Transcripts Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 3376838, p-value = 0.01867
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 0.01867125 
+Transcript Expression (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 9634848, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 1.42477e-33 
+ORF Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 5690530, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 1.084866e-134 
+Number of Isoforms per Gene 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 3648133, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 2.743006e-39 
+#############################################################
+Statstical Tests for dataset: Fetal 
+#############################################################
+
+Transcripts Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 5440376, p-value = 1.943e-06
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 1.943089e-06 
+Number of Exons (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 8588860, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 5.899501e-204 
+Non-Coding Transcripts Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 111782, p-value = 0.00229
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 0.002289979 
+Coding Transcripts Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 1994110, p-value = 0.8714
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 0.871396 
+Transcript Expression (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 5653706, p-value = 2.298e-11
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 2.297977e-11 
+ORF Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 3693608, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 4.795794e-108 
+Number of Isoforms per Gene 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 2107774, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 1.877929e-18 
+#############################################################
+Statstical Tests for dataset: Human 
+#############################################################
+
+Transcripts Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 22796902, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 3.2201e-34 
+Number of Exons (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 33083736, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 0 
+Non-Coding Transcripts Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 499678, p-value = 4.561e-06
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 4.56136e-06 
+Coding Transcripts Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 8486704, p-value = 0.0003733
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 0.0003733191 
+Transcript Expression (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 22719930, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 9.438371e-35 
+ORF Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 14083140, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 3.123483e-221 
+Number of Isoforms per Gene 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 6629574, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 1.209261e-80 
+#############################################################
+Statstical Tests for dataset: Mouse 
+#############################################################
+
+Transcripts Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 35201722, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 8.243411e-98 
+Number of Exons (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 45605081, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 0 
+Non-Coding Transcripts Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 688573, p-value = 1.482e-06
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 1.482168e-06 
+Coding Transcripts Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 11808106, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 1.757763e-16 
+Transcript Expression (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 31618662, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 5.668657e-40 
+ORF Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 17496352, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 8.332767e-195 
+Number of Isoforms per Gene 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 7397380, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 5.759306e-107 
+#############################################################
+Statstical Tests for dataset: Adult 
+#############################################################
+
+Transcripts Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 9546202, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 3.460411e-29 
+Number of Exons (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 13425658, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 1.845121e-259 
+Non-Coding Transcripts Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 184870, p-value = 1.075e-06
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 1.07521e-06 
+Coding Transcripts Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 3376838, p-value = 0.01867
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 0.01867125 
+Transcript Expression (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 9634848, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 1.42477e-33 
+ORF Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 5690530, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 1.084866e-134 
+Number of Isoforms per Gene 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 3648133, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 2.743006e-39 
+#############################################################
+Statstical Tests for dataset: Fetal 
+#############################################################
+
+Transcripts Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 5440376, p-value = 1.943e-06
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 1.943089e-06 
+Number of Exons (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 8588860, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 5.899501e-204 
+Non-Coding Transcripts Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 111782, p-value = 0.00229
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 0.002289979 
+Coding Transcripts Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 1994110, p-value = 0.8714
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 0.871396 
+Transcript Expression (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 5653706, p-value = 2.298e-11
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 2.297977e-11 
+ORF Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 3693608, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 4.795794e-108 
+Number of Isoforms per Gene 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 2107774, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 1.877929e-18 
+#############################################################
+Statstical Tests for dataset: Human 
+#############################################################
+
+Transcripts Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 22796902, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 3.2201e-34 
+Number of Exons (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 33083736, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 0 
+Non-Coding Transcripts Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 499678, p-value = 4.561e-06
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 4.56136e-06 
+Coding Transcripts Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 8486704, p-value = 0.0003733
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 0.0003733191 
+Transcript Expression (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 22719930, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 9.438371e-35 
+ORF Length (Annotated Genes only) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 14083140, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 3.123483e-221 
+Number of Isoforms per Gene 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  all_dat and lnc_dat
+W = 6629574, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 1.209261e-80 

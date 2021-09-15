@@ -1,0 +1,36 @@
+Mann Whitney for Number of Exons of Novel vs Annotated in Annotated Genes of dataset: Mouse 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  exons by Transcripts
+W = 194164618, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 0 
+Mann Whitney for Number of Exons of Novel vs Annotated in Annotated Genes of dataset: Human (Adult) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  exons by Transcripts
+W = 36078625, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 1.52643e-173 
+Mann Whitney for Number of Exons of Novel vs Annotated in Annotated Genes of dataset: Human (Fetal) 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  exons by Transcripts
+W = 26284226, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 2.042087e-135 
+Mann Whitney for Number of Exons of Novel vs Annotated in Annotated Genes of dataset: Human 
+
+	Wilcoxon rank sum test with continuity correction
+
+data:  exons by Transcripts
+W = 88368724, p-value < 2.2e-16
+alternative hypothesis: true location shift is not equal to 0
+
+Exact p value: 0 
