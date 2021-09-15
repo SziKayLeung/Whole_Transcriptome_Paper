@@ -1,0 +1,512 @@
+---
+title: "Human Mouse Comparison"
+author: Szi Kay Leung
+date: "`r Sys.Date()`"
+knit: (function(inputFile, encoding) { 
+      rmarkdown::render(inputFile,
+                        encoding=encoding, 
+                        output_file=paste0("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/Isoseq_Paper/Rmarkdowns",
+                        '/Human_Mouse_Comparison.html')) })
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: hide
+---
+
+```{r setup, include=FALSE, results="hide"}
+knitr::opts_chunk$set(echo = TRUE,fig.width=14, fig.height= 7)
+
+list_of_packages <- c("ggplot2", "scales", "reshape", "gridExtra", "grid", "dplyr","stringr","viridis","extrafont","tidyr","purr","DT")
+req_packages <- list_of_packages[!(list_of_packages %in% installed.packages()[,"Package"])]
+if(length(req_packages)) install.packages(req_packages, repo="http://cran.rstudio.com/")
+
+suppressMessages(library(ggplot2))
+suppressMessages(library(scales))
+suppressMessages(library(reshape2))
+suppressMessages(library(gridExtra))
+suppressMessages(library(grid))
+suppressMessages(library(dplyr))
+suppressMessages(library(stringr)) 
+suppressMessages(library(viridis)) 
+suppressMessages(library(extrafont))
+suppressMessages(library(tidyr))
+suppressMessages(library(purrr))
+suppressMessages(library(DT))
+suppressMessages(library(plotly))
+suppressMessages(library(pheatmap))
+suppressMessages(library(devtools))
+suppressMessages(library(easyGgplot2))
+
+#font_import()
+```
+**Aims**: Investigate human and mouse merged iso-seq data from SQANTI2 classification files (post-filtering):\
+1. Difference in number of isoforms per gene between human and mouse\
+2. Usage of splice sites between mouse and human\
+3. Difference in gene expression (from RNASeq Kallisto input)\
+
+
+```{r input, results="hide"}
+output_dir <-  "/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/Scripts/Whole_Transcriptome_Paper/Output/Tables/Human_Mouse_Comparisons"
+source("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/Scripts/Whole_Transcriptome_Paper/Output/Input_Variables.R")
+
+sqanti_files()
+reference_files()
+multiexonic()
+FSM()
+
+# read in mouse and human reference genome (adjusted in table)
+# datawrangle to create separate new column for gene names taken taken from "Genesymbol" (i.e. remove white space, capitalise)
+mm10 <- read.csv("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/reference_2019/gencode.vM22_gene_annotation_table.csv")%>% mutate(Gene = toupper(word(.$GeneSymbol,c(3),  sep = fixed (' '))))
+hg38 <- read.table("//gpfs/mrc0/projects/Research_Project-MRC148213/ISOSEQ/reference/gencode.v31_gene_annotation_table.txt", sep = "\t", header = T) %>% mutate(GeneSymbol = gsub(" ", "", GeneSymbol)) %>% mutate(Gene = GeneSymbol)
+```
+## Input SQANTI2 classificiation files
+
+**Mouse** - *`r class.names.files$Mouse`*, 
+\
+**Adult Human** - *`r class.names.files$Adult`*, 
+\
+**Fetal Human** - *`r class.names.files$Fetal`*, 
+\
+```{r}
+
+```
+## Input Reference files
+**Mouse** - *gencode.vM22_gene_annotation_table.txt* 
+\
+**Human** - *gencode.v31_gene_annotation_table.txt*
+
+```{r functions}
+## Tabulate sum of transcripts per gene in reference files and isoseq files 
+gencode_transcripts <- function(df) 
+  df %>% select(GeneSymbol, Transcriptid, Sample) %>% distinct() %>% 
+  group_by(GeneSymbol, Sample) %>% tally()
+isoseq_transcripts  <- function(df) df %>% group_by(associated_gene, Sample) %>% tally()
+
+# homologs_genes 
+# Aim: Remove genes from the homologous gene list that are present in both human and mouse genome, eliminating number overestimation or underestimation 
+# Input: homologs gene list, mm10 and hg38 genome list 
+# Output: same format as homologs gene list but removed common genes 
+homologs_genes <- function(){
+  # read in list of homologous genes between mouse and human; and capitalise for consistency
+  homologs_genes <- read.csv("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/reference_2019/mousehumangeneconversion.csv")
+  homologs_genes$mouse <- toupper(homologs_genes$mouse)
+  homologs_genes$human <- toupper(homologs_genes$human)
+  cat("Number of homologous genes listed between human and mouse:", nrow(homologs_genes), "\n") 
+  
+  # list only the unique genes with different names across human and mouse (from read in homologous list)
+  # if homologous human and does not match with the homologous gene, take note of the row number and append to vector list 
+  # use vector list of row numbers to extract the rows with mismatching names 
+  unique_naming_row <- c()
+  for(i in 1:nrow(homologs_genes)){
+    mismatching_row <- if(homologs_genes$human[i] != homologs_genes$mouse[i]){i}
+    unique_naming_row <- append(mismatching_row, unique_naming_row)
+  }
+  unique_homologs_genes <- homologs_genes[unique_naming_row,]
+  cat("Number of mismatching gene names between human and mouse:", nrow(unique_homologs_genes), "\n") 
+  
+  ##################
+  ## Remove any genes from the unique genes list that contain genes that are present across both species
+  ##################
+  # i.e SMS gene is present in both mouse and human genome; in unique gene list: 
+  # SMS-PS (mouse) --> SMS (human); 
+  # if convert SMS-PS to SMS, there may be two separate SMS records (one from converted SMS-PS and SMS original gene) 
+  # result in number overestimation
+  # i.e RPL29 gene is present in both mouse and human genome; in uniquge gene list: 
+  # RPL29 (mouse) --> LINC01621 (human); if convert RPL29 to LINC01621
+  # missed RPL29 when matching human and mouse genome even though RPL29 is present in human -----> number underestimation
+  # duplicate_mouse <- genes present in unique human list for conversion also present in mouse genome
+  # duplicate_human <- genes present in unique mouse list for conversion also present in human genome 
+  duplicate_mouse <- intersect(unique(mm10$Gene), unique_homologs_genes$human) 
+  duplicate_human <- intersect(unique(hg38$GeneSymbol), unique_homologs_genes$mouse)
+  cat("Number of genes from human homologous list present in mouse genome, thus removed for conversion", length(duplicate_mouse), "\n") 
+  cat("Number of genes from mouse homologous list present in human genome, thus removed for conversion", length(duplicate_human), "\n") 
+  # filter list of genes from unique homologous genes so no conversion
+  homologs_genes_filtered <- homologs_genes %>% 
+    filter(!human %in% duplicate_mouse) %>% 
+    filter(!mouse %in% duplicate_human)
+  
+  return(homologs_genes_filtered)
+}
+
+
+## Merge_Numbers
+# Aim: Merge genes between human and mouse to generate list of number of isoforms, normalised to number in reference 
+# homology_human_mouse = "yes" or "no"
+  # if "yes"; convert mouse gene names to equivalent to human gene names 
+  # ensure species1.df.classfreq = human!!! and species2.df.class.freq = mouse!!!
+# Input: homologs gene list, mm10 and hg38 genome list 
+# Output: same format as homologs gene list but removed common genes 
+Merge_Numbers <- function(species1.df.classfreq, species1.df.referencefreq, species2.df.classfreq, species2.df.referencefreq, output_file, homology_human_mouse){
+  
+  species1 <- species1.df.classfreq$Sample[1]
+  species2 <- species2.df.classfreq$Sample[1]
+  
+  # Merge species 1 (i.e Human) numbers from reference and isoseq files by gene names
+  # Normalise by dividing detected/known
+  species1.df <- merge(species1.df.classfreq, species1.df.referencefreq, 
+                       by.x = "associated_gene", by.y = "GeneSymbol", all = TRUE)
+  species1.df$normalised <- species1.df$n.x/species1.df$n.y
+  
+  # Merge species 2 (i.e Mouse) numbers from reference and isoseq files by gene names
+  # Normalise by dividing detected/known
+  species2.df <- merge(species2.df.classfreq, species2.df.referencefreq, 
+                       by.x = "associated_gene", by.y = "GeneSymbol", all = TRUE)
+  species2.df$normalised <- species2.df$n.x/species2.df$n.y
+
+  if(homology_human_mouse == "yes"){
+    ##################
+    # Replace human-equivalent gene for mouse 
+    ##################
+    # Use the homologs gene list but filtered to remove any common genes in both human and mouse genome 
+    cat("Working with homologous genes; Converting mouse genes to human equivalent genes", "\n")
+    homologs_genes_filtered <- homologs_genes()
+    # loop through each gene from mouse dataset
+    # if gene matches the list of genes from homologous list, replace with the human equivalent 
+    for(i in 1:nrow(species2.df)){
+      species2.df$human_homolog[i] <- 
+        ifelse(species2.df$associated_gene[i] %in% homologs_genes_filtered$mouse,
+               paste(as.character(homologs_genes_filtered$human[which(homologs_genes_filtered$mouse == 
+                                                                        species2.df$associated_gene[i])])), 
+               species2.df$associated_gene[i] )
+    }
+    
+    cat("Checking conversion correct", "\n")
+    print(species2.df[species2.df$associated_gene == "TOMM70A",])
+    
+    species2.df <- species2.df %>% select(human_homolog, Sample.x, n.x, Sample.y, n.y, normalised)
+    colnames(species2.df)[1] <- "associated_gene"
+  }else{
+    cat("Working with non-homologous genes as both datasets are of the same species")
+  }
+     
+  # Merge species 1 and species 2 by gene names for comparison
+  # remove repeated Sample name columns
+  merge_df <- merge(species1.df, species2.df, by = "associated_gene", all = TRUE)
+  merge_df[is.na(merge_df)] <- 0
+
+  merge_df <- merge_df[,-c(4,9)]
+  
+  colnames(merge_df) <- c("associated_gene", species1, paste0(species1,"_Detected_Num_Isoseq"),
+                          paste0(species1,"_Known_Num_Gencode"), paste0(species1,"_Normalised"),
+                          species2, paste0(species2,"_Detected_Num_Isoseq"),
+                          paste0(species2,"_Known_Num_Gencode"), paste0(species2,"_Normalised"))
+  
+   # Detection 
+  for(row in 1:nrow(merge_df)){
+    merge_df$Detected[row] <- 
+      if(merge_df[row,3] == 0 & merge_df[row,6] != 0){paste(species2)
+      }else{
+        if(merge_df[row,6] == 0 & merge_df[row,3] != 0){paste(species1)
+          }else{
+            if(merge_df[row,6] != 0 & merge_df[row,3] != 0){paste("Both")
+              }else{paste("Not_Deteced_In_Either_Genome")}}}}
+
+
+  # fully_matched between two species
+  common <- merge_df[merge_df$Detected == "Both", ]
+  
+  # diversity of isoforms between two species based on numbers detected in isoseq datasets (independent of Gencode number)
+  common[[paste0("isoseq_comparison_",species1,"vs", species2)]] <-
+    common[,paste0(species1,"_Detected_Num_Isoseq")]/common[,paste0(species2,"_Detected_Num_Isoseq")]
+  
+  common[[paste0("isoseq_comparison_",species2,"vs", species1)]] <-
+    common[,paste0(species2,"_Detected_Num_Isoseq")]/common[,paste0(species1,"_Detected_Num_Isoseq")]
+  
+  # diversity of isoforms between two species based on numbers detected in isoseq datasets (dependent of Gencode number)
+  
+  common[[paste0("isoseq_comparison_normalised",species1,"vs", species2)]] <-
+    common[,paste0(species1,"_Normalised")]/common[,paste0(species2,"_Normalised")]
+  
+  common[[paste0("isoseq_comparison_normalised",species2,"vs", species1)]] <-
+    common[,paste0(species2,"_Normalised")]/common[,paste0(species1,"_Normalised")]
+  
+  common$isoseq_comparison_diff <- abs(common[,paste0(species1,"_Detected_Num_Isoseq")] - common[,paste0(species2,"_Detected_Num_Isoseq")])
+  
+  
+  assign(output_file, merge_df, envir=.GlobalEnv)
+  assign(paste0(output_file,"_fullymatched"), common, envir=.GlobalEnv)
+}
+
+
+
+# Merge_Numebers_TPM 
+# Aim: Recalculate TPM not considering monoexonic transcripts and merge associated genes between species1.df1 and species.df2 
+# Input: species1.df.classfreq = filtered monoexonic transcripts from classification file
+# homology_human_mouse = "yes" or "no"
+  # if "yes"; convert mouse gene names to equivalent to human gene names 
+  # ensure species1.df.classfreq = human!!! and species2.df.class.freq = mouse!!!
+# output_file = name of output file (and prefix of "_fullymatched")
+# Output files: 2 files of all and only matching gene lists between human and mouse 
+Merge_Numbers_TPM <- function(species1.df.classfreq, species2.df.classfreq, output_file, homology_human_mouse){
+  
+  # Species 1 = Human 
+  # Species 2 = Mouse
+  ##################
+  # Recalculate IsoSeq TPM gene expression not considering monoexonic transcripts, and summing IsoSeq TPM of all transcripts per associated gene 
+  ##################
+  recalculate_TPM <- function(input.species.df.classfreq){
+    # recalculate TPM using total FL not including monoexonic transcripts (input file)
+    TPM <- TPM_Calculation(input.species.df.classfreq) 
+    # sum IsoSeq TPM from each transcript associated per gene 
+    Gene_TPM <- aggregate(TPM$ISOSEQ_TPM, by=list(associated_gene=TPM$associated_gene), FUN=sum) %>% 
+      # log IsoSeq TPM 
+      mutate(Log_ISOSEQ_TPM = log10(x)) %>% 
+      select("associated_gene","Log_ISOSEQ_TPM") 
+    # Species ID column
+    Gene_TPM$Sample <- input.species.df.classfreq$Sample[1]
+    
+    return(Gene_TPM)
+  }
+  
+  
+  df1.TPM <- recalculate_TPM(species1.df.classfreq)
+  df2.TPM <- recalculate_TPM(species2.df.classfreq)
+  
+  
+  if(homology_human_mouse == "yes"){
+    ##################
+    # Replace human-equivalent gene for mouse 
+    ##################
+    # Use the homologs gene list but filtered to remove any common genes in both human and mouse genome 
+    cat("Working with homologous genes; Converting mouse genes to human equivalent genes", "\n")
+    homologs_genes_filtered <- homologs_genes()
+    # loop through each gene from mouse dataset
+    # if gene matches the list of genes from homologous list, replace with the human equivalent 
+    for(i in 1:nrow(df2.TPM)){
+      df2.TPM$human_homolog[i] <- 
+        ifelse(df2.TPM$associated_gene[i] %in% homologs_genes_filtered$mouse,
+               paste(as.character(homologs_genes_filtered$human[which(homologs_genes_filtered$mouse == 
+                                                                        df2.TPM$associated_gene[i])])), 
+               df2.TPM$associated_gene[i] )
+    }
+    
+    cat("Checking conversion correct", "\n")
+    print(df2.TPM[df2.TPM$associated_gene == "TOMM70A",])
+    
+    # replace the homologs column name with associated gene name for merging downstream 
+    df2.TPM <- df2.TPM %>% .[,c(4,2,3)] 
+    colnames(df2.TPM)[1] <- "associated_gene"
+  }else{
+    cat("Working with non-homologous genes as both datasets are of the same species")
+  }
+  
+  ##################
+  # Merging Human and Mouse gene name 
+  ##################
+  species1 <- species1.df.classfreq$Sample[1]
+  species2 <- species2.df.classfreq$Sample[1]
+  # all 
+  df3 <- merge(df1.TPM, df2.TPM, by = "associated_gene", all = TRUE)
+  colnames(df3) <- c("associated_gene", paste0(species1,"_Detected_LogTPM_Isoseq"), species1, paste0(species2,"_Detected_LogTPM_Isoseq"),species2)
+  
+  # fully_matched between two species i.e. remove rows with NAs in either column
+  df4 <- merge(df1.TPM, df2.TPM, by = "associated_gene")
+  colnames(df4) <- c("associated_gene", paste0(species1,"_Detected_LogTPM_Isoseq"), 
+                     species1, paste0(species2,"_Detected_LogTPM_Isoseq"),species2)
+  # diversity of isoforms between two species based on numbers detected in isoseq datasets (independent of Gencode number)
+  df4$isoseq_comparison <- df4[,paste0(species1,"_Detected_LogTPM_Isoseq")]/
+    df4[,paste0(species2,"_Detected_LogTPM_Isoseq")]
+  
+  assign(output_file, df3, envir=.GlobalEnv)
+  assign(paste0(output_file,"_fullymatched"), df4, envir=.GlobalEnv)
+}
+
+density_plot <- function(dat,x.var,y.var, x_lab, y_lab,title){
+  
+  print(cor.test(dat[[x.var]],dat[[y.var]]))
+  cor(dat[[x.var]],dat[[y.var]], use = "pairwise.complete.obs")
+  
+  corr.value <- cor(dat[[x.var]],dat[[y.var]], use = "pairwise.complete.obs")
+  p.value <- cor.test(dat[[x.var]],dat[[y.var]], use = "pairwise.complete.obs")$p.value 
+  print(p.value)
+  
+  # corr.value <- cor(FSM_TPM$ISOSEQ_TPM_Normalised,FSM_TPM$RNASeq_TPM) # normalised ISOSEQ FL counts to length
+  corr <- grobTree(textGrob(paste("r = ", round(corr.value, 2)), x = 0.05, y = 0.97, hjust = 0, 
+                            gp = gpar(col = "black", fontsize = 20, fontface = "italic")))
+  
+  x.var <- rlang::sym(quo_name(enquo(x.var)))
+  y.var <- rlang::sym(quo_name(enquo(y.var)))
+  
+  mytheme <- theme(axis.line = element_line(colour = "black"),
+                   panel.grid.major = element_blank(),
+                   panel.grid.minor = element_blank(),
+                   panel.border = element_blank(),
+                   panel.background = element_blank(),
+                   text=element_text(size=20,  family="ArialMT"),
+                   axis.title.x = element_text(vjust=-0.5),
+                   axis.title.y = element_text(vjust=0.5, margin = margin(t = 0, r = 10, b = 0, l = 0)))
+  
+  
+  p <- ggplot(dat, aes(x = log10(!! x.var), y = log10(!! y.var))) +
+    annotation_custom(corr) +
+    stat_density_2d(aes(fill = stat(level)), geom = "polygon") +
+    geom_point(size = 0.4, alpha = 0.25) +
+    scale_fill_distiller(palette=4, direction=1, name = "Density") +
+    theme_bw() +
+    labs(x = x_lab, y = y_lab, title = paste(title,"\n\n\n")) + 
+    geom_smooth(method=lm, colour = "black") + 
+    mytheme 
+  
+  return(p)
+}
+
+
+density_plot <- function(dat,x.var,y.var, x_lab, y_lab,title){
+  
+  print(cor.test(dat[[x.var]],dat[[y.var]]))
+  cor(dat[[x.var]],dat[[y.var]], use = "pairwise.complete.obs")
+  
+  corr.value <- cor(dat[[x.var]],dat[[y.var]], use = "pairwise.complete.obs")
+  p.value <- cor.test(dat[[x.var]],dat[[y.var]], use = "pairwise.complete.obs")$p.value 
+  print(p.value)
+  
+  # corr.value <- cor(FSM_TPM$ISOSEQ_TPM_Normalised,FSM_TPM$RNASeq_TPM) # normalised ISOSEQ FL counts to length
+  corr <- grobTree(textGrob(paste("r = ", round(corr.value, 2)), x = 0.05, y = 0.97, hjust = 0, 
+                            gp = gpar(col = "black", fontsize = 20, fontface = "italic")))
+  
+  x.var <- rlang::sym(quo_name(enquo(x.var)))
+  y.var <- rlang::sym(quo_name(enquo(y.var)))
+  
+  mytheme <- theme(axis.line = element_line(colour = "black"),
+                   panel.grid.major = element_blank(),
+                   panel.grid.minor = element_blank(),
+                   panel.border = element_blank(),
+                   panel.background = element_blank(),
+                   text=element_text(size=20,  family="ArialMT"),
+                   axis.title.x = element_text(vjust=-0.5),
+                   axis.title.y = element_text(vjust=0.5, margin = margin(t = 0, r = 10, b = 0, l = 0)))
+  
+  
+  p <- ggplot(dat, aes(x = !! x.var, y = !! y.var)) +
+    annotation_custom(corr) +
+    stat_density_2d(aes(fill = stat(level)), geom = "polygon") +
+    geom_point(size = 0.4, alpha = 0.25) +
+    scale_fill_distiller(palette=4, direction=1, name = "Density") +
+    theme_bw() +
+    labs(x = x_lab, y = y_lab, title = paste(title,"\n\n\n")) + 
+    geom_smooth(method=lm, colour = "black") + 
+    mytheme 
+  
+  return(p)
+}
+```
+
+## Human Vs Mouse 
+
+### Number of Isoforms per Gene
+Normalised Number of isoforms = Detected Number of isoforms in Isoseq / Known Number of isoforms in Gencode
+```{r}
+reference_freq <- lapply(reference_files, function(x) gencode_transcripts(x))
+class_freq <- lapply(class.files, function(x) isoseq_transcripts(x))
+multiexonic_class_freq <- lapply(multiexonic, function(x) isoseq_transcripts(x))
+FSM_class_freq <- lapply(FSM, function(x) isoseq_transcripts(x))
+```
+```{r}
+########## Tabulating isoform numbers only 
+# multiexonic isoforms only 
+Merge_Numbers(multiexonic_class_freq$Human, reference_freq$Human, multiexonic_class_freq$Mouse, reference_freq$Mouse, "human_mouse_multiexonic_NUM", "no")
+Merge_Numbers(multiexonic_class_freq$Human, reference_freq$Human, multiexonic_class_freq$Mouse, reference_freq$Mouse, "human_mouse_multiexonic_NUM_homology", "yes")
+# all isoforms 
+Merge_Numbers(class_freq$Human, reference_freq$Human, class_freq$Mouse, reference_freq$Mouse, "human_mouse_all_NUM", "no")
+Merge_Numbers(class_freq$Human, reference_freq$Human, class_freq$Mouse, reference_freq$Mouse, "human_mouse_all_NUM_homology", "yes")
+# FSM isoforms only 
+Merge_Numbers(FSM_class_freq$Human, reference_freq$Human, FSM_class_freq$Mouse, reference_freq$Mouse, "human_mouse_FSM_NUM","yes")
+
+write.csv(human_mouse_all_NUM_homology,paste0(output_dir,"/human_mouse_all_NUM_homology.csv") )
+write.csv(human_mouse_all_NUM,paste0(output_dir,"/human_mouse_all_NUM.csv"))
+write.csv(human_mouse_multiexonic_NUM,paste0(output_dir,"/human_mouse_multiexonic_NUM.csv"))
+write.csv(human_mouse_multiexonic_NUM_fullymatched,paste0(output_dir,"/human_mouse_multiexonic_NUM_fullymatched.csv"))
+write.csv(human_mouse_multiexonic_NUM_homology,paste0(output_dir,"/human_mouse_multiexonic_NUM_homology.csv"))
+write.csv(human_mouse_multiexonic_NUM_homology_fullymatched,paste0(output_dir,"/human_mouse_multiexonic_NUM_homology_fullymatched.csv"))
+write.csv(human_mouse_FSM_NUM_fullymatched,paste0(output_dir,"/human_mouse_FSM_NUM_fullymatched.csv"))
+
+```
+
+### Total Isoform abundance per Gene
+```{r}
+Merge_Numbers_TPM(multiexonic$Human,multiexonic$Mouse,"human_mouse_multiexonic_TPM", "no")
+Merge_Numbers_TPM(multiexonic$Human,multiexonic$Mouse,"human_mouse_multiexonic_TPM_homologs", "yes")
+write.csv(human_mouse_multiexonic_TPM,paste0(output_dir,"/human_mouse_multiexonic_TPM.csv"))
+write.csv(human_mouse_multiexonic_TPM_fullymatched,paste0(output_dir,"/human_mouse_multiexonic_TPM_fullymatched.csv"))
+write.csv(human_mouse_multiexonic_TPM_homologs,paste0(output_dir,"/human_mouse_multiexonic_TPM_homologs.csv"))
+write.csv(human_mouse_multiexonic_TPM_homologs_fullymatched,paste0(output_dir,"/human_mouse_multiexonic_TPM_homologs_fullymatched.csv"))
+```
+
+
+```{r}
+# Adult vs Fetal (human)
+Merge_Numbers_TPM(multiexonic$Adult,multiexonic$Fetal,"adult_fetal_multiexonic_TPM", "no")
+write.csv(adult_fetal_multiexonic_TPM,paste0(output_dir,"/adult_fetal_multiexonic_TPM.csv"))
+write.csv(adult_fetal_multiexonic_TPM_fullymatched,paste0(output_dir,"/adult_fetal_multiexonic_TPM_fullymatched.csv"))
+
+Merge_Numbers(multiexonic_class_freq$Adult, reference_freq$Human,multiexonic_class_freq$Fetal, reference_freq$Human, "adult_fetal_multiexonic_NUM", "no")
+write.csv(adult_fetal_multiexonic_NUM,paste0(output_dir,"/adult_fetal_multiexonic_NUM.csv"))
+write.csv(adult_fetal_multiexonic_NUM_fullymatched,paste0(output_dir,"/adult_fetal_multiexonic_NUM_fullymatched.csv"))
+
+
+# all isoforms 
+Merge_Numbers(class_freq$Adult, reference_freq$Human, class_freq$Fetal, reference_freq$Human, "adult_fetal_all_NUM", "no")
+write.csv(adult_fetal_all_NUM,paste0(output_dir,"/adult_fetal_all_NUM.csv"))
+write.csv(adult_fetal_all_NUM_fullymatched,paste0(output_dir,"/adult_fetal_all_NUM_fullymatched.csv"))
+
+```
+
+
+```{r}
+###### QC of homologous genes
+cat("dataset 1: matching human and mouse genes, not considering homology:\n")
+cat("dataset 2: matching human and mouse genes, considering homology:\n")
+cat("Number of genes that are present in dataset 1 but not dataset 2:", 
+    length(setdiff(human_mouse_multiexonic_TPM_fullymatched$associated_gene, 
+        human_mouse_multiexonic_TPM_homologs_fullymatched$associated_gene)), "\n")
+
+cat("Number of genes that are present in dataset 2 but not dataset 1:", length(
+  setdiff(human_mouse_multiexonic_TPM_homologs_fullymatched$associated_gene,
+        human_mouse_multiexonic_TPM_fullymatched$associated_gene)), "\n")
+
+# Example of gene that is present in dataset2 but not in dataset1: TOMM70 (Human), TOMM70A (Mouse)
+# not present in dataset1 (not considering homology)
+human_mouse_multiexonic_TPM_fullymatched[human_mouse_multiexonic_TPM_fullymatched %in% c("TOMM70","TOMM70A")]
+# but present in dataset2 (considering homology)
+human_mouse_multiexonic_TPM_homologs_fullymatched[human_mouse_multiexonic_TPM_homologs_fullymatched$associated_gene == "TOMM70",]
+# but gene is present in both separate classification files of human and mouse 
+class.files$Mouse[class.files$Mouse$associated_gene == "TOMM70A",]
+class.files$Human[class.files$Human$associated_gene == "TOMM70",]
+
+
+##### numbers QC 
+# Example of gene that is present in dataset2 but not in dataset1: TOMM70 (Human), TOMM70A (Mouse)
+# not present in dataset1 (not considering homology)
+human_mouse_multiexonic_NUM_fullymatched[human_mouse_multiexonic_NUM_fullymatched$associated_gene == "TOMM70",]
+# but present in dataset2 (considering homology)
+human_mouse_multiexonic_NUM_homology_fullymatched[human_mouse_multiexonic_NUM_homology_fullymatched$associated_gene == "TOMM70",]
+# but gene is present in both separate classification files of human and mouse 
+human_mouse_multiexonic_NUM[human_mouse_multiexonic_NUM$associated_gene == "TOMM70",]
+human_mouse_multiexonic_NUM[human_mouse_multiexonic_NUM$associated_gene == "TOMM70A",]
+```
+
+```{r}
+# Correlation of matched isoseq numbers between human and mouse 
+density_plot(human_mouse_all_NUM_fullymatched,
+             "Human_Detected_Num_Isoseq",
+             "Mouse_Detected_Num_Isoseq", 
+             "Number of detected isoforms - Human", 
+             "Number of detected isoforms - Mouse", 
+             "Number of detected isoforms - Human vs Mouse")
+```
+
+```{r}
+# Example of EIF1AX
+#human_mouse_FSM[human_mouse_FSM$associated_gene == "EIF1AX",]
+#class.files$Human[class.files$Human$associated_gene == "EIF1AX" & class.files$Human$structural_category == "FSM",]
+#human_mouse_ALL[human_mouse_ALL$associated_gene == "EIF1AX",]
+#class.files$Human[class.files$Human$associated_gene == "EIF1AX",]
+#reference_files$Human[reference_files$Human$GeneSymbol == "EIF1AX",]
+```
+
+
+
+
+
+
