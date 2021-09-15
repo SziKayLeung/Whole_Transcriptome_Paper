@@ -4,6 +4,9 @@
 
 source("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/Scripts/Whole_Transcriptome_Paper/Output/Figures/All_Plots_Functions.R")
 
+# do not output log files for venn diagrams
+futile.logger::flog.threshold(futile.logger::ERROR, name = "VennDiagramLogger")
+
 ### Variables (Input, Output) ########################################################################
 
 output_plot_dir <- "/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/Scripts/Whole_Transcriptome_Paper/Output/Figures"
@@ -36,7 +39,7 @@ hg38 <- read.table(paste0(aaron_reference_dir, "gencode.v31_gene_annotation_tabl
 
 ### QC Plots ########################################################################################
 ### CCS 
-#ccs_length_distribution ("NA","NA","Human_Mouse_Merge") # main
+human_mouse_ccs <- ccs_length_distribution ("NA","NA","Human_Mouse_Merge") # main
 ccssuppA <- ccs_length_distribution ("NA","NA","Fetal_Adult_Merge")
 ccssuppB <- ccs_length_distribution(ccs_input_dir$Adult,"Adult", "Individual")
 ccssuppC <- ccs_length_distribution(ccs_input_dir$Fetal,"Fetal", "Individual")
@@ -44,6 +47,7 @@ ccssuppD <- ccs_length_distribution(ccs_input_dir$Mouse,"Mouse", "Individual")
 
 ### Rarefaction
 rarefaction_plots <- rarefaction_distribution()
+rrsupp <- rarefaction_distribution()[[1]]
 rrsuppA <- rarefaction_distribution()[[2]]
 rrsuppB <- rarefaction_distribution()[[3]][["Human"]]
 rrsuppC <- rarefaction_distribution()[[3]][["Adult"]]
@@ -88,8 +92,12 @@ num_iso <- no_of_isoforms_group()
 bpnumisosuppA <- no_of_isoforms_gene()[[1]]
 bpnumisosuppB <- no_of_isoforms_gene()[[2]]
 
+# CPAT scores 
+Human_CPAT_plots <- cpat_plots(Human_CPAT,"Human")
+Human_CPAT_Plots_Cate <- CPAT_plots_cate(class.files$Human,Human_CPAT,"Human")
+
 # Structural categories 
-#structural_categories_distribution("Individual")
+Human_structural <- structural_categories_distribution("Human")
 #structural_categories_distribution("Merged")
 
 
@@ -108,6 +116,7 @@ exon_iso_corrsuppD <- exon_length_isoform_correlation(class.files$Mouse)[[7]]
 
 # Distance to cage peak 
 all_hist_peaks_merged <- all_hist_peaks("All_Transcripts")
+noveltranscripts_hist_peaks_merged <- all_hist_peaks("Novel_Transcripts_Annotated_Genes")
 
 # novel transcripts of annotated genes
 # List of Plots: cage peaks, tss, tts, and then: "Fetal","Mouse","Adult","Human"
@@ -159,8 +168,6 @@ lncRNA_length_suppA <- lncRNA_plots$Human[[1]]
 lncRNA_length_suppB <- lncRNA_plots$Mouse[[1]]
 lncRNA_length_suppC <- lncRNA_plots$Human[[2]]
 lncRNA_length_suppD <- lncRNA_plots$Mouse[[2]]
-plot_grid(lncRNA_length_suppA, lncRNA_length_suppB, lncRNA_length_suppC, lncRNA_length_suppD, 
-          labels = "auto", label_size = 30, label_fontfamily = "ArialMT", ncol = 2)
 
 # Expression
 lncRNA_exp_suppA <- lncRNA_plots$Human[[5]]
@@ -236,105 +243,112 @@ commonASEvents_suppB <- fetal_adult_suppa2_output[[2]]
 # Number of Splicing Events per AS Gene 
 numASEvents <- SUPPA2_NumAS_PerGene()
 
-HumanMouse_AS <- AS_genes_events("Human","Mouse")
-AdultFetal_AS <- AS_genes_events("Human (Adult)","Human (Fetal)")
+Human_AS <- AS_genes_events("Human")
+Mouse_AS <- AS_genes_events("Mouse")
+Human_Adult_AS <- AS_genes_events("Human (Adult)")
+Human_Fetal_AS <- AS_genes_events("Human (Fetal)")
+
+#AdultFetal_AS <- AS_genes_events("Human (Adult)","Human (Fetal)")
 #SUPPA2_events_genes_plot()
 
 ### ONT Validation ###############################################################
 #ONT_validation()
 
 ### ERCC ###############################################################
-# run_ERCC(Ercc.class.file)
+ERCC <- run_ERCC(Ercc.class.file)
 
 
 ### Main figures ################################################################### 
-empty_plot <- plot.new()
-pdf(paste0(output_plot_dir,"/Figure1_R.pdf"), width = 11, height = 8.5)
-ccs_length_distribution ("NA","NA","Human_Mouse_Merge")
-rarefaction_plots[[1]]
+# Figure 1
+pdf(paste0(output_plot_dir,"/Figure1_R_plots.pdf"), width = 10, height = 10)
+top_row <- plot_grid(human_mouse_ccs, all_hist_peaks_merged[[4]], nrow = 1, labels = c("A","B"),label_fontfamily = "ArialMT")
+bottom_row <- plot_grid(Human_CPAT_plots[[1]],Human_CPAT_plots[[2]],num_iso[[1]], nrow = 1,  labels = c("C","D","E"), rel_widths = c(1.1,1,1.3),label_fontfamily = "ArialMT")
+plot_grid(top_row,bottom_row, ncol = 1, scale = 0.9) 
 dev.off()
 
-pdf(paste0(output_plot_dir,"/Figure2_R.pdf"), width = 11, height = 8.5)
-rnaseq_isoseq_correlation(class.files$Mouse)[[1]] + mymaintheme 
-rnaseq_isoseq_correlation(class.files$Mouse)[[3]] + mymaintheme 
-rnaseq_junction_support()[[2]] + mymaintheme + theme(legend.position = c(0.90,0.75))
+# Figure 2
+pdf(paste0(output_plot_dir,"/Figure2_R_plots.pdf"), width = 8.5, height = 11)
+top_figure <- plot_grid(rasterGrob(Figure2a),Human_structural, rel_widths = c(1,0.6), scale = 0.9, labels = c("A","B"))
+mid_figure <- plot_grid(rasterGrob(Figure2c),rasterGrob(Figure2d), nrow = 1,scale = 0.95,labels = c("C","D"))
+bottom_figure <- plot_grid(rasterGrob(Figure2e),NULL,rel_widths = c(1,0),scale = 0.95, labels = c("E"))
+plot_grid(top_figure,mid_figure,bottom_figure, nrow = 3)
 dev.off()
 
-pdf(paste0(output_plot_dir,"/Figure3_R.pdf"), width = 11, height = 8.5)
-all_hist_peaks_merged[[4]] + mymaintheme + theme(legend.position = c(0.85,0.85))
-all_hist_peaks_merged[[5]] + mymaintheme + theme(legend.position = c(0.85,0.85))
-all_hist_peaks_merged[[6]] + mymaintheme + theme(legend.position = c(0.85,0.85))
-num_iso[[1]] + mymaintheme  + theme(legend.position = c(0.85,0.85))
-structural_categories_distribution("Merged")[[1]] + mymaintheme  + theme(legend.position = c(0.85,0.85))
-AnnvsNovIso_AnnoGenesuppA[[1]] + mymaintheme + theme(legend.position = c(0.90,0.90))
-dev.off()
+# Figure 3; Tracks 
+# Figure 4; Tracks
 
-pdf(paste0(output_plot_dir,"/Figure5_R.pdf"), width = 11, height = 8.5)
-HumanMouse_AS[[2]] + mymaintheme + theme(legend.position = "bottom")
-plot_grid(grobTree(AS_venn_suppA), grobTree(AS_venn_suppB), ncol = 1)
-HumanMouse_AS[[3]] + mymaintheme + theme(legend.position = c(0.85,0.85))
-plot_grid(grobTree(human_mouse_IR_venn),grobTree(adult_fetal_IR_venn), ncol = 1)
-IR_rate_plots[[1]] + mymaintheme + theme(legend.position = c(0.85,0.85))
+pdf(paste0(output_plot_dir,"/Figure5_R.pdf"), width = 8.5, height = 11)
+top_row = plot_grid(NULL,Human_AS[[1]],Human_AS[[2]] + theme(legend.position="none"), nrow = 1, scale = 0.9, rel_widths = c(0.5,0.25,0.25), labels = c("a","b","c"))
+mid_row = plot_grid(NULL,numASEvents[[2]], nrow = 1, scale = 0.9, rel_widths = c(0.6,0.4), labels = c("d","e"))
+bottom_row = plot_grid(NULL,labels = c("f"))
+bottom_row2 = plot_grid(NULL,labels = c("g"))
+plot_grid(top_row,mid_row,bottom_row,bottom_row2,nrow = 4)
 dev.off()
 
 
 ### Supplementary figures ###################################################################
 pdf(paste0(output_plot_dir,"/Supplementary_Plots.pdf"), width = 11, height = 15)
 # CCS
-plot_grid(ccssuppA,ccssuppB,ccssuppC,ccssuppD + theme(legend.position = c(0.8,0.7)),labels = c("a", "b","c","d"),label_size = 30,label_fontfamily = "ArialMT") 
+plot_grid(ccssuppA,ccssuppB,ccssuppC,ccssuppD + theme(legend.position = c(0.8,0.7)),NULL,NULL,labels = c("a", "b","c","d"),label_size = 30,label_fontfamily = "ArialMT", ncol = 2) 
 # Rarefaction
-plot_grid(rrsuppA + theme(legend.position = c(0.8,0.2)),NULL,rrsuppB,rrsuppC,rrsuppD,rrsuppE, labels = c("a","","b","c","d","e"), label_size = 30, label_fontfamily = "ArialMT", ncol = 2, scale = 0.9)
-# Venn diagram of overlap of genes
-plot_grid(grobTree(vdgenessuppA),grobTree(vdgenessuppB),labels = c("a","b"),label_size = 30,label_fontfamily = "ArialMT",ncol = 1)
+plot_grid(rrsupp, rrsuppA + theme(legend.position = c(0.8,0.2)),rrsuppB,rrsuppC,rrsuppD,rrsuppE, labels = c("a","b","c","d","e","f"), label_size = 30, label_fontfamily = "ArialMT", ncol = 2, scale = 0.9)
+
 # GO results from top 500 most abundant genes
-plot_grid(most_abundant500Genes(),empty_plot,ncol = 1,scale = 0.9)
+top_row <-plot_grid(most_abundant500Genes(),labels = c("a"),scale = 0.9,label_size = 30, label_fontfamily = "ArialMT")
+bottom_row <-plot_grid(ERCC[[2]],ERCC[[3]],labels = c("b","c"),scale = 0.9,label_size = 30, label_fontfamily = "ArialMT")
+plot_grid(top_row,bottom_row, nrow = 2)
 # Fetal Correlation RNASeq
-plot_grid(fcrnaseqsuppA, fcrnaseqsuppB,empty_plot,empty_plot,labels = c("a","b"),label_size = 30,label_fontfamily = "ArialMT", nrow = 3)
-# Number of isoforms - boxplot
-plot_grid(bpnumisosuppA, bpnumisosuppB, empty_plot,empty_plot,empty_plot,empty_plot, labels = c("a","b"), label_size = 30, label_fontfamily = "ArialMT", ncol = 2)
+#plot_grid(fcrnaseqsuppA, fcrnaseqsuppB,NULL,NULL,labels = c("a","b"),label_size = 30,label_fontfamily = "ArialMT", nrow = 3)
+
+# cage peaks, TTS, TSS
+plot_grid(all_hist_peaks_merged[[4]],noveltranscripts_hist_peaks_merged[[4]],all_hist_peaks_merged[[5]],noveltranscripts_hist_peaks_merged[[5]],all_hist_peaks_merged[[6]],noveltranscripts_hist_peaks_merged[[6]],labels = "auto",label_size = 30,label_fontfamily = "ArialMT", ncol = 2, scale = 0.9)
+
 # Length vs number of isoforms correlation
-plot_grid(length_iso_corrsuppA, length_iso_corrsuppB, length_iso_corrsuppC, length_iso_corrsuppD, empty_plot, empty_plot,labels = c("a","b","c","d"), label_size = 30, label_fontfamily = "ArialMT", ncol = 2)
 # Exon vs number of isoforms correlation
-plot_grid(exon_iso_corrsuppA, exon_iso_corrsuppB, exon_iso_corrsuppC, exon_iso_corrsuppD,empty_plot, empty_plot, labels = c("a","b","c","d"), label_size = 30, label_fontfamily = "ArialMT", ncol = 2)
+plot_grid(length_iso_corrsuppA, length_iso_corrsuppB, length_iso_corrsuppC, length_iso_corrsuppD,exon_iso_corrsuppA, exon_iso_corrsuppB, exon_iso_corrsuppC, exon_iso_corrsuppD, labels = "auto", label_size = 30, label_fontfamily = "ArialMT", ncol = 2, scale = 0.9)
+
 # Percentage of annotated trancripts (annotated genes) across categories 
-plot_grid(AnnoGene_NovelIso_catesuppA, AnnoGene_NovelIso_catesuppB, empty_plot,empty_plot,empty_plot,empty_plot, labels = c("a","b"), label_size = 30, label_fontfamily = "ArialMT", nrow = 3)
+#plot_grid(AnnoGene_NovelIso_catesuppA, AnnoGene_NovelIso_catesuppB, NULL,NULL,NULL,NULL, labels = c("a","b"), label_size = 30, label_fontfamily = "ArialMT", nrow = 3)
 # Novel vs Annotated Transcript Expression and Length in Annotated Gene
-plot_grid(AnnvsNovIso_AnnoGenesuppA[[1]], AnnvsNovIso_AnnoGenesuppA[[3]], empty_plot,empty_plot,labels = c("a","b"), label_size = 30, label_fontfamily = "ArialMT", nrow = 2)
-plot_grid(AnnvsNovIso_AnnoGenesuppB[[1]],AnnvsNovIso_AnnoGenesuppB[[3]],AnnvsNovIso_AnnoGenesuppC[[1]],AnnvsNovIso_AnnoGenesuppC[[3]], labels = c("a","b","c","d"), label_size = 30, label_fontfamily = "ArialMT", ncol = 2)
+plot_grid(AnnoGene_NovelIso_catesuppA, AnnoGene_NovelIso_catesuppB,AnnvsNovIso_AnnoGenesuppA[[1]], AnnvsNovIso_AnnoGenesuppA[[3]], AnnvsNovIso_AnnoGenesuppB[[1]], AnnvsNovIso_AnnoGenesuppB[[3]],AnnvsNovIso_AnnoGenesuppC[[1]],AnnvsNovIso_AnnoGenesuppC[[3]], labels = "auto", label_size = 30, label_fontfamily = "ArialMT", ncol = 2, scale = 0.9)
+
+# Venn diagram of overlap of genes
+plot_grid(grobTree(vdgenessuppA),grobTree(vdgenessuppB),dataset_comp_suppA,dataset_comp_suppB,dataset_comp_suppC,dataset_comp_suppD,labels = "auto",label_size = 30,label_fontfamily = "ArialMT",ncol = 2, scale = 0.9)
+
 # Cage Peak: Novel transcripts of annotated genes
-plot_grid(NovIso_AnnoGene_cagesuppA, NovIso_AnnoGene_cagesuppB, empty_plot,empty_plot,empty_plot,empty_plot, labels = c("a","b"), label_size = 30, label_fontfamily = "ArialMT", nrow = 3)
+#plot_grid(NovIso_AnnoGene_cagesuppA, NovIso_AnnoGene_cagesuppB, NULL,NULL,NULL,NULL, labels = c("a","b"), label_size = 30, label_fontfamily = "ArialMT", nrow = 3)
 # Junction Support novel transcripts of annotated genes 
-plot_grid(junction_support_subset_plot[[1]][[2]],empty_plot, ncol = 1, scale = 0.9)
+#plot_grid(junction_support_subset_plot[[1]][[2]],NULL, ncol = 1, scale = 0.9)
 # ONT
-plot_grid(ONT_validation(),empty_plot, ncol = 1, scale = 0.9)
+#plot_grid(ONT_validation(),NULL, ncol = 1, scale = 0.9)
 # Length of Novel vs Annotated genes 
 # Expression of Novel vs Annotated genes 
-plot_grid(NovelGenes_lengthsuppA, NovelGenes_lengthsuppB,empty_plot,empty_plot,empty_plot,empty_plot,labels = c("a","b"), label_size = 30, label_fontfamily = "ArialMT",ncol = 2)
-# LncRNA length
-plot_grid(lncRNA_length_suppA, lncRNA_length_suppB, lncRNA_length_suppC, lncRNA_length_suppD, empty_plot,empty_plot,
-          labels = c("a","b","c","d"), label_size = 30, label_fontfamily = "ArialMT", ncol = 2)
-# LncRNA expression
-plot_grid(lncRNA_exp_suppA, lncRNA_exp_suppB,lncRNA_exp_suppC, lncRNA_exp_suppD, empty_plot,empty_plot, labels = c('a', 'b','c', 'd'), label_size = 30, label_fontfamily = "ArialMT", ncol = 2)
+plot_grid(NovelGenes_lengthsuppA, NovelGenes_lengthsuppB,NULL,NULL,NULL,NULL,labels = c("a","b"), label_size = 30, label_fontfamily = "ArialMT",ncol = 2, scale = 0.9)
+
+# LncRNA length# LncRNA expression
+plot_grid(lncRNA_length_suppA, lncRNA_length_suppB, lncRNA_length_suppC, lncRNA_length_suppD, lncRNA_exp_suppA, lncRNA_exp_suppB,lncRNA_exp_suppC, lncRNA_exp_suppD, labels = "auto", label_size = 30, label_fontfamily = "ArialMT", ncol = 2)
 # LncRNA ORF
-plot_grid(lncRNA_orf_suppA, lncRNA_orf_suppB, empty_plot,empty_plot, empty_plot,empty_plot, labels = c("a","b"), label_size = 30, label_fontfamily = "ArialMT",ncol = 2)
+#plot_grid(lncRNA_orf_suppA, lncRNA_orf_suppB, NULL,NULL, NULL,NULL, labels = c("a","b"), label_size = 30, label_fontfamily = "ArialMT",ncol = 2)
+
 # AS Proportion of events
-plot_grid(HumanMouse_AS[[1]], AdultFetal_AS[[1]], empty_plot,empty_plot, empty_plot,empty_plot, labels = c("a","b"), label_size = 30, label_fontfamily = "ArialMT", ncol = 2)
 # common overlap of splicing events between datasets
-plot_grid(commonASEvents_suppA,commonASEvents_suppB, labels = c("a","b"), label_size = 30, label_fontfamily = "ArialMT", ncol = 1)
+plot_grid(HumanMouse_AS[[1]], AdultFetal_AS[[1]], NULL,NULL, NULL,NULL, labels = c("a","b"), label_size = 30, label_fontfamily = "ArialMT", ncol = 2)
+plot_grid(Mouse_AS[[1]],Mouse_AS[[2]],Human_Adult_AS[[1]],Human_Adult_AS[[2]],Human_Fetal_AS[[1]],Human_Fetal_AS[[2]],commonASEvents_suppA,commonASEvents_suppB, labels = "auto",label_size = 30, label_fontfamily = "ArialMT", ncol = 2)
+#plot_grid(commonASEvents_suppA,commonASEvents_suppB, labels = c("a","b"), label_size = 30, label_fontfamily = "ArialMT", ncol = 1)
+
 # Number of Splicing Events per AS Gene 
-plot_grid(numASEvents[[1]],empty_plot, ncol = 1, scale = 0.9)
+#plot_grid(numASEvents[[1]],NULL, ncol = 1, scale = 0.9)
+
 #  NMD_vs_NonNMD Expression
-plot_grid(nmd_expression$Human,nmd_expression$Mouse,empty_plot,empty_plot,empty_plot,empty_plot,labels = c("a","b"),label_size = 30,label_fontfamily = "ArialMT",ncol = 2)
 # IR_NMD_run Venndiagram of NMD in IR transcripts
-plot_grid(grobTree(IR_nmd_suppA),grobTree(IR_nmd_suppB),grobTree(IR_nmd_suppC),grobTree(IR_nmd_suppD),labels = c("a","b","c","d"),label_size = 30,label_fontfamily = "ArialMT")
-# Human and mouse comparison numbers, # Adult and Fetal comparison numbers
-plot_grid(dataset_comp_suppA, dataset_comp_suppC,dataset_comp_suppB, dataset_comp_suppD,empty_plot,empty_plot,labels = c("a","b","c","d"),label_size = 30,label_fontfamily = "ArialMT", ncol = 2)
-# Splice sites of all transcripts in annotated genes
-plot_grid(splice_site_frequency_output[[1]],splice_site_frequency_output[[2]],empty_plot, labels = c("a","b"),label_size = 30,label_fontfamily = "ArialMT",ncol = 1)
-# Number of Isoforms in adult and fetal
-plot_grid(num_iso[[2]],empty_plot,ncol = 1,scale = 0.9)
 # Intron Retention Rate
-plot_grid(IR_rate_plots[[5]],empty_plot,ncol = 1,scale = 0.9)
+plot_grid(nmd_expression$Human,nmd_expression$Mouse,grobTree(IR_nmd_suppA),grobTree(IR_nmd_suppB),grobTree(IR_nmd_suppC),grobTree(IR_nmd_suppD),IR_rate_plots[[1]],labels = "auto",label_size = 30,label_fontfamily = "ArialMT", ncol = 2, scale = 0.9)
+
+
+# Splice sites of all transcripts in annotated genes
+#plot_grid(splice_site_frequency_output[[1]],splice_site_frequency_output[[2]],NULL, labels = c("a","b"),label_size = 30,label_fontfamily = "ArialMT",ncol = 1)
+# Number of Isoforms in adult and fetal
+plot_grid(num_iso[[2]],NULL,ncol = 1,scale = 0.9)
 dev.off()
 
 #   detach("package:plyr")
