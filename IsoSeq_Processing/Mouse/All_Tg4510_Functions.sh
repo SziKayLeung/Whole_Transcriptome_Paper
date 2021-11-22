@@ -118,12 +118,14 @@ refine2fasta(){
   Samples=$(echo "${@:3}")
 
   REFERENCE=/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/reference_2019
+  CUPCAKE=/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/softwares/Post_Isoseq3/cDNA_Cupcake/sequence
   cd $output_dir
   source activate sqanti2_py3
   for i in ${Samples[@]}; do echo "Processing: $i"; samtools bam2fq $input_dir/$i.flnc.bam | seqtk seq -A > $i.fa; done
   cat *fa* > All_flnc.fasta
   minimap2 -t 30 -ax splice -uf --secondary=no -C5 -O6,24 -B4 $REFERENCE/mm10.fa All_flnc.fasta > All.sam 2> All.map.log
   samtools sort -O SAM All.sam > All.sorted.sam
+  python $CUPCAKE/sam_to_gff3.py All.sorted.sam -i All_flnc.fasta -s mm10
 }
 
 # run_CLUSTER $Sample $Input_REFINE_directory $Output_directory

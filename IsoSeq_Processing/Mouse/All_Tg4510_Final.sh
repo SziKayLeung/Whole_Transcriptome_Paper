@@ -50,6 +50,7 @@ echo "Already processed in batch (Mouse/All_Batch_Processing.sh)"
 echo "#************************************* Isoseq3 and Post_Isoseq3 [Function 4,5,6]"
 # 4) merging_at_refine <input_flnc_bam_dir> <output_directory> <output_name> <samples.....>
 merging_at_refine $Isoseq3_WKD/REFINE $Isoseq3_WKD/MERGED_CLUSTER WholeIsoSeq Q21 O18 L22 K18 O23 S23 S18 K17 M21 K23 Q20 K24
+refine2fasta $Isoseq3_WKD/REFINE $Isoseq3_WKD/REFINE/fasta Q21 O18 L22 K18 O23 S23 S18 K17 M21 K23 Q20 K24
 
 # 5) run_map_cupcakecollapse <sample_prefix_input/output_name> <isoseq3_input_directory> <mapping_output_directory> <tofu_output_directory>
 run_map_cupcakecollapse WholeIsoSeq $Isoseq3_WKD/MERGED_CLUSTER $PostIsoseq3_WKD/MAP $PostIsoseq3_WKD/TOFU
