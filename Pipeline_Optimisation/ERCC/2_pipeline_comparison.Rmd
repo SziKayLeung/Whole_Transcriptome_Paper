@@ -99,10 +99,17 @@ cupcake_p <- run_ERCC(ERCC$cupcake)
 
 ```
 
-### Tama
+### Tama pre-filter
 
 ```{r}
 tama_p <- run_ERCC(ERCC$tama)
+
+```
+
+### TAMA post-filter 
+
+```{r}
+tama_fil_p <- run_ERCC(ERCC$tama_filtered)
 
 ```
 
@@ -114,10 +121,16 @@ tama_p <- run_ERCC(ERCC$tama)
 cupcake_p[[1]]
 ```
 
-### Tama
+### Tama 
 
 ```{r }
 tama_p[[1]]
+```
+
+### Tama post filter
+
+```{r }
+tama_fil_p[[1]]
 ```
 
 ## Isoform vs Concentration {.tabset .tabset-pills}
@@ -134,6 +147,12 @@ cupcake_p[[2]]
 tama_p[[2]]
 ```
 
+### Tama post filter
+
+```{r }
+tama_fil_p[[2]]
+```
+
 ## Correlation {.tabset .tabset-pills}
 
 ### Cupcake
@@ -146,4 +165,10 @@ cupcake_p[[3]]
 
 ```{r }
 tama_p[[3]]
+```
+
+### Tama post filter
+
+```{r }
+tama_fil_p[[3]]
 ```
