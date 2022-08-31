@@ -1,0 +1,149 @@
+---
+title: "Pipeline comparison"
+author: "Szi Kay Leung"
+date: "31/08/2022"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Input files
+
+Cupcake pipeline: IsoSeq3 --> cupcake (-c 85, -i 95) --> tama filter (remove fragments) --> sqanti2  \
+Tama pipeline: IsoSeq3 Refine --> tama collapse (-c 99 -i 85) --> tama filter (remove singletons, remove fragments) --> sqanti2
+
+```{r input}
+# packages
+suppressMessages(library("dplyr"))
+suppressMessages(library("ggplot2"))
+suppressMessages(library("tidyr"))
+suppressMessages(library("grid"))
+
+# scripts
+source("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/scripts/General/5_TappAS_Differential/plot_aesthetics.R")
+source("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/scripts/General/5_TappAS_Differential/draw_density.R")
+
+
+
+ERCC <- list(
+  cupcake = read.table("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/rTg4510/A_IsoSeq_Whole/ERCC/WholeIsoSeq_sqantitamafiltered.classification.txt",
+                       as.is = T, sep = "\t", header = T),
+  tama = read.table("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/rTg4510/A_IsoSeq_Whole/ERCC_TAMA/4_sqanti/tama_collapsed/ERCCT_classification.txt",
+                   as.is = T, sep = "\t", header = T),
+  tama_filtered = read.table("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/rTg4510/A_IsoSeq_Whole/ERCC_TAMA/4_sqanti/tama_filtered/ERCCT_filtFrag_classification.txt",
+                   as.is = T, sep = "\t", header = T)
+)
+
+
+# Abundance
+tama_counts <- read.table("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/rTg4510/A_IsoSeq_Whole/ERCC_TAMA/3_tama_merge/ERCCT_counts_read_support.txt",header = T)
+ERCC$tama <- merge(ERCC$tama,tama_counts[,c("merge_trans_id","trans_read_count")], by.x = "isoform", by.y = "merge_trans_id") %>% mutate(FL = trans_read_count)
+
+tama_counts <- read.table("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/rTg4510/A_IsoSeq_Whole/ERCC_TAMA/3_tama_merge/ERCCT_nRead2_counts.txt",header = T)
+ERCC$tama_filtered <- merge(ERCC$tama_filtered,tama_counts[,c("new_trans_id","num_reads")], by.x = "isoform", by.y = "new_trans_id") %>% mutate(FL = num_reads)
+
+```
+
+# Output {.tabset .tabset-pills}
+
+```{r output, echo = FALSE}
+run_ERCC <- function(class){
+  
+  ERCC_conc <- read.table("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/references/ERCC/ERCC_whole_transcriptome_calculations.txt", header = T,
+                          as.is = T, sep = "\t")[-1,] 
+  
+  cat("Total unique ERCCs:", length(unique(class$chrom)), paste0("(", round(length(unique(class$chrom))/92 * 100,2), "%)"))
+  
+  # redundant 
+  redundant <- class[,c("chrom")] %>% table() %>% reshape2::melt()
+  colnames(redundant) <- c("ERCC","num_isoforms")
+  
+  p1 <- redundant %>% 
+    group_by(num_isoforms) %>% tally() %>% ggplot(., aes(x = as.factor(num_isoforms), y = n)) + geom_bar(stat = "identity") + 
+    mytheme + labs(x = "ERCC", y = "Number of Isoforms")
+  
+  # isoform vs concentration
+  isoform_conc <- merge(redundant, ERCC_conc, by.x = "ERCC", by.y = "ERCC.ID", all = TRUE) %>%
+    mutate(log2_amount_of_ERCC = log2(amount_of_ERCC)) %>%
+    replace_na(list(num_isoforms = 0)) %>% 
+    mutate(num_isoforms = as.factor(num_isoforms))
+  
+  p2 <- ggplot(isoform_conc, aes(x = num_isoforms, y = log2_amount_of_ERCC, colour = num_isoforms)) + geom_jitter(width = 0.2) + theme(legend.position = "none") + 
+    mytheme + labs(x = "Number of Isoforms", y = "Amount of ERCC (log2)") + theme(legend.position = "none")
+  
+  # correlation 
+  ERCC_corr <- merge(class,ERCC_conc, by.x = "chrom", by.y = "ERCC.ID") %>% 
+    mutate(log2_amount_of_ERCC = log2(amount_of_ERCC)) %>%
+    mutate(log2_FL_reads = log2(FL)) 
+  
+  p3 <- density_plot(ERCC_corr,"log2_amount_of_ERCC","log2_FL_reads", "Amount of ERCC (Log2)", "Number of Full-Length Reads (Log2)","")
+  p3
+  
+  return(list(p1,p2,p3))
+}
+
+
+```
+## Summary {.tabset .tabset-pills}
+
+### Cupcake
+
+```{r }
+cupcake_p <- run_ERCC(ERCC$cupcake)
+
+```
+
+### Tama
+
+```{r}
+tama_p <- run_ERCC(ERCC$tama)
+
+```
+
+## Number of Isoforms {.tabset .tabset-pills}
+
+### Cupcake
+
+```{r }
+cupcake_p[[1]]
+```
+
+### Tama
+
+```{r }
+tama_p[[1]]
+```
+
+## Isoform vs Concentration {.tabset .tabset-pills}
+
+### Cupcake
+
+```{r }
+cupcake_p[[2]]
+```
+
+### Tama
+
+```{r }
+tama_p[[2]]
+```
+
+## Correlation {.tabset .tabset-pills}
+
+### Cupcake
+
+```{r }
+cupcake_p[[3]]
+```
+
+### Tama
+
+```{r }
+tama_p[[3]]
+```
