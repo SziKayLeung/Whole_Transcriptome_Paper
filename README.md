@@ -3,9 +3,11 @@
 This is a repository of scripts that were used in the paper **"[Full-length transcript sequencing of human and mouse identifies widespread isoform diversity and alternative splicing in the cerebral cortex](https://www.sciencedirect.com/science/article/pii/S2211124721015047?via%3Dihub#da0010)"** by SK.Leung, A.R.Jeffries,..E.Hannon,J.Mill. 
 
 ## Data
-Raw PacBio Iso-Seq data have been deposited in the Sequence Read Archive (SRA) database (https://www.ncbi.nlm.nih.gov/sra) under accession numbers PRJNA664117 (human cortex) and PRJNA663877 (mouse cortex). UCSC genome browser tracks of our processed Iso-Seq data (filtered and unfiltered) together with a visual database of cortical isoforms are available at: http://genome.exeter.ac.uk/BrainIsoforms.html.
+Raw PacBio Iso-Seq data have been deposited in the Sequence Read Archive (SRA) database under accession numbers [PRJNA664117](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA664117/) (human cortex) and [PRJNA663877](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA663877/) (mouse cortex). 
 
-Intermediate files (gtf, fasta) generated from Cupcake and SQANTI2 (v7.4) can be downloaded through Zenodo ([DOI:10.5281/zenodo.7611814](https://zenodo.org/record/7611814#.Y-DzwnbP2Ul)
+UCSC genome browser tracks of our processed Iso-Seq data (filtered and unfiltered) together with a visual database of cortical isoforms are available at: http://genome.exeter.ac.uk/BrainIsoforms.html.
+
+Intermediate files (gtf, fasta) generated from Cupcake and SQANTI2 (v7.4) can be downloaded through Zenodo ([DOI:10.5281/zenodo.7611814](https://zenodo.org/record/7611814#.Y-DzwnbP2Ul))
 
 ## Scripts
 The scripts are categorised under: 
