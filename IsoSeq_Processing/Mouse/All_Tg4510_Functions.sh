@@ -186,7 +186,7 @@ merging_at_refine(){
 
 ################################################################################################
 #************************************* Post_Isoseq3 (Minimap2, Cupcake, Demultiplex) [Function 5, 6]
-# run_map_cupcakecollapse <sample_prefix_input/output_name> <isoseq3_input_directory> <mapping_output_directory> <tofu_output_directory>
+#  cakecollapse <sample_prefix_input/output_name> <isoseq3_input_directory> <mapping_output_directory> <tofu_output_directory> <species>
 # Prerequisite: mm10 cage peak
 run_map_cupcakecollapse(){
 
@@ -207,7 +207,14 @@ run_map_cupcakecollapse(){
 
     echo "Processing Sample $1 for Minimap2 and sort"
     cd $3 #cd to $MAP directory for output
-    minimap2 -t 30 -ax splice -uf --secondary=no -C5 -O6,24 -B4 $REFERENCE/mm10.fa $2/$1.clustered.hq.fastq > $1.sam 2> $1.map.log
+    if [ $5 == "human" ]; then
+      echo "Aligning to human hg38 genome"
+      minimap2 -t 30 -ax splice -uf --secondary=no -C5 -O6,24 -B4 $REFERENCE/hg38.fa $2/$1.clustered.hq.fastq > $1.sam 2> $1.map.log
+    else
+      echo "Aligning to mouse mm10 genome"
+      minimap2 -t 30 -ax splice -uf --secondary=no -C5 -O6,24 -B4 $REFERENCE/mm10.fa $2/$1.clustered.hq.fastq > $1.sam 2> $1.map.log
+    fi
+    source activate nanopore
     samtools sort -O SAM $1.sam > $1.sorted.sam
 
     # Alignment stats
@@ -444,7 +451,85 @@ run_sqanti2(){
     source deactivate
 }
 
+# run_sqanti3 <input_tofu_prefix> <input_gtf> <input_tofu_dir> <input_RNASEQ_dir> <input_KALLISTO_file> <input_abundance> <output_dir> <mode=genome/rnaseq/lncrna>
+run_sqanti3_human(){
 
+    source activate sqanti2_py3
+
+    # variables
+    SQANTI2_DIR=/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/softwares/Post_Isoseq3/SQANTI2
+    SQANTI3_DIR=/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/softwares/SQANTI3
+    CUPCAKE_SEQUENCE=/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/softwares/Post_Isoseq3/cDNA_Cupcake/sequence
+    REFERENCE=/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/reference_2019
+    CAGE_DIR=/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/reference_2019/CAGE
+    TAPPAS_dir=/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/softwares/TAPPAS
+    GENERALFUNC=/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/Scripts/General/2_Transcriptome_Annotation
+
+    # copy STAR output SJ.out.bed files
+    SJ_OUT_BED=($(
+        for rnaseq in ${SAMPLES_NAMES[@]}; do
+            name=$(find $4 -name "*SJ.out.bed" -exec basename \{} \; | grep ^$rnaseq)
+            File=$(find $4 -name "$name")
+            echo $File
+        done
+        ))
+    for file in ${SJ_OUT_BED[@]}; do cp $file $7 ;done
+
+
+    # prepare sqanti
+    cd $7
+    export PYTHONPATH=$PYTHONPATH:$CUPCAKE_SEQUENCE
+    python $SQANTI3_DIR/sqanti3_qc.py -v
+
+    # sqanti qc
+    echo "Processing Sample $1 for SQANTI2 QC"
+
+    # no kalliso file
+    if [ $8 == "rnaseq" ]; then
+      python $SQANTI3_DIR/sqanti3_qc.py -t 30 --gtf $3/$2 $REFERENCE/gencode.v31.annotation.gtf $REFERENCE/hg38.fa --cage_peak $SQANTI3_DIR/data/ref_TSS_annotation/human.refTSS_v3.1.hg38.bed --coverage "./*SJ.out.bed" --polyA_motif_list $SQANTI2_DIR/../human.polyA.list.txt --genename --isoAnnotLite --fl_count $6 --gff3 $TAPPAS_dir/Homo_sapiens_GRCh38_Ensembl_86.gff3 --report pdf &> $1.sqanti.qc.log
+
+    elif [ $8 == "lncrna" ]; then
+      # create tab separated file from kallisto
+      # Rscript script.R <input.file_fromkallisto> <output.file_intosqanti>
+      Rscript $GENERALFUNC/TabSeparated_Kallisto.R $5 $7/$1".mod2.abundance.tsv"
+      kallisto_expfile=$7/$1".mod2.abundance.tsv"
+      echo "Using $kallisto_expfile"
+
+      echo "Processing with lncRNA.gtf for genome annotation "
+      python $SQANTI3_DIR/sqanti3_qc.py -t 30 --gtf $3/$2 $REFERENCE/gencode.v31.long_noncoding_RNAs.gtf $REFERENCE/hg38.fa --cage_peak $SQANTI3_DIR/data/ref_TSS_annotation/human.refTSS_v3.1.hg38.bed --coverage "./*SJ.out.bed" --polyA_motif_list $SQANTI2_DIR/../human.polyA.list.txt --skipORF --fl_count $6 --genename --isoAnnotLite --gff3 $TAPPAS_dir/Homo_sapiens_GRCh38_Ensembl_86.gff3 --report pdf &> $1.sqanti.qc.log
+
+    elif [ $8 == "rnaseq_noORF" ]; then
+
+      echo "Processing with gencode.v31.annotation.gtf for genome annotation "
+      python $SQANTI3_DIR/sqanti3_qc.py -t 30 --gtf $3/$2 $REFERENCE/gencode.v31.annotation.gtf $REFERENCE/hg38.fa --cage_peak $SQANTI3_DIR/data/ref_TSS_annotation/human.refTSS_v3.1.hg38.bed -c ./"*SJ.out.bed" --polyA_motif_list $SQANTI2_DIR/../human.polyA.list.txt --fl_count $6 --genename --isoAnnotLite --gff3 $TAPPAS_dir/Homo_sapiens_GRCh38_Ensembl_86.gff3 --report pdf --skipORF &> $1.sqanti.qc.log
+
+
+    elif [ $8 == "genome" ]; then
+
+      # create tab separated file from kallisto
+      # Rscript script.R <input.file_fromkallisto> <output.file_intosqanti>
+      Rscript $GENERALFUNC/TabSeparated_Kallisto.R $5 $7/$1".mod2.abundance.tsv"
+      kallisto_expfile=$7/$1".mod2.abundance.tsv"
+      echo "Using $kallisto_expfile"
+
+      echo "Processing with gencode.v31.annotation.gtf for genome annotation "
+      python $SQANTI3_DIR/sqanti3_qc.py -t 30 --gtf $3/$2 $REFERENCE/gencode.v31.annotation.gtf $REFERENCE/hg38.fa --cage_peak $SQANTI3_DIR/data/ref_TSS_annotation/human.refTSS_v3.1.hg38.bed -c ./"*SJ.out.bed" --polyA_motif_list $SQANTI2_DIR/../human.polyA.list.txt --expression $kallisto_expfile --fl_count $6 --genename --isoAnnotLite --gff3 $TAPPAS_dir/Homo_sapiens_GRCh38_Ensembl_86.gff3 --report pdf &> $1.sqanti.qc.log
+
+    elif [ $8 == "basic" ]; then
+      echo "Processing with gencode.v31.annotation.gtf for genome annotation and basic"
+      python $SQANTI3_DIR/sqanti3_qc.py -t 30 --gtf $3/$2 $REFERENCE/gencode.v31.annotation.gtf $REFERENCE/hg38.fa --cage_peak $SQANTI3_DIR/data/ref_TSS_annotation/human.refTSS_v3.1.hg38.bed --polyA_motif_list $SQANTI2_DIR/../human.polyA.list.txt --genename --isoAnnotLite --gff3 $TAPPAS_dir/Homo_sapiens_GRCh38_Ensembl_86.gff3 --skipORF --report pdf &> $1.sqanti.qc.log
+
+    else
+      echo "8th argument required"
+    fi
+
+    echo "Processing Sample $1 for SQANTI2 filter"
+    python $SQANTI3_DIR/sqanti3_RulesFilter.py $1"_classification.txt" $1"_corrected.fasta" $1"_corrected.gtf" -a 0.6 -c 3 &> $1.sqanti.filter.log
+
+    # remove temp SJ.out bed files
+    #rm *SJ.out.bed
+    source deactivate
+}
 
 ################################################################################################
 #************************************* TAMA [Function 11, 12]

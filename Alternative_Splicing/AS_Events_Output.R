@@ -227,7 +227,8 @@ anno_novel_AS <- bind_rows(subset_isoform_events("novel"),subset_isoform_events(
 for(e in c("A3","A5","AF","AL","IR","MX","SE")){anno_novel_events(e,anno_novel_AS)}
 write.csv(anno_novel_AS, paste0(output_table_dir,"/AS_IR/Mouse_AS_NovelAnnoIsoforms.csv"))
 
-knowngenes_AS <- known_genes_AS()
+
+knowngenes_AS <- dataset_tally[[1]] %>% filter(!grepl("NOVEL",associated_gene)) %>% group_by(Event) %>% tally(n) %>% mutate(perc = n/ sum(n) * 100)
 write.csv(knowngenes_AS, paste0(output_table_dir,"/AS_IR/Mouse_AS_KnownGenes.csv"))
 
 
