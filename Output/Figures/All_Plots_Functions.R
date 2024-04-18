@@ -21,6 +21,8 @@ suppressMessages(library(directlabels))
 suppressMessages(library(cowplot))
 suppressMessages(library(wesanderson))
 suppressMessages(library(png))
+suppressMessages(library(data.table))
+
 
 
 ### Source additional scripts #############################################################################
@@ -96,7 +98,7 @@ density_plot <- function(dat,x.var,y.var, x_lab, y_lab,title){
   
   # corr.value <- cor(FSM_TPM$ISOSEQ_TPM_Normalised,FSM_TPM$RNASeq_TPM) # normalised ISOSEQ FL counts to length
   corr <- grobTree(textGrob(paste("r = ", round(corr.value, 2)), 
-                            x = 0.05, y = 0.97, hjust = 0, 
+                            x = 0.05, y = 0.90, hjust = 0, 
                             gp = gpar(col = "black", fontsize = 20, fontface = "italic")))
   
   x.var <- rlang::sym(quo_name(enquo(x.var)))
@@ -891,9 +893,9 @@ rnaseq_isoseq_transcriptome <- function(cuffrefmap_input,cufftmap_input){
     ggplot(., aes(x = Sample, y = perc, fill = structural_category)) + geom_bar(stat = "identity") + mytheme +
     labs(x = "", y = "Isoforms (%)", fill = "Structural Category", title = "\n") + theme(legend.position = "bottom")
   
-  output <- plot_grid(grobTree(p1),p2,p3,p4,p5,p6, labels = "auto", label_size = 30, label_fontfamily = "ArialMT", ncol = 2)
+  #output <- plot_grid(grobTree(p1),p2,p3,p4,p5,p6, labels = "auto", label_size = 30, label_fontfamily = "ArialMT", ncol = 2)
   
-  return(output)
+  return(list(p2,p5,p6))
 }
 
 # rnaseq_isoseq_counts
@@ -1404,13 +1406,13 @@ subset_feature <- function(col_name_feature, ylabel, category){
     set2 <- extract_feature(annotated.class.files.novel.transcripts, "Novel") 
     merge <- bind_rows(list(set1, set2))
   } else { 
-    set1 <- extract_feature(subset_transcripts("Known", "FSM"), "FSM (Known)")
-    set2 <- extract_feature(subset_transcripts("Known", "ISM"), "ISM (Known)")
-    set3 <- extract_feature(subset_transcripts("Novel", "NIC"), "NIC (Novel)")
-    set4 <- extract_feature(subset_transcripts("Novel", "NNC"), "NNC (Novel)")
-    set5 <- extract_feature(subset_transcripts("Novel", "Fusion"), "Fusion (Novel)")
+    set1 <- extract_feature(subset_transcripts("Known", "FSM"), "FSM")
+    set2 <- extract_feature(subset_transcripts("Known", "ISM"), "ISM")
+    set3 <- extract_feature(subset_transcripts("Novel", "NIC"), "NIC")
+    set4 <- extract_feature(subset_transcripts("Novel", "NNC"), "NNC")
+    set5 <- extract_feature(subset_transcripts("Novel", "Fusion"), "Fusion")
     merge <- bind_rows(list(set1, set2, set3, set4, set5)) 
-    merge$Transcripts <- factor(merge$Transcripts, levels = c("FSM (Known)", "ISM (Known)", "NIC (Novel)", "NNC (Novel)","Fusion (Novel)"))
+    merge$Transcripts <- factor(merge$Transcripts, levels = c("FSM", "ISM", "NIC", "NNC","Fusion"))
   }
   
   plot_distribution <- function(dataset1, dataset2){
@@ -1421,10 +1423,9 @@ subset_feature <- function(col_name_feature, ylabel, category){
       theme_bw() + 
       mytheme + 
       labs(x = "", y= ylabel, fill = "Isoforms", title = "\n\n") + 
-      theme(legend.justification=c(1,1), legend.position=c(0.95,0.95),legend.title = element_blank(),
-            legend.direction = "horizontal") + 
-      scale_x_discrete(labels = c(paste(dataset1,"Cortex"),paste(dataset2,"Cortex"))) + 
-      guides(fill=guide_legend(nrow=3,byrow=TRUE))
+      theme(legend.position=c("bottom"),legend.title = element_blank())+ 
+      scale_x_discrete(labels = c(paste(dataset1,"Cortex"),paste(dataset2,"Cortex"))) #+ 
+      #guides(fill=guide_legend(nrow=3,byrow=TRUE))
     
     return(p)
   }
@@ -1907,7 +1908,7 @@ human_mouse_suppa2 <- function(type){
     theme_bw() + 
     mytheme + 
     labs(x = "Splicing Events", y = "Number of Genes") + 
-    theme(legend.position = c(.15, 0.8))
+    theme(legend.position = "bottom")
   
   
   ########################## Plots by converting mouse ogous gene names to human 
@@ -1955,11 +1956,11 @@ human_mouse_suppa2 <- function(type){
     ggplot(., aes(x = Event, fill = Detected, y = n)) + 
     geom_bar(stat = "identity", position = position_dodge()) +
     scale_fill_manual(values=c("#999999", label_colour("Human"), label_colour("Mouse")), 
-                      labels=c("Common", "Human Only", "Mouse Only")) + 
+                      labels=c("Common", "Human", "Mouse")) + 
     theme_bw() + 
     mytheme + 
     labs(x = "Splicing Events", y = "Number of Genes", title = "\n\n") + 
-    theme(legend.position = c(.90, 0.90),legend.title = element_blank())
+    theme(legend.position = c("bottom"),legend.title = element_blank())
   
   # unique(Human_SUPPA2$Gene[Human_SUPPA2$Gene%in% Mouse_SUPPA2_homologues_match$Gene])
   if(type == "not_homology"){return(list(p1,p2))}
@@ -2028,11 +2029,11 @@ fetal_adult_suppa2 <- function(){
     ggplot(., aes(x = Event, fill = Detected, y = n)) + 
     geom_bar(stat = "identity", position = position_dodge()) +
     scale_fill_manual(values=c("#999999", label_colour("Adult"), label_colour("Fetal")), 
-                               labels=c("Common", "Human (Adult) Cortex Only", "Human (Fetal) Cortex Only")) + 
+                               labels=c("Common", "Human Adult", "Human Fetal")) + 
     theme_bw() + 
     labs(x = "Splicing Events", y = "Number of AS Genes", title = "\n\n") + 
     mytheme + 
-    theme(legend.position = c(.90, 0.90), legend.title = element_blank())
+    theme(legend.position = c("bottom"), legend.title = element_blank())
   
   return(list(p1,p2))
   
@@ -2888,7 +2889,8 @@ ONT_validation <- function(){
 ### ERCC #################################################################
 run_ERCC <- function(class){
   
-  ERCC_conc <- read.csv("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/ONT/ERCC/ERCC_calculations.csv", header = T)[-1,]
+  ERCC_conc <- read.table("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/references/ERCC/ERCC_whole_transcriptome_calculations.txt", header = T,
+                          as.is = T, sep = "\t")[-1,] 
   
   cat("Total unique ERCCs:", length(unique(class$chrom)), paste0("(", round(length(unique(class$chrom))/92 * 100,2), "%)"))
   
@@ -2901,7 +2903,7 @@ run_ERCC <- function(class){
     mytheme + labs(x = "ERCC", y = "Number of Isoforms")
   
   # isoform vs concentration
-  isoform_conc <- merge(redundant, ERCC_conc, by.x = "ERCC", by.y = "ERCC_ID", all = TRUE) %>%
+  isoform_conc <- merge(redundant, ERCC_conc, by.x = "ERCC", by.y = "ERCC.ID", all = TRUE) %>%
     mutate(log2_amount_of_ERCC = log2(amount_of_ERCC)) %>%
     replace_na(list(num_isoforms = 0)) %>% 
     mutate(num_isoforms = as.factor(num_isoforms))
@@ -2910,7 +2912,7 @@ run_ERCC <- function(class){
     mytheme + labs(x = "Number of Isoforms", y = "Amount of ERCC (log2)") + theme(legend.position = "none")
   
   # correlation 
-  ERCC_corr <- merge(class,ERCC_conc, by.x = "chrom", by.y = "ERCC_ID") %>% 
+  ERCC_corr <- merge(class,ERCC_conc, by.x = "chrom", by.y = "ERCC.ID") %>% 
     mutate(log2_amount_of_ERCC = log2(amount_of_ERCC)) %>%
     mutate(log2_FL_reads = log2(FL)) 
   
