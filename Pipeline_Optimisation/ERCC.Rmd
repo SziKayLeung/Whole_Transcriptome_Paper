@@ -1,0 +1,791 @@
+---
+title: "ERCC"
+author: Szi Kay Leung
+date: "`r Sys.Date()`"
+output:
+  rmdformats::material:
+    self_contained: true
+    thumbnails: true
+    lightbox: true
+    gallery: true
+    highlight: tango
+    code_folding: hide
+    fig_caption: true
+    cards: true
+
+
+
+---
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message = FALSE ,fig.width=15, fig.height= 11.5)
+#rmarkdown::render("/gpfs/ts0/home/sl693") 
+
+suppressMessages(library(reshape2))
+suppressMessages(library(plyr))
+suppressMessages(library(dplyr))
+suppressMessages(library(tibble))
+suppressMessages(library(DT))
+suppressMessages(library(ggplot2))
+suppressMessages(library(stringr)) 
+suppressMessages(library(tidyr))
+suppressMessages(library(scales))
+suppressMessages(library(rjson))
+suppressMessages(library(magrittr))
+suppressMessages(library(extrafont))
+suppressMessages(library(cowplot))
+loadfonts()
+
+```
+
+# Aim
+
+**To assess the quality of whole transcriptomic Iso-Seq runs using ERCC as benchmark**    
+- Number of reads mapped to ERCC (difference between WT and TG?)  
+- Correlation of ERCC known concentration and FL Reads per ERCC detected  
+- Features of those ERCCs not detected  
+- Additional: saturation of detecting ERCCs  
+
+```{r}
+source("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/Scripts/IsoSeq_Tg4510/Rmarkdown_Input.R")
+ERCC_conc <- read.csv("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/ONT/ERCC/ERCC_calculations.csv", header = T)[-1,] 
+
+<<<<<<< HEAD
+<<<<<<< HEAD
+# cannot load magic for; magic library otherwise error in loops
+=======
+>>>>>>> c34b526e4f39c14e6ca6579cf2dd5726cda490a5
+=======
+>>>>>>> c34b526e4f39c14e6ca6579cf2dd5726cda490a5
+```
+
+
+# Chain: Number of Reads
+
+## {.tabset .tabset-pills}
+
+### Pipeline
+
+This was performed by merging only WT (n = 6), only TG (n = 6) and all the samples (n = 12) together at Isoseq3 Cluster, align to ERCC, cupcake collapse and chain three datasets, followed by SQANTI.
+
+![Pipeline for analysis](/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/Scripts/IsoSeq_Tg4510/Images/Chained_Batches.png)
+
+
+### Classification file
+
+```{r}
+
+# Read in sqanti classification file mapped to ERCC (post chaining WT and TG)
+<<<<<<< HEAD
+<<<<<<< HEAD
+class <- read.table("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcriptome/OLD_2020/All_Samples/ERCC/SQANTI/all_samples.chained_classification.filtered_lite_classification.txt", 
+=======
+class <- read.table("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcriptome/All_Samples/ERCC/SQANTI/all_samples.chained_classification.filtered_lite_classification.txt", 
+>>>>>>> c34b526e4f39c14e6ca6579cf2dd5726cda490a5
+=======
+class <- read.table("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcriptome/All_Samples/ERCC/SQANTI/all_samples.chained_classification.filtered_lite_classification.txt", 
+>>>>>>> c34b526e4f39c14e6ca6579cf2dd5726cda490a5
+                    header = T, as.is = T, sep = "\t")
+
+datatable(head(class), options = list(scrollX = TRUE))
+
+```
+
+### Unique ERCC
+```{r, warning = FALSE}
+
+# replace FL count with pb id, otherwise NA if 0
+unique <- setNames(data.frame(matrix(ncol = 4, nrow = nrow(class))), c("isoform","FL.All_Merged","FL.TG_Merged","FL.WT_Merged"))
+unique$isoform <- class$isoform
+for (j in c("FL.All_Merged","FL.TG_Merged","FL.WT_Merged")){
+  for(i in 1:nrow(class)){unique[[j]][i] <- ifelse(class[[j]][i] > 0, paste(class$chrom[i]),paste("NA"))}
+}
+
+
+# count the unique pbid (/ERCC) per dataset
+p1 <- apply(unique[,-1], 2, function(x) length(unique(x))) %>% melt() %>% 
+  rownames_to_column(., "dataset") %>%
+  mutate(type = c("All","NotAll","NotAll")) %>% 
+  mutate(perc = value/92 * 100) %>% 
+  ggplot(., aes(x = dataset, y = perc)) + geom_bar(stat = "identity") +
+  mytheme + labs(x = "", y = "ERCCs detected (%)")
+
+
+p1 
+ 
+
+```
+
+### Redundant Isoforms from Chained Data
+
+Plot is drawn from All_Merged dataset in Sqanti chained output
+
+```{r, warning = FALSE}
+redundant <- unique[,c("FL.All_Merged")] %>% table() %>% melt 
+colnames(redundant) <- c("ERCC","num_isoforms")
+
+p2 <- redundant %>% 
+  group_by(num_isoforms) %>% tally() %>% ggplot(., aes(x = num_isoforms, y = n)) + geom_bar(stat = "identity") + 
+  mytheme + labs(x = "ERCC", y = "Number of Isoforms")
+
+p2
+
+datatable(redundant)
+```
+
+### Isoforms vs Concentration 
+
+```{r}
+
+isoform_conc <- merge(redundant, ERCC_conc, by.x = "ERCC", by.y = "ERCC_ID", all = TRUE) %>%
+  mutate(log2_amount_of_ERCC = log2(amount_of_ERCC)) %>%
+  replace_na(list(num_isoforms = 0)) %>% 
+  mutate(num_isoforms = as.factor(num_isoforms))
+
+p3 <- ggplot(isoform_conc, aes(x = num_isoforms, y = log2_amount_of_ERCC, colour = num_isoforms)) + geom_jitter(width = 0.2) + theme(legend.position = "none") + 
+  mytheme + labs(x = "Number of Isoforms", y = "Amount of ERCC (log2)")
+
+p3
+```
+
+# All: Number of Reads
+
+## {.tabset .tabset-pills}
+
+### Pipeline
+
+![Pipeline for analysis](/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/Scripts/IsoSeq_Tg4510/Images/All.png)
+
+### Classification file
+
+```{r}
+# Read in sqanti classification file mapped to ERCC (post chaining WT and TG)
+<<<<<<< HEAD
+<<<<<<< HEAD
+class <- read.table("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcriptome/OLD_2020/All_Samples/ERCC/SQANTIAll/All_Merged.collapsed.filtered_classification.filtered_lite_classification.txt", header = T, as.is = T, sep = "\t")
+=======
+class <- read.table("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcriptome/All_Samples/ERCC/SQANTIAll/All_Merged.collapsed.filtered_classification.filtered_lite_classification.txt", header = T, as.is = T, sep = "\t")
+>>>>>>> c34b526e4f39c14e6ca6579cf2dd5726cda490a5
+=======
+class <- read.table("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcriptome/All_Samples/ERCC/SQANTIAll/All_Merged.collapsed.filtered_classification.filtered_lite_classification.txt", header = T, as.is = T, sep = "\t")
+>>>>>>> c34b526e4f39c14e6ca6579cf2dd5726cda490a5
+
+datatable(head(class), options = list(scrollX = TRUE))
+
+```
+
+### Unique ERCC
+
+```{r, warning = FALSE}
+cat("Total unique ERCCs:", length(unique(class$chrom)), paste0("(", round(length(unique(class$chrom))/92 * 100,2), "%)"))
+```
+
+### Redundant Isoforms 
+
+```{r, warning = FALSE}
+redundant <- class[,c("chrom")] %>% table() %>% melt 
+colnames(redundant) <- c("ERCC","num_isoforms")
+
+p4 <- redundant %>% 
+  group_by(num_isoforms) %>% tally() %>% ggplot(., aes(x = num_isoforms, y = n)) + geom_bar(stat = "identity") + 
+  mytheme + labs(x = "ERCC", y = "Number of Isoforms")
+
+p4
+datatable(redundant)
+
+```
+
+### Isoforms vs Concentration 
+
+```{r}
+
+isoform_conc <- merge(redundant, ERCC_conc, by.x = "ERCC", by.y = "ERCC_ID", all = TRUE) %>%
+  mutate(log2_amount_of_ERCC = log2(amount_of_ERCC)) %>%
+  replace_na(list(num_isoforms = 0)) %>% 
+  mutate(num_isoforms = as.factor(num_isoforms))
+
+p5 <- ggplot(isoform_conc, aes(x = num_isoforms, y = log2_amount_of_ERCC, colour = num_isoforms)) + geom_jitter(width = 0.2) + theme(legend.position = "none") + 
+  mytheme + labs(x = "Number of Isoforms", y = "Amount of ERCC (log2)")
+
+p5
+```
+
+# Demultiplex: Number of Reads
+
+This was performed by merging only WT (n = 6), only TG (n = 6) and all the samples (n = 12) together at Isoseq3 Cluster, align to ERCC, cupcake collapse, demultiplex, followed by SQANTI.  
+Note: only 10 samples had ERCCs
+
+## {.tabset .tabset-pills}
+
+### Pipeline
+
+![Pipeline for analysis](/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/Scripts/IsoSeq_Tg4510/Images/All_Demux.png)
+
+
+### Classification file
+
+```{r}
+
+<<<<<<< HEAD
+<<<<<<< HEAD
+class <- read.table("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcriptome/OLD_2020/All_Samples/ERCC/SQANTIDEMUX/All_Merged.collapsed.filtered_classification.filtered_lite_classification.txt",header = T, as.is = T, sep = "\t") %>% 
+=======
+class <- read.table("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcriptome/All_Samples/ERCC/SQANTIDEMUX/All_Merged.collapsed.filtered_classification.filtered_lite_classification.txt",header = T, as.is = T, sep = "\t") %>% 
+>>>>>>> c34b526e4f39c14e6ca6579cf2dd5726cda490a5
+=======
+class <- read.table("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcriptome/All_Samples/ERCC/SQANTIDEMUX/All_Merged.collapsed.filtered_classification.filtered_lite_classification.txt",header = T, as.is = T, sep = "\t") %>% 
+>>>>>>> c34b526e4f39c14e6ca6579cf2dd5726cda490a5
+  mutate(Total_FL = .[,46:55] %>% rowSums(na.rm = TRUE))
+ 
+datatable(head(class), options = list(scrollX = TRUE))
+
+```
+
+### Unique ERCC
+```{r, warning = FALSE}
+cat("Total unique ERCCs in both WT and TG:", length(unique(class$chrom)), paste0("(", round(length(unique(class$chrom))/92 * 100,2), "%)"))
+
+# replace FL count with pb id, otherwise NA if 0
+samples <- colnames(class)[46:55]
+unique <- setNames(data.frame(matrix(ncol = 12, nrow = nrow(class))), c("isoform","ERCC",samples))
+unique$ERCC <- class$chrom
+unique$isoform <- class$isoform
+for (j in samples){
+  for(i in 1:nrow(class)){unique[[j]][i] <- ifelse(class[[j]][i] > 0, paste(class$chrom[i]),paste("NA"))}
+}
+
+# number of ERCC detected across WT and TG 
+totalERCC <- apply(unique[,-c(1,2)], 2, function(x) length(unique(x))) %>% melt() %>% 
+  rownames_to_column(., "dataset") %>% 
+  mutate(phenotype = word(dataset, c(2), sep = "_")) %>%
+  `colnames<-`(c("sample", "num", "phenotype"))
+
+aggregate(x = totalERCC$num, by = list(totalERCC$phenotype),FUN = mean) %>% `colnames<-`(c("Phenotype", "Mean_ERCC_Detected")) %>%
+  mutate(perc = round(Mean_ERCC_Detected/92 * 100,2))
+
+# count the unique pbid (/ERCC) per dataset
+p6 <- apply(unique[,-c(1,2)], 2, function(x) length(unique(x))) %>% melt() %>% 
+  rownames_to_column(., "dataset") %>%
+  mutate(Genotype = word(.$dataset,c(2), sep = "_")) %>% 
+  mutate(perc = value/92 * 100) %>% 
+  ggplot(., aes(x = Genotype, y = perc)) + geom_boxplot() +
+  geom_jitter(aes(color = Genotype), shape=16, position=position_jitter(0.2)) + 
+  mytheme + labs(x = "", y = "ERCCs detected (%)", title = "\n\n") +
+  theme(legend.position = "none") + ylim(20,60) +
+  scale_color_manual(values = c(label_colour("TG"),label_colour("WT")))
+
+
+p6
+```
+
+### Redundant Isoforms
+
+```{r, warning = FALSE}
+redundant <- unique[,c("ERCC")] %>% table() %>% melt 
+colnames(redundant) <- c("ERCC","num_isoforms")
+
+p7 <- redundant %>% 
+  group_by(num_isoforms) %>% tally() %>% ggplot(., aes(x = num_isoforms, y = n)) + geom_bar(stat = "identity") + 
+  mytheme + labs(x = "ERCC", y = "Number of Isoforms")
+
+p7
+datatable(redundant)
+
+# number of ERCC with redudant isoforms
+cat("Number of ERCC with more than one isoform", nrow(redundant[redundant$num_isoforms > 1,]), 
+    "(",round(nrow(redundant[redundant$num_isoforms > 1,])/92 * 100, 2),"%)")
+
+```
+
+### Isoforms vs Concentration 
+
+```{r}
+isoform_conc <- merge(redundant, ERCC_conc, by.x = "ERCC", by.y = "ERCC_ID", all = TRUE) %>%
+  mutate(log2_amount_of_ERCC = log2(amount_of_ERCC)) %>%
+  replace_na(list(num_isoforms = 0)) %>% 
+  mutate(num_isoforms = as.factor(num_isoforms))
+
+p8 <- ggplot(isoform_conc, aes(x = num_isoforms, y = log2_amount_of_ERCC, colour = num_isoforms)) + geom_jitter(width = 0.2) + theme(legend.position = "none") + 
+  mytheme + labs(x = "Number of Isoforms", y = "Known Amounts of ERCC (log2)", title = "\n\n")
+
+p8
+```
+
+### + TAMA
+
+To use TAMA's tama_remove_fragment_models.py to remove shorter redundant "isoforms" from the same ERCCs. Script is applied after SQANTI filtering.
+
+```{r}
+<<<<<<< HEAD
+<<<<<<< HEAD
+TAMA <- "/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcriptome/OLD_2020/All_Samples/ERCC/TOFU/TAMA_Filter/"
+=======
+TAMA <- "/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcriptome/All_Samples/ERCC/TOFU/TAMA_Filter/"
+>>>>>>> c34b526e4f39c14e6ca6579cf2dd5726cda490a5
+=======
+TAMA <- "/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcriptome/All_Samples/ERCC/TOFU/TAMA_Filter/"
+>>>>>>> c34b526e4f39c14e6ca6579cf2dd5726cda490a5
+tama_retained <- read.table(paste0(TAMA,"All_Merged_postsqanti.bed")) %>% mutate(TAMA = "Retained") 
+tama_discard <- read.table(paste0(TAMA,"All_Merged_postsqanti_discarded.txt")) %>% mutate(TAMA = "Discarded")
+tama <- bind_rows(tama_retained, tama_discard) %>% mutate(isoform = word(.$V4, c(2),sep = ";"))
+
+p9 <- tama %>% group_by(V1,TAMA) %>% tally() %>%
+  ggplot(., aes(x = reorder(V1,-n), y = n, fill = TAMA)) + geom_bar(stat = "identity") + 
+  labs(y = "Number of Isoforms", x = "", title = "\n\n") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
+        legend.title = element_blank(), legend.position = c(0.9, 0.9)) +
+  mytheme 
+
+# reads filtered from TAMA 
+# total FL reads across 10 samples associated with isoform 
+p10 <- class[class$chrom %in% tama_discard$V1,] %>%
+  mutate(Total_FL = .[, 46:55] %>% rowSums(na.rm = TRUE)) %>%
+  left_join(., tama, by = ("isoform")) %>% 
+  mutate(log10_Total_FL = log10(Total_FL)) %>%
+  ggplot(., aes(x = chrom, y = log10_Total_FL, colour = TAMA)) + geom_point() + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  mytheme + labs(y = "Full-Length Reads (Log10)", x = "", title = "\n\n") 
+
+p11 <- class %>%
+  mutate(Total_FL = .[, 46:55] %>% rowSums(na.rm = TRUE)) %>%
+  left_join(., tama, by = ("isoform")) %>% 
+  mutate(log10_Total_FL = log10(Total_FL)) %>%
+  ggplot(., aes(x = chrom, y = log10_Total_FL, colour = TAMA)) + geom_point() + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  mytheme + labs(y = "Full-Length Reads (Log10)", x = "") 
+
+p9 
+p10
+
+```
+
+### Correlation 
+
+```{r}
+ERCC_corr <- tama_retained %>% 
+  mutate(isoform = word(V4, c(2),sep = ";")) %>%
+  left_join(.,class[,c("isoform","Total_FL")], by = "isoform") %>% 
+  left_join(.,ERCC_conc, by = c("V1" = "ERCC_ID")) %>% 
+  mutate(log2_amount_of_ERCC = log2(amount_of_ERCC)) %>%
+  mutate(log2_FL_reads = log2(Total_FL)) 
+
+p12 <- density_plot(ERCC_corr,"log2_amount_of_ERCC","log2_FL_reads", "Amount of ERCC (Log2)", "Number of Full-Length Reads (Log2)","")
+p12
+```
+  
+# Mapping: Filtered ERCCs
+
+## {.tabset .tabset-pills}
+
+### Number of reads mapped {.tabset .tabset-pills}
+
+#### Merged
+
+```{r}
+<<<<<<< HEAD
+<<<<<<< HEAD
+All_Samples_dir <- "/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcriptome/OLD_2020/All_Samples/"
+=======
+All_Samples_dir <- "/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcriptome/All_Samples/"
+>>>>>>> c34b526e4f39c14e6ca6579cf2dd5726cda490a5
+=======
+All_Samples_dir <- "/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcriptome/All_Samples/"
+>>>>>>> c34b526e4f39c14e6ca6579cf2dd5726cda490a5
+
+# ERCC_mapped, ERCC_unmapped, Mouse all, Mouse mapped, mouse unmapped
+Merged_mapping <- list(
+  ## ERCC
+  read.table(paste0(All_Samples_dir,"/ERCC/MAPPING/All_Merged_reads_with_alignment_statistics.txt")),
+  read.table(paste0(All_Samples_dir, "/ERCC/MAPPING/All_Merged.notread.clustered.hq.fastq.paf"), as.is = T, sep = "\t") %>%
+    mutate(transcript = word(V1, c(1), sep = fixed(" "))),
+  
+  ## Mouse 
+  read.table(paste0(All_Samples_dir,"/MOUSE/MAPPING/PAF/All_Merged.allread.clustered.hq.fastq.paf"), as.is = T, sep = "\t") %>%
+    mutate(transcript = word(V1, c(1), sep = fixed(" "))),  
+  read.table(paste0(All_Samples_dir, "/MOUSE/MAPPING/PAF/All_Merged_reads_with_alignment_statistics.txt"), as.is = T, sep = "\t") %>%
+    mutate(transcript = word(V1, c(1), sep = fixed(" "))),
+  read.table(paste0(All_Samples_dir,"/MOUSE/MAPPING/PAF/All_Merged.notread.clustered.hq.fastq.paf"), as.is = T, sep = "\t")
+) 
+
+names(Merged_mapping) <- c("ERCC_mapped","ERCC_unmapped","Mouse_all","Mouse_mapped","Mouse_unmapped")
+
+#total_num
+# number of total FL reads being mapped
+# number of mapped ERCC reads  
+# number of mapped mouse reads
+# number of unmapped reads
+
+total_num <- data.frame("total_fl" = nrow(Merged_mapping$Mouse_all),
+                        "ERCC_mapped" = nrow(Merged_mapping$ERCC_mapped),
+                        "Mouse_mapped" = nrow(Merged_mapping$Mouse_mapped),
+                        "Mouse_unmapped" = length(setdiff(Merged_mapping$Mouse_unmapped$V1,Merged_mapping$ERCC_mapped$V1)))
+
+total_num <- total_num %>% melt() %>% mutate(perc = value/total_num$total_fl * 100) %>%
+  filter(variable != "total_fl") %>% 
+  mutate(sample = "Merged") %>% 
+  mutate(phenotype = "Merged") %>% 
+  mutate(all_reads = total_num$total_fl) %>%
+  select(sample, phenotype, variable, value, all_reads) %>%
+  `colnames<-`(c("sample", "phenotype","type", "total_reads", "all_reads")) %>% 
+  mutate(perc = total_reads/all_reads * 100) %>%
+  mutate(dataset = "merged")
+
+<<<<<<< HEAD
+<<<<<<< HEAD
+total_num
+
+=======
+>>>>>>> c34b526e4f39c14e6ca6579cf2dd5726cda490a5
+=======
+>>>>>>> c34b526e4f39c14e6ca6579cf2dd5726cda490a5
+
+```
+
+#### Individual 
+
+```{r}
+############# Individual
+<<<<<<< HEAD
+<<<<<<< HEAD
+Individual_Mouse_Mapping_dir = "/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcriptome/OLD_2020/Individual/MAPPING"
+Individual_ERCC_Mapping_dir = "/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcriptome/OLD_2020/Individual/ERCC_MAPPING"
+=======
+Individual_Mouse_Mapping_dir = "/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcriptome/Individual/MAPPING"
+Individual_ERCC_Mapping_dir = "/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcriptome/Individual/ERCC_MAPPING"
+>>>>>>> c34b526e4f39c14e6ca6579cf2dd5726cda490a5
+=======
+Individual_Mouse_Mapping_dir = "/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcriptome/Individual/MAPPING"
+Individual_ERCC_Mapping_dir = "/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcriptome/Individual/ERCC_MAPPING"
+>>>>>>> c34b526e4f39c14e6ca6579cf2dd5726cda490a5
+
+Individual_Mapping <- list(
+  # ERCC 
+  # do not include Q21 and O18 as did not use ERCCs
+  lapply(grep(list.files(path = Individual_ERCC_Mapping_dir, pattern = "reads_with_alignment_statistics.txt", full.names = T),
+                     pattern=c("Q21|O18"), invert=TRUE, value=TRUE),
+       function(x) read.table(x,as.is = T, sep = "\t") %>% 
+         mutate(transcript = word(V1, c(1), sep = fixed(" ")))),
+  
+  # Mouse
+  lapply(list.files(path = Individual_Mouse_Mapping_dir, pattern = "allread.clustered.hq.fastq.paf", full.names = T),
+       function(x) read.table(x,as.is = T, sep = "\t") %>% 
+         mutate(transcript = word(V1, c(1), sep = fixed(" ")))),
+  lapply(list.files(path = Individual_Mouse_Mapping_dir, pattern = "reads_with_alignment_statistics.txt", full.names = T),
+       function(x) read.table(x,as.is = T, sep = "\t") %>% mutate(transcript = word(V1, c(1), sep = fixed(" ")))),
+  lapply(list.files(path = Individual_Mouse_Mapping_dir, pattern = "notread.clustered.hq.fastq.paf", full.names = T),
+       function(x) read.table(x,as.is = T, sep = "\t"))
+)
+names(Individual_Mapping) <- c("ERCC_mapped","all","mapped","unmapped")
+# the sample name input into each list is the same order (alphabetical)
+names(Individual_Mapping$ERCC_mapped) <- grep(list.files(path = Individual_ERCC_Mapping_dir, pattern = "reads_with_alignment_statistics.txt"),pattern=c("Q21|O18"), invert=TRUE, value=TRUE)
+names(Individual_Mapping$all) <- list.files(path = Individual_Mouse_Mapping_dir, pattern = "allread.clustered.hq.fastq.paf")
+names(Individual_Mapping$mapped) <- list.files(path = Individual_Mouse_Mapping_dir, pattern = "reads_with_alignment_statistics.txt")
+names(Individual_Mapping$unmapped) <- list.files(path = Individual_Mouse_Mapping_dir, pattern = "notread.clustered.hq.fastq.paf")
+
+individual_total_num <- bind_rows(
+  ldply(Individual_Mapping$ERCC_mapped, function(x) nrow(x)) %>% mutate(sample = word(.id, c(1), sep = fixed("_"))) %>% 
+         mutate(type = "ERCC_mapped"), 
+  ldply(Individual_Mapping$mapped, function(x) nrow(x)) %>% mutate(sample = word(.id, c(1), sep = fixed("_"))) %>%
+         mutate(type = "Mouse_mapped"),
+  ldply(Individual_Mapping$unmapped, function(x) nrow(x)) %>% mutate(sample = word(.id, c(1), sep = fixed("."))) %>%
+         mutate(type = "Mouse_unmapped")
+)
+
+individual_total_reads <- ldply(Individual_Mapping$all, function(x) nrow(x)) %>% mutate(sample = word(.id, c(1), sep = fixed(".")))
+individual_total_num <- individual_total_num %>% 
+  mutate(phenotype = ifelse(.$sample %in% c("O18","K18","S18","L22","Q20","K24"), "TG","WT")) %>%
+  left_join(., individual_total_reads, by = "sample") %>%
+  select(sample, phenotype, type, V1.x, V1.y) %>%
+  `colnames<-`(c("sample", "phenotype","type", "total_reads", "all_reads")) %>%
+  mutate(perc = total_reads/all_reads * 100) %>% 
+  mutate(dataset = "individual")
+
+
+all_num <- bind_rows(individual_total_num, total_num)
+
+plot_mapping <- function(dat){
+  p <- ggplot(dat, aes(x = phenotype, y = perc, fill = phenotype)) + geom_boxplot() +
+    geom_dotplot(binaxis='y', stackdir='center', position=position_dodge(0.7), dotsize = 0.5) + 
+    mytheme + labs(x = "", y = "Full-Length clustered reads (%)", title = "\n\n") +
+    scale_fill_manual(values = c(label_colour("TG"),label_colour("WT"),label_colour("Merged"))) + 
+    theme(legend.position = "none",
+          strip.background = element_blank(),
+          strip.text.x = element_blank()) +
+    facet_grid(~dataset,scales = "free_x")
+  
+  return(p)
+}
+
+plot_mapping(all_num %>% filter(type == "Mouse_mapped")) 
+pmousemap <- plot_mapping(all_num %>% filter(type == "Mouse_mapped")) + ylim(97,100) 
+pERCCmap <- plot_mapping(all_num%>% filter(type == "ERCC_mapped")) + ylim(0,1)
+plot_grid(pmousemap,pERCCmap , labels = c("a","b"))
+
+          
+```
+
+
+### Alignment vs Identity of all mapped ERCCs
+Threshold:  
+minimum alignment coverage = 0.95 (parameter set from discarded ERCC)  
+minimum alignment identity = 0.95
+
+```{r}
+cat("Total unique ERCCs in both WT and TG:", length(unique(Merged_mapping$ERCC_mapped$V2)), paste0("(", round(length(unique(Merged_mapping$ERCC_mapped$V2))/92 * 100,2), "%)"))
+
+# plot of Alignable length and identity
+p13 <- Merged_mapping$ERCC_mapped %>% 
+  mutate(identity = V8 * 100) %>% 
+  mutate(length = V6 * 100) %>%
+  ggplot(., aes(x = length, y = identity)) + 
+  geom_point() + mytheme + labs(x = "Alignment Length (%)", y = "Alignment Identity (%)", title = "\n\n") +
+  geom_hline(yintercept = 95, linetype = 2) +
+  geom_vline(xintercept = 95, linetype = 2) +
+  annotate("text", x = 20, y = 94, label = "95% Threshold") +
+  annotate("text", x = 94, y = 50, label = "95% Threshold", angle = 90) +
+  annotate("rect", xmin = 95, xmax = 100, ymin = 95, ymax = 100, fill = "palegreen", alpha = 0.2)
+
+p13 
+```
+
+### Post Filtering 
+
+```{r, warning = FALSE}
+filter_map <- Merged_mapping$ERCC_mapped[Merged_mapping$ERCC_mapped$V8 > 0.95 & Merged_mapping$ERCC_mapped$V6 > 0.90,]
+cat("Total unique ERCCs in both WT and TG (post filtering on length and identity):", length(unique(filter_map$V2)), paste0("(", round(length(unique(filter_map$V2))/92 * 100,2), "%)"))
+
+cluster <- filter_map %>% group_by(V2) %>% tally() %>% 
+  mutate(V1 = V2) %>%
+  full_join(., tama[tama$TAMA == "Retain",c("V1","TAMA","isoform")], by = "V1") %>% 
+  .[,c("V2","n","TAMA","isoform")] %>%
+  `colnames<-`(c("ERCC_ID", "Num_Isoform", "Status","isoform")) %>% 
+  full_join(.,ERCC_conc[,c("ERCC_ID","amount_of_ERCC")], by = "ERCC_ID") %>%
+  replace_na(list(Num_Isoform = 0, Status = "Discard")) %>%
+  mutate(Status=replace(Status, Num_Isoform==0, "Not_Detected"))
+
+p14 <- ggplot(cluster,aes(x = Num_Isoform, y = log2(amount_of_ERCC), colour = Status)) + geom_jitter(width = 0.2) +
+  mytheme + labs(x = "Number of Isoforms", y = "Amount of ERCC (log2)") +
+  scale_colour_discrete(name = "", label = c("Discard","Not Detected", "Retain")) + 
+  theme(legend.position = c(0.8, 0.2))
+
+p14
+```
+
+### Discarded ERCC
+
+Rationale for discarded ERCC (1 isoform) from cupcake collapse   
+Cupcake's parameters: minimum alignment coverage = 0.99, minimum alignment identity = 0.95
+
+```{r}
+# rationale for discarded ERCC (1 isoform)
+discarded_ERCC <- cluster[cluster$Status == "Discard" & cluster$Num_Isoform == "1",]
+discarded_transcript <- filter_map[filter_map$V2 %in% discarded_ERCC$ERCC_ID,]
+
+<<<<<<< HEAD
+<<<<<<< HEAD
+cupcake_discard <- read.table("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcriptome/OLD_2020/All_Samples/ERCC/TOFU/All_Merged.ignored_ids.txt", as.is = T, sep = "\t") %>% `colnames<-`(c("transcript", "status"))
+=======
+cupcake_discard <- read.table("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcriptome/All_Samples/ERCC/TOFU/All_Merged.ignored_ids.txt", as.is = T, sep = "\t") %>% `colnames<-`(c("transcript", "status"))
+>>>>>>> c34b526e4f39c14e6ca6579cf2dd5726cda490a5
+=======
+cupcake_discard <- read.table("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcriptome/All_Samples/ERCC/TOFU/All_Merged.ignored_ids.txt", as.is = T, sep = "\t") %>% `colnames<-`(c("transcript", "status"))
+>>>>>>> c34b526e4f39c14e6ca6579cf2dd5726cda490a5
+
+p15 <- cupcake_discard %>% filter(transcript %in% discarded_transcript$V1) %>% 
+  left_join(., discarded_transcript[,c("V1","V2")], by = c("transcript" = "V1")) %>% 
+  mutate(coverage = as.numeric(word(status, c(2), sep = " ")) * 100) %>%
+  ggplot(., aes(x = V2, y = coverage)) + geom_point() + ylim(80,100) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  mytheme + labs(x = "Discarded ERCC", y = "Alignment Length (%)")
+
+p15
+
+datatable(cupcake_discard %>% filter(transcript %in% discarded_transcript$V1))
+```
+
+# Readjustment of Demultiplex 
+
+## {.tabset .tabset-pills}
+
+### Unique ERCC
+
+Reduced cupcake's collapse default parameters (0.99) to 0.95
+
+
+```{r}
+<<<<<<< HEAD
+<<<<<<< HEAD
+class <- read.table("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcriptome/OLD_2020/All_Samples/ERCC/TOFU_ADJUST/SQANTI/All_Merged.collapsed.filtered_classification.filtered_lite_classification.txt",header = T, as.is = T, sep = "\t") 
+=======
+class <- read.table("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcriptome/All_Samples/ERCC/TOFU_ADJUST/SQANTI/All_Merged.collapsed.filtered_classification.filtered_lite_classification.txt",header = T, as.is = T, sep = "\t") 
+>>>>>>> c34b526e4f39c14e6ca6579cf2dd5726cda490a5
+=======
+class <- read.table("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcriptome/All_Samples/ERCC/TOFU_ADJUST/SQANTI/All_Merged.collapsed.filtered_classification.filtered_lite_classification.txt",header = T, as.is = T, sep = "\t") 
+>>>>>>> c34b526e4f39c14e6ca6579cf2dd5726cda490a5
+
+class <- class %>% mutate(Total_FL = .[,46:55] %>% rowSums(na.rm = TRUE))
+
+cat("Total unique ERCCs in both WT and TG:", length(unique(class$chrom)), paste0("(", round(length(unique(class$chrom))/92 * 100,2), "%)"))
+
+# replace FL count with pb id, otherwise NA if 0
+samples <- colnames(class)[46:55]
+unique <- setNames(data.frame(matrix(ncol = 12, nrow = nrow(class))), c("isoform","ERCC",samples))
+unique$ERCC <- class$chrom
+unique$isoform <- class$isoform
+for (j in samples){
+  for(i in 1:nrow(class)){unique[[j]][i] <- ifelse(class[[j]][i] > 0, paste(class$chrom[i]),paste("NA"))}
+}
+
+
+# count the unique pbid (/ERCC) per dataset
+p16 <- apply(unique[,-c(1,2)], 2, function(x) length(unique(x))) %>% melt() %>% 
+  rownames_to_column(., "dataset") %>%
+  mutate(Genotype = word(.$dataset,c(2), sep = "_")) %>% 
+  mutate(perc = value/92 * 100) %>% 
+  ggplot(., aes(x = Genotype, y = perc)) + geom_boxplot() +
+  geom_jitter(aes(color = Genotype), shape=16, position=position_jitter(0.2)) + 
+  mytheme + labs(x = "", y = "ERCCs detected (%)", title = "\n\n") +
+  theme(legend.position = "none") + 
+  ylim(20,60) +
+  scale_color_manual(values = c(label_colour("TG"),label_colour("WT")))
+
+
+p16
+```
+
+### Redundant Isoforms
+
+```{r, warning = FALSE}
+redundant <- unique[,c("ERCC")] %>% table() %>% melt 
+colnames(redundant) <- c("ERCC","num_isoforms")
+
+p17 <- redundant %>% 
+  group_by(num_isoforms) %>% tally() %>% ggplot(., aes(x = num_isoforms, y = n)) + geom_bar(stat = "identity") + 
+  mytheme + labs(x = "ERCC", y = "Number of Isoforms")
+
+p17
+datatable(redundant)
+```
+
+### Isoforms vs Concentration 
+
+```{r}
+isoform_conc <- merge(redundant, ERCC_conc, by.x = "ERCC", by.y = "ERCC_ID", all = TRUE) %>%
+  mutate(log2_amount_of_ERCC = log2(amount_of_ERCC)) %>%
+  replace_na(list(num_isoforms = 0)) %>% 
+  mutate(num_isoforms = as.factor(num_isoforms))
+
+p18 <- ggplot(isoform_conc, aes(x = num_isoforms, y = log2_amount_of_ERCC, colour = num_isoforms)) + geom_jitter(width = 0.2) + theme(legend.position = "none") + 
+  mytheme + labs(x = "Number of Isoforms", y = "Amount of ERCC (log2)")
+
+p18
+```
+
+### + TAMA
+
+To use TAMA's tama_remove_fragment_models.py to remove shorter redundant "isoforms" from the same ERCCs. Script is applied after SQANTI filtering.
+
+```{r}
+<<<<<<< HEAD
+<<<<<<< HEAD
+TAMA <- "/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcriptome/OLD_2020/All_Samples/ERCC/TOFU_ADJUST/TAMA_Filter/"
+=======
+TAMA <- "/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcriptome/All_Samples/ERCC/TOFU_ADJUST/TAMA_Filter/"
+>>>>>>> c34b526e4f39c14e6ca6579cf2dd5726cda490a5
+=======
+TAMA <- "/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcriptome/All_Samples/ERCC/TOFU_ADJUST/TAMA_Filter/"
+>>>>>>> c34b526e4f39c14e6ca6579cf2dd5726cda490a5
+tama_retained_adjusted <- read.table(paste0(TAMA,"All_Merged_postsqanti.bed")) %>% mutate(TAMA = "Retain") 
+tama_discard <- read.table(paste0(TAMA,"All_Merged_postsqanti_discarded.txt")) %>% mutate(TAMA = "Discard")
+tama <- bind_rows(tama_retained_adjusted, tama_discard) %>% mutate(isoform = word(.$V4, c(2),sep = ";"))
+
+p19 <- tama %>% group_by(V1,TAMA) %>% tally() %>%
+  ggplot(., aes(x = reorder(V1,-n), y = n, fill = TAMA)) + geom_bar(stat = "identity") + labs(y = "Number of Isoforms", x = "ERCC") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  mytheme
+
+# reads filtered from TAMA 
+# total FL reads across 10 samples associated with isoform 
+p20 <- class[class$chrom %in% tama_discard$V1,] %>%
+  mutate(Total_FL = .[, 46:55] %>% rowSums(na.rm = TRUE)) %>%
+  left_join(., tama, by = ("isoform")) %>% 
+  mutate(log10_Total_FL = log10(Total_FL)) %>%
+  ggplot(., aes(x = chrom, y = log10_Total_FL, colour = TAMA)) + geom_point() + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  mytheme + labs(y = "FL Reads (Log10)", x = "ERCC") 
+
+p11 <- class %>%
+  mutate(Total_FL = .[, 46:55] %>% rowSums(na.rm = TRUE)) %>%
+  left_join(., tama, by = ("isoform")) %>% 
+  mutate(log10_Total_FL = log10(Total_FL)) %>%
+  ggplot(., aes(x = chrom, y = log10_Total_FL, colour = TAMA)) + geom_point() + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  mytheme + labs(y = "FL Reads (Log10)", x = "ERCC") 
+
+p19 
+p20
+  
+```
+
+### Rescued lowly-expressed transcripts
+
+```{r}
+#setdiff(tama_retained$V1,tama_retained_adjusted$V1)
+#setdiff(tama_retained_adjusted$V1,tama_retained$V1)
+
+tama_retained_adjusted$status <- ifelse(tama_retained_adjusted$V1 %in% tama_retained$V1, "99% Identity", "95% Identity")
+
+p21 <- tama_retained_adjusted %>% 
+  left_join(.,ERCC_conc, by = c("V1" = "ERCC_ID")) %>%
+  ggplot(., aes(x = status, y = log2(amount_of_ERCC))) + geom_boxplot() + geom_jitter(width = 0.2) + 
+  mytheme + labs(x = "", y = "Known Amounts of ERCC (log2)", title = "\n\n")
+
+p21
+```
+
+### Correlation 
+
+```{r}
+ERCC_corr <- tama_retained_adjusted %>% 
+  mutate(isoform = word(V4, c(2),sep = ";")) %>%
+  left_join(.,class[,c("isoform","Total_FL")], by = "isoform") %>% 
+  left_join(.,ERCC_conc, by = c("V1" = "ERCC_ID")) %>% 
+  mutate(log2_amount_of_ERCC = log2(amount_of_ERCC)) %>%
+  mutate(log2_FL_reads = log2(Total_FL)) 
+
+p22 <- density_plot(ERCC_corr,"log2_amount_of_ERCC","log2_FL_reads", "Amount of ERCC (Log2)", "Number of Full-Length Reads (Log2)","")
+p22
+```
+
+
+```{r}
+<<<<<<< HEAD
+<<<<<<< HEAD
+# outputs
+#pdf(paste0(output_plot_dir,"/ERCC.pdf"), width = 15, height = 11.5)
+#plot_grid(p6,p16,p12,p22, labels = c("a","b","c"), label_size = 25, label_fontfamily = "CM Roman", label_fontface = "bold",scale = 0.95)
+#top_row <- plot_grid(p8,p10, labels = c("a","b"), label_size = 25, label_fontfamily = "CM Roman", label_fontface = "bold")
+#plot_grid(top_row,p9, labels = c('', 'c'), label_size = 25, ncol = 1,label_fontfamily = "CM Roman", label_fontface = "bold", scale = 0.95)
+#plot_grid(p13,p21, labels = c("a","b"), label_size = 25, label_fontfamily = "CM Roman", label_fontface = "bold",scale = 0.95, ncol = 1)
+#plot_grid(pmousemap,pERCCmap, labels = c("a","b"), label_size = 25, label_fontfamily = "CM Roman", label_fontface = "bold",scale = 0.95)
+#dev.off()
+=======
+=======
+>>>>>>> c34b526e4f39c14e6ca6579cf2dd5726cda490a5
+
+# outputs
+pdf(paste0(output_plot_dir,"/ERCC.pdf"), width = 15, height = 11.5)
+plot_grid(p6,p16,p12,p22, labels = c("a","b","c"), label_size = 25, label_fontfamily = "CM Roman", label_fontface = "bold",scale = 0.95)
+top_row <- plot_grid(p8,p10, labels = c("a","b"), label_size = 25, label_fontfamily = "CM Roman", label_fontface = "bold")
+plot_grid(top_row,p9, labels = c('', 'c'), label_size = 25, ncol = 1,label_fontfamily = "CM Roman", label_fontface = "bold", scale = 0.95)
+plot_grid(p13,p21, labels = c("a","b"), label_size = 25, label_fontfamily = "CM Roman", label_fontface = "bold",scale = 0.95, ncol = 1)
+plot_grid(pmousemap,pERCCmap, labels = c("a","b"), label_size = 25, label_fontfamily = "CM Roman", label_fontface = "bold",scale = 0.95)
+dev.off()
+
+
+
+<<<<<<< HEAD
+>>>>>>> c34b526e4f39c14e6ca6579cf2dd5726cda490a5
+=======
+>>>>>>> c34b526e4f39c14e6ca6579cf2dd5726cda490a5
+```
+

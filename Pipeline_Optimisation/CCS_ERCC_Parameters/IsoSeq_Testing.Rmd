@@ -1,0 +1,911 @@
+---
+title: "IsoSeq Testing"
+author: Szi Kay Leung
+date: "`r Sys.Date()`"
+output:
+  rmdformats::material:
+    self_contained: true
+    thumbnails: true
+    lightbox: true
+    gallery: true
+    highlight: tango
+    code_folding: hide
+    fig_caption: true
+    cards: true
+
+
+
+---
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE,warning=FALSE,message=FALSE,fig.width=14, fig.height= 7)
+
+
+suppressMessages(library(dplyr))
+suppressMessages(library(ggplot2))
+suppressMessages(library(tidyr))
+suppressMessages(library(grid))
+suppressMessages(library(waffle))
+suppressMessages(library(hrbrthemes))
+suppressMessages(library(stringr))
+suppressMessages(library(ComplexHeatmap))
+suppressMessages(library(viridis))
+suppressMessages(library(wesanderson))
+suppressMessages(library(kableExtra))
+suppressMessages(library(tibble))
+suppressMessages(library(rjson)) # json files
+suppressMessages(library(ggplot2))
+suppressMessages(library(scales))
+suppressMessages(library(magrittr))
+suppressMessages(library(tibble))
+suppressMessages(library(reshape))
+suppressMessages(library(plyr))
+
+# Read in ERCC
+ERCC_conc <- read.csv("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/ONT/ERCC/ERCC_calculations.csv", header = T)[-1,]
+source("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/Scripts/IsoSeq_Tg4510/Rmarkdown_Input.R")
+
+# 04/01/2021: updated paths 
+
+```
+
+# Aim
+
+**To choose the most appropriate parameters for CCS in Iso-Seq bioinformatics pipeline by**    
+- number of reads downstream of CCS  
+- number of ERCCs detected   
+
+## Method {.tabset .tabset-pills}
+Two-stage analysis:  
+
+1. Part 1: 1 sample (K18), 10% CCS, 12 CCS parameter combinations    
+  - RQ (minimum base accuracy): 0.8, 0.85, 0.9, 0.99  
+  - number of CCS passes: 1, 2, 3  
+  Only using 10% CCS given the number of parameters tested  
+  *Note: Iso-Seq paper: 0.99RQ, 1 pass; Iso-Seq official page: 0.9RQ, 3 passes; Default settting: 0.99RQ, 3 passes*
+
+2. Part 2: 3 samples (K18, K23, M21), 100% CCS, 2 parameter combinations  
+
+### Analysis
+- Run CCS with the different parameters (Testing_CCS_Parameters_Part1.sh, Testing_CCS_Parameters_Part2a.sh)
+- Post CCS, run Iso-Seq3 pipeline (LIMA, REFINE, CLUSTER) to obtain the number of reads (FL, FLNC, Testing_CCS_Parameters_Part2b.sh)
+- Map with ERCC, and proceed with Cupcake
+
+### Datawrangle from Cupcake output files
+Use all output files from Cupcake to determine the number of FL reads associated with ERCC    
+1. group.txt: Output from further collapsing of polished transcripts from Iso-Seq3 to unique isoforms (denoted by PB.ID)  
+2. gff: Important to find which PB.ID denotes to ERCC  
+3. abundance: For the number of FL reads associatd with that PB.ID (note this would be the summation of FL reads across the collapsing the polished transcripts)  
+*In theory, only need gff and abundance, however interesting to see how many FL transcripts are further collapsed*
+
+## Results
+From Part 1, 0.9RQ (Iso-Seq official page) appears to be the most appropriate in terms of not being too stringent (0.9RQ), with similar output to 0.95RQ with 0, 1, 2 passes.
+
+from Part 2, noticed a lot of redundant isoforms that were not properly collapsed post Cupcake (this was only evident in Part 2 and not Part 1 due to 100% generation of CCS rather than 10%).
+
+
+```{r function}
+# number_of_reads
+# Aim: huge wrapper function to read in multiple files from CCS, LIMA and REFINE directory, and output 5 plots
+number_of_reads <- function(stage){
+
+  ####################### CCS
+  # Extract only values from mix of values and percentage
+  CCS_values <- cbind(as.character(CCS[,1]), apply(CCS[,-1], 2, function(x) word(x, c(1), sep = fixed("("))))
+  colnames(CCS_values)[1] <- "Description"
+  CCS_values_mod <- as.data.frame(CCS_values) %>% melt(., id = "Description") %>%
+    mutate(sample = word(variable, c(1), sep = fixed("_"))) %>%
+    # split CCS parameters
+    mutate(num_passes = word(variable, c(2), sep = fixed("_"))) %>%
+    mutate(RQ = word(variable, c(4), sep = fixed("_"))) %>%
+    mutate(value = as.numeric(as.character(value)))
+
+  ####################### LIMA
+  # Extract only values from the mix of values and percentage from LIMA output
+  LIMA_values <- data.frame(LIMA[,1],lapply(LIMA[,2:ncol(LIMA)], function(x) as.numeric(word(x, c(1),  sep = fixed ('(')) )))
+  colnames(LIMA_values)[1] <- "Description"
+  LIMA_values_mod <- as.data.frame(LIMA_values) %>% melt(., id = "Description") %>%
+    mutate(sample = word(variable, c(1), sep = fixed("_"))) %>%
+    # split LIMA parameters
+    mutate(num_passes = word(variable, c(2), sep = fixed("_"))) %>%
+    mutate(RQ = word(variable, c(4), sep = fixed("_"))) %>%
+    mutate(RQ = as.character(paste0("0.", word(RQ, c(2), sep = fixed(".")))))
+
+
+  # Refine into one dataframe and data-wrangled for easy merging
+  REFINE <- do.call("rbind", REFINE_list) %>%
+    rownames_to_column(., var = "variable") %>%
+    mutate(sample = word(variable, c(1), sep = fixed("_"))) %>%
+    mutate(num_passes = word(variable, c(2), sep = fixed("_"))) %>%
+    mutate(RQ = word(variable, c(4), sep = fixed("_"))) %>%
+    mutate(RQ = as.character(paste0("0.", word(RQ, c(2), sep = fixed("."))))) %>%
+    as.data.frame() %>%
+    gather(., Description, value, 2:4, factor_key=TRUE) %>%
+    .[,c("Description","variable","value","num_passes","RQ","sample")]
+
+
+  Reads <-   
+    CCS_values_mod[CCS_values_mod$Description == "ZMWs generating CCS (B)  ",] %>%
+    bind_rows(CCS_values_mod[CCS_values_mod$Description == "ZMWs input          (A)  ",]) %>%
+    bind_rows(REFINE)
+
+  Reads$Description <- revalue(Reads$Description, c("ZMWs input          (A)  "="Polymerase Reads", "ZMWs generating CCS (B)  "="CCS Reads",
+                               "num_reads_fl"="FL Reads", "num_reads_flnc"="FLNC reads",
+                               "num_reads_flnc_polya" = "Poly-A FLNC reads"))
+  levels(Reads$Description) <- c("Polymerase Reads","CCS Reads","FL Reads","FLNC reads","Poly-A FLNC reads")
+
+  ### To calculate proportions to generate plots
+  # total failed ccs reads
+  failed_CCS_reads <- as.data.frame(CCS_values) %>% melt(., id = "Description") %>% filter(Description %in% c("ZMWs filtered       (C)  "))
+  failed_LIMA_reads <- as.data.frame(LIMA_values) %>% melt(., id = "Description") %>% filter(Description %in% c("ZMWs below any threshold  (C) "))
+
+  ############# Applying plots
+
+  # p1: Percentage of polymerase reads successful for CCS generation
+  # p2: Rationale for failed polymerase reads for CCS generation
+  # P3: Percentage of CCS reads successful for FL generation
+  # p4: Rationale for failed CCS reads for FL generation
+  # p5: Tally of all reads
+
+  p1 <- CCS_values_mod %>%
+    filter(Description %in% c("ZMWs input          (A)  ", "ZMWs generating CCS (B)  ")) %>%
+    spread(., Description, value) %>%
+    mutate(Reads_Perc = .$"ZMWs generating CCS (B)  "  / .$"ZMWs input          (A)  " * 100 )
+  if(stage == "Part1"){
+    p1 <- plot_line(p1, "num_passes", "Reads_Perc", "Number of Passes", "Passed polymerase reads (%)","RQ") +
+      mytheme + theme(legend.position = "bottom") +
+      scale_colour_manual(values = c(wes_palette("Chevalier1")[3], wes_palette("Darjeeling1")[2], wes_palette("Darjeeling1")[1],
+                                   wes_palette("Darjeeling2")[5])) + scale_y_continuous(limits = c(70, 86))
+  } else if (stage == "Part2"){
+     p1 <- plot_line(p1, "num_passes", "Reads_Perc", "Number of Passes", "Passed polymerase reads (%)","sample") +
+       mytheme + theme(legend.position = "bottom") +
+       scale_colour_manual(values = c(wes_palette("Darjeeling2")[3],wes_palette("Darjeeling2")[2],wes_palette("Darjeeling2")[4]))
+  } else {
+      print("Function input: Part1 or Part2")
+  }
+
+  p2 <-
+    CCS_values_mod %>%
+    filter(!Description %in% c("ZMWs input          (A)  ", "ZMWs generating CCS (B)  ", "ZMWs filtered       (C)  ")) %>%
+    full_join(., failed_CCS_reads, by = "variable") %>%
+    mutate(Perc = as.numeric(value.x)/as.numeric(value.y) * 100) %>%
+    filter(as.numeric(value.x) != 0)
+  if(stage == "Part1"){
+    p2 <- ggplot(p2, aes(x = Perc, y = reorder(Description.x, Perc), fill = RQ)) + geom_bar(stat = "identity", position = position_dodge()) +
+    facet_grid(rows = vars(num_passes)) +
+    mytheme + theme(legend.position = "bottom") +
+    labs(x = "Failed polymerase reads (%)", y = "Rationale") +
+    scale_fill_manual(values = c(wes_palette("Chevalier1")[3], wes_palette("Darjeeling1")[2], wes_palette("Darjeeling1")[1], wes_palette("Darjeeling2")[5]))
+  } else if (stage == "Part2"){
+     p2 <- ggplot(p2, aes(x = Perc, y = reorder(Description.x, Perc), fill = sample)) + geom_bar(stat = "identity", position = position_dodge()) +
+       facet_grid(rows = vars(num_passes)) +
+       mytheme + labs(x = "Failed polymerase reads (%)", y = "Rationale") +
+       scale_fill_manual(values = c(wes_palette("Darjeeling2")[3],wes_palette("Darjeeling2")[2],wes_palette("Darjeeling2")[4]))
+  } else {
+      print("Function input: Part1 or Part2")
+  }
+
+
+
+  p3 <-
+    LIMA_values_mod %>%
+    filter(Description %in% c("ZMWs input                (A) ", "ZMWs above all thresholds (B) ")) %>%
+    spread(., Description, value) %>%
+    mutate(Reads_Perc = .$"ZMWs above all thresholds (B) "  / .$"ZMWs input                (A) " * 100 )
+  if(stage == "Part1"){
+    p3 <- plot_line(p3, "num_passes", "Reads_Perc", "Number of Passes", "Passed CCS reads (%)","RQ") +
+    mytheme + theme(legend.position = "bottom") +
+    scale_colour_manual(values = c(wes_palette("Chevalier1")[3], wes_palette("Darjeeling1")[2], wes_palette("Darjeeling1")[1], wes_palette("Darjeeling2")[5]))
+  } else if (stage == "Part2"){
+    p3 <- plot_line(p3, "num_passes", "Reads_Perc", "Number of Passes", "Passed CCS reads (%)","sample") +
+      mytheme + theme(legend.position = "bottom") +
+      scale_colour_manual(values = c(wes_palette("Darjeeling2")[3],wes_palette("Darjeeling2")[2],wes_palette("Darjeeling2")[4]))
+  } else {
+      print("Function input: Part1 or Part2")
+  }
+
+
+  p4 <-
+    LIMA_values_mod %>%
+    filter(Description %in% c("Below min end score           ","Below min score               ",
+                               "Below min length              ", "Below min passes              ",
+                               "Below min ref span            ","Below min score lead          ",
+                               "Without adapter               ","Undesired 3p--3p pairs        ",
+                               "Undesired 5p--5p pairs        ","Undesired no hit              ")) %>%
+    full_join(., failed_LIMA_reads, by = "variable") %>%
+    mutate(Perc = as.numeric(value.x)/as.numeric(value.y) * 100) %>%
+    filter(as.numeric(value.x) != 0) %>%
+    mutate(RQ = as.character(RQ))
+  if(stage == "Part1"){
+    p4 <- ggplot(p4, aes(x = Perc, y = reorder(Description.x, Perc), fill = RQ)) + geom_bar(stat = "identity", position = position_dodge()) +
+    facet_grid(rows = vars(num_passes)) +
+    mytheme + theme(legend.position = "bottom") +
+    labs(x = "Failed CCS reads (%)", y = "Rationale") +
+    scale_fill_manual(values = c(wes_palette("Chevalier1")[3], wes_palette("Darjeeling1")[2], wes_palette("Darjeeling1")[1], wes_palette("Darjeeling2")[5]))
+  } else if (stage == "Part2"){
+    p4 <- ggplot(p4, aes(x = Perc, y = reorder(Description.x, Perc), fill = sample)) + geom_bar(stat = "identity", position = position_dodge()) +
+      facet_grid(rows = vars(num_passes)) +
+      mytheme + theme(legend.position = "bottom") +
+      labs(x = "Failed CCS reads (%)", y = "Rationale") +
+      scale_fill_manual(values = c(wes_palette("Darjeeling2")[3],wes_palette("Darjeeling2")[2],wes_palette("Darjeeling2")[4]))
+  } else {
+      print("Function input: Part1 or Part2")
+  }
+
+  # p5
+  if(stage == "Part1"){
+    p5 <- ggplot(Reads, aes(x = reorder(Description, -value), y = value, group = interaction(num_passes, RQ), colour = RQ, linetype = num_passes)) +
+      geom_line() + geom_point() +  mytheme + theme(legend.position = "bottom") + labs(x = "", y = "Number of Reads") +
+      scale_colour_manual(values = c(wes_palette("Chevalier1")[3], wes_palette("Darjeeling1")[2],
+                                     wes_palette("Darjeeling1")[1], wes_palette("Darjeeling2")[5]))
+  } else if (stage == "Part2"){
+    p5 <- ggplot(Reads, aes(x = reorder(Description, -value), y = value, group = interaction(num_passes, sample), colour = sample, linetype = num_passes)) +
+      geom_line() + geom_point() +  mytheme + theme(legend.position = "bottom") + labs(x = "", y = "Number of Reads") +
+      scale_colour_manual(values = c(wes_palette("Darjeeling2")[3],wes_palette("Darjeeling2")[2],wes_palette("Darjeeling2")[5]))
+  } else {
+      print("Function input: Part1 or Part2")
+  }
+
+  output_plots <- list(p1,p2,p3,p4,p5,Reads)
+  names(output_plots) <- c("p1","p2","p3","p4","p5","Reads")
+  assign("num_reads",output_plots, envir = .GlobalEnv)
+}
+
+```
+
+
+# Part 1: K18, 10% CCS generation
+- Default setting of 0.99RQ too stringent with filtering of real isoforms (false negative), and the number of passes for this RQ setting makes no significant difference  
+- 0.9RQ (Iso-Seq official page) with 3 passes similar to 0.95 (with 0,1,2 pass)   
+- Strong correlation between ERCC read count and ERCC amount (corr = 0.8)  
+- From 10% of polymerase reads, top 25% of ERCC reads detected  
+
+
+## Number of Reads downstream of CCS {.tabset .tabset-pills}
+
+```{r part1_descriptive}
+## Input CCS, LIMA, REFINE files
+
+# Input Directory Paths
+CCS_input_dir <- "/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/WholeTranscriptome/Testing/CCS/Part1_K18"
+LiMA_input_dir <- "/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/WholeTranscriptome/Testing/LIMA/Part1_K18"
+ISOSEQ_input_dir <- "/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/WholeTranscriptome/Testing/REFINE/Part1_K18"
+# CCS, LIMA summary
+CCS <- read.csv(paste0(CCS_input_dir, "/Testing_CCS_output.csv"), header = T)
+LIMA <- read.csv(paste0(LiMA_input_dir, "/Testing_LIMA_summary.csv"), header = T)
+# REFINE summary input
+REFINE_json_list <- list.files(paste0(ISOSEQ_input_dir), pattern = "flnc.filter_summary.json", full.names = T)
+REFINE_list <- lapply(REFINE_json_list , function(x) as.data.frame(fromJSON(file = x)))
+names(REFINE_list) <- list.files(paste0(ISOSEQ_input_dir), pattern = "flnc.filter_summary.json")
+for(i in 1:length(names(REFINE_list))){
+  REFINE_list[[i]]$Sample <- names(REFINE_list)[[i]]
+}
+
+
+number_of_reads("Part1")
+```
+
+### Successful CCS
+Range of proporition of CCS generated can vary as much as 70% - 85%, with the main determining factor being RQ value particularly with only 1 full pass.  
+At 0.99 (default setting/Iso-Seq paper), number of passes do not really make a difference.
+
+```{r}
+num_reads$p1
+```
+
+### Failed CCS
+The majority of polymerase reads failing to generate CCS is due to "lacking full passes" and "CCS below minimum RQ" (hence varying the two parameters).
+
+```{r}
+num_reads$p2
+```
+
+### Successful FLNC
+Full-length reads are generated from CCS by removal of cDNA primers. CCS with unwanted orientations are removed and are oriented 5â€™ to 3â€™. With more stringent parameters for CCS generation, fewer reads are filtered out subsequently.
+
+```{r}
+num_reads$p3
+```
+
+### Failed FLNC
+Majority of CCS reads failing to generate FL due to undesired 3p-3p pairs (cDNA synthesis?)
+```{r}
+num_reads$p4
+```
+
+### All Reads
+Significant different in number of reads generated from RQ threshold of 0.99 and other testing RQ parameters, where number of passes does not have that much of an impact. 0.9 with 3 passes similar to 0.95 and other passes
+```{r}
+num_reads$p5
+```
+
+## ERCC {.tabset .tabset-pills}
+
+```{r part1_ercc}
+# Part 1 files  
+working_tofu_dir <- "/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/WholeTranscriptome/Testing/TOFU/Part1_K18"
+TOFU_read("collapsed.group.txt", "collapsed_TOFU_grouped_reads")
+TOFU_read("collapsed.filtered.gff", "collapsed_TOFU_gff")
+TOFU_read("filtered.abundance.txt", "collapsed_TOFU_abundance_reads")
+
+# merge for full information
+collapsed_TOFU_reads <- collapsed_TOFU_grouped_reads %>%
+  full_join(., collapsed_TOFU_gff, by = c("PB.ID","variable")) %>%
+  full_join(., collapsed_TOFU_abundance_reads, by = c("PB.ID","variable"))
+
+```
+
+### Read Count
+Similar ERCC read count observed across all parameters. However, one ERCC not detected from 0.99RQ whereas detected for other RQ. 0.99RQ is too stringent and missing real isoforms. 3 passes are clustered together for 0.8,0.9 and 0.95RQ.
+
+```{r part1_ercc_heatmap, fig.cap="Heatmap of K18 with the FL Read count of detected ERCCs"}
+draw_heatmap("Part1")
+```
+
+### Correlation
+Strong correlation between FL count and ERCC Amount - Iso-Seq is quantitative!
+- No significant difference across the different parameters
+
+```{r }
+# merge with ERCC conc
+ERCC_output <- merge(collapsed_TOFU_reads, ERCC_conc, by.x = "V1", by.y = "ERCC_ID")
+
+magic_for(silent = TRUE)
+for (i in unique(ERCC_output$variable)) {
+  df <- ERCC_output[ERCC_output$variable == i,]
+  corr <- cor(df$amount_of_ERCC, df$count_fl)
+  put(corr)
+}
+corr_output <- magic_result_as_dataframe() %>%
+  mutate(num_passes = word(i, c(2), sep = fixed("_"))) %>%
+  mutate(RQ = word(i, c(4), sep = fixed("_")))
+
+levels(corr_output$num_passes) <- factor(c("1","2","3"))
+levels(corr_output$num_passes) <- factor(c("1","3"))
+plot_line_no_reorder(corr_output, "num_passes", "corr", "Number of Passes", "Pearson's Correlation: FL Count & Amounts of ERCC","RQ") +
+  mytheme + theme(legend.position = "bottom") +
+  scale_colour_manual(values = c(wes_palette("Chevalier1")[3], wes_palette("Darjeeling1")[2], wes_palette("Darjeeling1")[1], wes_palette("Darjeeling2")[5]))
+
+```
+
+### Sensitivity
+ERCC detected from 1 sample.  
+- Note, only 10% of polyermase reads were generated to make CCS   
+- will need to test on 1 entire sample  
+- does adding new sample increase ERCC detection  
+```{r}
+
+# which ERCC detected
+df <- ERCC_output[ERCC_output$variable == "K18_1_passes_0.8",]
+for (ERCC_ID in unique(ERCC_conc$ERCC_ID)){
+  Detected <- ifelse(ERCC_ID %in% noquote(df$V1), "Yes","No")
+  put(Detected)
+}
+
+merge(magic_result_as_dataframe(), ERCC_conc, by = "ERCC_ID", all = T) %>%
+  ggplot(., aes(x = reorder(ERCC_ID, -amount_of_ERCC), y = log2(amount_of_ERCC),colour = Detected)) + geom_point() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  mytheme +
+  labs(x = "ERCC", y= "Log2 Stock ERCC amount")
+```
+
+# Part 2: K18, K23, M21 with 100% CCS generation
+
+All three samples (K18, M21 and K23) have ERCC added prior to sequencing, and are used to further validate impact of CCS parameters tested in Part 1. In previous testing of number of passes (passes = 1, 2, 3) and minimum base accuracy (RQ = 0.8,0.9,0.95,0.99), 0.99RQ was too stringent and generating false negative. This was, however, only tested on 10% of polymerase reads (as CCS takes 10hours to generate). Thus, CCS reads were fully generated on two additional samples but with fewer testing parameters (0.90RQ with 1 pass, and 0.99RQ with 3 passes).
+
+## Number of Reads downstream of CCS {.tabset .tabset-pills}
+```{r}
+# Input Directory Paths
+CCS_input_dir <- "/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/WholeTranscriptome/Testing/CCS"
+LiMA_input_dir <- "/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/WholeTranscriptome/Testing/LIMA"
+ISOSEQ_input_dir <- "/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/WholeTranscriptome/Testing/REFINE"
+# CCS, LIMA summary
+CCS <- read.csv(paste0(CCS_input_dir, "/Testing_Part2_CCS_output.csv"), header = T)
+LIMA <- read.csv(paste0(LiMA_input_dir, "/Testing_Part2_LIMA_summary.csv"), header = T)
+# REFINE summary input
+REFINE_json_list <- list.files(paste0(ISOSEQ_input_dir), pattern = "flnc.filter_summary.json", full.names = T)
+REFINE_list <- lapply(REFINE_json_list , function(x) as.data.frame(fromJSON(file = x)))
+names(REFINE_list) <- list.files(paste0(ISOSEQ_input_dir), pattern = "flnc.filter_summary.json")
+for(i in 1:length(names(REFINE_list))){
+  REFINE_list[[i]]$Sample <- names(REFINE_list)[[i]]
+}
+number_of_reads("Part2")
+```
+
+### Successful CCS
+Proportion of CCS reads generated do not differ significantly between the number of passes, with sample (hence sequencing depth) being the most driving factor).
+
+```{r}
+num_reads$p1
+```
+
+### Failed CCS
+The majority of polymerase reads failing to generate CCS is due to "lacking full passes" and "CCS below minimum RQ" (hence varying the two parameters).
+
+```{r}
+num_reads$p2
+```
+
+### Successful FLNC
+Full-length reads are generated from CCS by removal of cDNA primers. CCS with unwanted orientations are removed and are oriented 5â€™ to 3â€™. With more stringent parameters for CCS generation, fewer reads are filtered out subsequently.
+
+```{r}
+num_reads$p3
+```
+
+### Failed FLNC
+Majority of CCS reads failing to generate FL due to undesired 3p-3p pairs (cDNA synthesis?)
+```{r}
+num_reads$p4
+```
+
+### All Reads
+The effects of using passes 1 or passes 3 remain constant in terms of the number of reads filtered through.
+```{r}
+num_reads$p5
+```
+
+## ERCC {.tabset .tabset-pills}
+```{r}
+# TOFU
+working_tofu_dir <- "/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/WholeTranscriptome/Testing/TOFU"
+TOFU_read("collapsed.group.txt", "collapsed_TOFU_grouped_reads")
+TOFU_read("collapsed.filtered.gff", "collapsed_TOFU_gff")
+TOFU_read("filtered.abundance.txt", "collapsed_TOFU_abundance_reads")
+
+# merge for full information
+collapsed_TOFU_reads <- collapsed_TOFU_grouped_reads %>%
+  full_join(., collapsed_TOFU_gff, by = c("PB.ID","variable")) %>%
+  full_join(., collapsed_TOFU_abundance_reads, by = c("PB.ID","variable"))
+```
+
+### Read Count
+Shown below is a heatmap of the FL read counts across ERCC in Samples K23 and M21 (fully generated CCS) using 0.9RQ, and minimum passes 1 and 3. Note, FL read count from each ERCC is from the summation of counts from all isoforms mapped to that ERCC (i.e with Example above PB.1.1 - PB.1.5 all mapped to ERCC-00002). Sample M21 had a significantly lower yield and number of FL reads compared to sample K23.
+
+It appears that with great sequencing depth, the number of passes do not make a difference even in detecting lowly-expressed genes (as with Sample K23). However, with samples of lower sequencing depth (as with sample M21), a pass of 3 may generate a few false negatives.
+```{r}
+
+## Heatmap of the number of FL reads associated per ERCC across the samples
+# Create matrix of the heatmap for input
+reads_heatmap <- collapsed_TOFU_reads %>% filter(V3 == "transcript") %>% group_by(variable, V1) %>% tally(count_fl) %>%
+  spread(., variable, n) %>%
+  column_to_rownames(., var = "V1") %>%
+  as.matrix()
+
+# for ERCC not detected - replace NA as 1, as required value for heatmap clustering
+# note replace with 1 rather than 0 as log10 1 = 0
+reads_heatmap[is.na(reads_heatmap)] <- 1
+
+# Create a metadata dataframe for additional information to annotate the heatmap
+reads_metadata <- as.data.frame(unique(collapsed_TOFU_reads$variable)) %>%
+  `colnames<-`(c("variable")) %>%
+  mutate(num_passes = word(variable, c(2), sep = fixed("_"))) %>%
+  mutate(RQ = word(variable, c(4), sep = fixed("_"))) %>%
+  mutate(Sample = word(variable, c(1), sep = fixed("_")))
+# only keep the relevant columns
+ann <- data.frame(reads_metadata$num_passes, reads_metadata$RQ, reads_metadata$Sample)
+# determine the colours and format for the annotations
+colnames(ann) <- c('Passes', 'RQ','Sample')
+colours <- list('Passes' = c('1' = alpha(wes_palette("Darjeeling2")[4],0.7), '2' = wes_palette("Zissou1")[2],'3' =wes_palette("Darjeeling2")[2]),
+                'RQ' = c('0.8' = wes_palette("Chevalier1")[3], '0.9' = wes_palette("Darjeeling1")[2],
+                         '0.95' = wes_palette("Darjeeling1")[1],'0.99' = wes_palette("Darjeeling2")[5]),
+                'Sample' = c('K18' = wes_palette("GrandBudapest1")[2],'K23' = wes_palette("GrandBudapest1")[3], 'M21' = wes_palette("GrandBudapest1")[4]))
+colAnn <- HeatmapAnnotation(df = ann, which = 'col',
+                            col = colours, annotation_width = unit(c(1, 4), 'cm'), gap = unit(1, 'mm'))
+
+# Combine matrix and annotation  
+ht_list <- Heatmap(log10(reads_heatmap),
+        top_annotation = colAnn,
+        show_row_dend = FALSE, show_column_names = FALSE, col=plasma(100),
+        name = 'FL Count (Log10)',
+        row_names_gp = gpar(fontsize = 10),
+        heatmap_legend_param = list(direction = "horizontal"))
+
+
+draw(ht_list, heatmap_legend_side = "top", annotation_legend_side = "top",merge_legend = TRUE)
+
+```
+
+### Correlation
+
+High correlation (r = ~0.85) between number of FL reads and known amounts of ERCC. Of note, no difference between the different passes and the samples (despite difference in sequencing depth)
+
+```{r}
+# Read in amounts of ERCC and merge with FL reads
+ERCC_conc <- read.csv("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/ONT/ERCC/ERCC_calculations.csv", header = T)[-1,]
+ERCC_output <- merge(collapsed_TOFU_reads, ERCC_conc, by.x = "V1", by.y = "ERCC_ID") %>%
+  mutate(log2_amount_of_ERCC = log2(amount_of_ERCC)) %>%
+  mutate(log2_FL_reads = log2(count_fl))
+
+# loop through the different datasets and aggregate the number of FL reads associated with each ERCC
+# note summation of FL reads across transcripts collapsed to ERCC
+# calculate the correlation of the known amount of ERCC and summation of FL reads
+magic_for(silent = TRUE)
+for (i in unique(ERCC_output$variable)) {
+  df <- ERCC_output[ERCC_output$variable == i & ERCC_output$V3 == "transcript",]
+  df_sum <- aggregate(df$count_fl, by=list(V1=df$V1), FUN=sum) %>% left_join(ERCC_conc, by = c("V1"="ERCC_ID"))
+
+  df_sum <- df_sum %>% mutate(log2_amount_of_ERCC = log2(amount_of_ERCC)) %>% mutate(log2_FL_reads = log2(x))
+  corr <- cor(df_sum$log2_amount_of_ERCC, df_sum$log2_FL_reads)
+  put(corr)
+}
+
+# Prepare for plots
+corr_output <- magic_result_as_dataframe() %>%
+  mutate(num_passes = word(i, c(2), sep = fixed("_"))) %>%
+  mutate(RQ = word(i, c(4), sep = fixed("_"))) %>%
+  mutate(sample = word(i, c(1), sep = fixed("_")))
+levels(corr_output$num_passes) <- factor(c("1","3"))
+
+# Plot the number of passes with the correlation of FL Read count to Amount of ERCC
+plot_line_no_reorder(corr_output, "num_passes", "corr", "Number of Passes", "Pearson's Correlation: Log2(FL Count) & Log2(Amounts of ERCC)","sample") +
+  mytheme + theme(legend.position = "bottom") +
+  scale_colour_manual(values = c(wes_palette("GrandBudapest1")[2],wes_palette("GrandBudapest1")[3],wes_palette("GrandBudapest1")[4]))
+```
+
+### Sensitivity
+
+Sensitivity curve of the concentration of ERCC detected per sample (with 1 pass) - no significant difference in number of ERCC detected was observed with the different passes; of note, as shown in heatmap. Unsurprisisingly, the detection of ERCC is primarily driven by sequencing depth (i.e run yield) rather than by the parameters. However, for samples with low sequencing depth, using less stringent parameters can reduce false negatives.  
+
+```{r}
+# sensitivity <variable>
+# <variable> = name of dataset
+# Aim: draw a sensitivity curve of the number of detected ERCC by ascending known concentration
+  # 1. Extract the unique row of ERCC and known concentration (this is to remove any duplicated rows for ERCC with more than one isoform)
+  # 2. Arrange ERCC concentration in ascending order
+  # 3.
+sensitivity <- function(..){
+  # Subset for each dataset
+  df <- ERCC_output[ERCC_output$variable %in% ..,] %>%
+    # Extract the unique row of ERCC and known concentration (this is to remove any duplicated rows for ERCC with more than one isoform)
+    # Arrange ERCC concentration in ascending order for cumulative observations
+    select(V1,amount_of_ERCC,variable) %>% unique() %>% arrange(amount_of_ERCC) %>%
+    # Cumulative rolling count for each unique ERCC detected from lowest to highest ERCC concentration
+    mutate(count = cumsum(!duplicated(V1)))
+  df
+}
+
+
+bind_rows(sensitivity("K23_1_passes_0.9"), sensitivity("M21_1_passes_0.9"), sensitivity("K18_1_passes_0.9")) %>%
+  ggplot(.,aes(x = amount_of_ERCC, y = count, colour = variable)) + geom_point(size = (0.2)) +
+  mytheme + labs(x = "Amount of ERCC", y = "Frequency of ERCC") + theme(legend.position = c(0.8,0.2)) + geom_smooth(se = FALSE) +
+  scale_colour_manual(values = c(wes_palette("GrandBudapest1")[2], wes_palette("GrandBudapest1")[3], wes_palette("GrandBudapest1")[4]),labels = c("K18","K23","M21"), name = "Sample")
+
+```
+
+The addition of samples for detecting more "novel" genes/isoforms are only important if not able to achieve initial high sequencing depth with the first sample.
+
+```{r}
+bind_rows(
+  sensitivity(c("K23_1_passes_0.9","M21_1_passes_0.9")) %>% select(-variable) %>% mutate(count = cumsum(!duplicated(V1))) %>% mutate(Samples = "K23+M21"),
+   sensitivity(c("K23_1_passes_0.9","K18_1_passes_0.9")) %>% select(-variable) %>% mutate(count = cumsum(!duplicated(V1))) %>% mutate(Samples = "K23+K18"),
+  sensitivity("M21_1_passes_0.9") %>% select(-variable) %>% mutate(count = cumsum(!duplicated(V1))) %>% mutate(Samples = "M21"),
+  sensitivity("K23_1_passes_0.9") %>% select(-variable) %>% mutate(count = cumsum(!duplicated(V1))) %>% mutate(Samples = "K23")) %>%
+  ggplot(.,aes(x = amount_of_ERCC, y = count, colour = Samples)) + geom_point(size = (0.2)) +
+  mytheme + labs(x = "Amount of ERCC", y = "Frequency of ERCC") + theme(legend.position = c(0.8,0.2)) + geom_smooth(se = FALSE) +
+  scale_colour_manual(values = c(wes_palette("GrandBudapest1")[1], wes_palette("GrandBudapest1")[3], wes_palette("GrandBudapest2")[4], wes_palette("GrandBudapest1")[2]))
+```
+
+# Part 2 Problem: Redundacy Observed
+
+A minority of ERCCs have more than one isoform (despite only one isoform per ERCC), indicating redundancy in *Cupcake TOFU*;
+Passes make no difference to collapsing efficiency.   
+Note: ERCC transcripts follow the 1 gene, 1 exon, 1 transcript layout, providing each ERCC transcript with a unique sequence identity. This is evident in the input files
+
+Implications:
+- inflated number of isoforms to genes?
+- more highly sequenced sample (K18, K23), the greater degree of inflation
+- the ERCCs with the high number of isoforms (i.e. ERCC-00130 with 6/7 isoforms has highest concentration amongst ERCCS)
+- more highly expressed gene,  greater degree of inflation (false positives)
+
+## Input Cupcake Files {.tabset .tabset-pills}
+
+### Group_Reads.txt
+Shown below is a snapshot of group_reads.txt from TOFU cupcake. Of note, *Cupcake TOFU* is further collapse HQ-polished FL transcripts into unique isoforms. However, a few of these unique isoforms are mapped to the same locus region (i.e. gene with multiple isoforms), despite only one isoform known per ERCC - indicating redundancy in collapsing using default parameters from *Cupcake TOFU*.
+
+```{r}
+head(collapsed_TOFU_grouped_reads[1:4,]) %>% kbl() %>% kable_styling() %>%
+  footnote(general = "As shown, unique isoform PB.1.4 has 2 identical transcripts (transcript/29277,transcript/29793) that are further collapsed by Cupcake TOFU. Naming system for the post-collapse isoform is PB.<loci_index>.<isoform_index>")
+```
+
+### Input.gff
+Shown below is a snapshot of input GFF
+
+```{r}
+head(collapsed_TOFU_gff[collapsed_TOFU_gff$V3 == "transcript",]) %>% kbl() %>% kable_styling() %>%
+  footnote(general = "GFF is necessary to determine the corresponding PB.ID and mapped gene (in this case ERCC) from V1")
+```
+
+### Abundance.txt
+Shown below is a snapshot of abundance.txt with the summation of FL reads associated with each PB.ID - for PB1.1, 2870 full-length reads were detected across the 8 polished FL transcripts that were further collpased by *Cupcake TOFU*.
+
+```{r}
+head(collapsed_TOFU_abundance_reads[1:4,]) %>% kbl() %>% kable_styling() %>%
+  footnote(general = "count_fl = Number of full-length reads")
+```
+
+## Redundant isoforms {.tabset .tabset-pills}
+
+### Plot
+
+```{r}
+# Tally the number of isoforms mapped to ERCC, and the distribution of the number of isoforms
+num_isoform <- collapsed_TOFU_reads[collapsed_TOFU_reads$V3 == "transcript",] %>%
+  group_by(V1,variable) %>% tally() %>%
+  group_by(n, variable) %>% tally() %>%
+  `colnames<-`(c("num_of_isoforms","variable","count"))
+
+# Tally the total number of ERCCs detected across the datasets for percentage
+total_num_isoform <- num_isoform %>% group_by(variable) %>% tally(count) %>%  `colnames<-`(c("variable","total_count"))
+num_isoform %>%
+  full_join(., total_num_isoform, by = "variable") %>%
+  mutate(perc = count/total_count * 100) %>%
+  mutate(sample = word(variable, c(1), sep = fixed("_"))) %>%
+  mutate(passes = word(variable, c(2), sep = fixed("_"))) %>%
+  ggplot(., aes(x = num_of_isoforms, y = perc, fill = passes)) + geom_bar(stat = "identity",position = position_dodge()) +
+  facet_grid(~ sample) +
+  mytheme + labs(x = "Number of Isoforms", y = "ERCC (%)") +
+  scale_fill_manual(values = c(alpha(wes_palette("Darjeeling2")[4],0.7), wes_palette("Darjeeling2")[2]))
+```
+
+### Table
+
+```{r}
+redundancy <- collapsed_TOFU_reads[collapsed_TOFU_reads$V3 == "transcript",] %>%
+  group_by(V1,variable) %>% tally() %>% select(V1,variable,n) %>% `colnames<-`(c("ERCC","Dataset","Number of isoforms"))
+
+DT::datatable(redundancy, caption = "Number of isoforms of ERCC")
+```
+
+### Rationale
+Interestingly, all the â€œuniqueâ€ isoforms have the same  sequence, but are truncated in length. Note: the sequences highlighted are identical across all the â€œuniqueâ€ isoforms. Shown are sequences of isoforms classified as unique by Cupcake TOFU, all mapped to ERCC-00130
+
+![Redundant Isoforms, truncated at 3' end](/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/Scripts/IsoSeq3_Tg4510/Images/redundant_isoforms.png)
+
+Subsequently, went back to original CCS reads, and noticed all these isoforms have polyA tails. Hence, classified by Iso-Seq3 pipeline as unique isoforms after removal of polyA- also explains why not removed by Cupcake TOFU. PolyA due to random priming from oligoDT during cDNA synthesis? ïƒ  the region where polyAs occur coincidentally reside with genomic As (though only 3 or 4 As)
+
+![Redundant Isoforms all with polyA](/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/Scripts/IsoSeq3_Tg4510/Images/redundant_isoforms_polya.png)
+
+# Part 2 Proposed Solution: Filtering fragments with TAMA
+
+## {.tabset .tabset-pills}
+
+### Partially-resolved redundancy
+TAMA (partially) successfully removes redundant isoforms. Post-filtering with TAMA (shaded dark green), number of isoforms per ERCCs reduced significantly, with no difference between the number of passes. Note still some ERCCs with isoforms not fully removed.
+```{r}
+TAMA_filter_dir <- "/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/WholeTranscriptome/Testing/TOFU/TAMA_FILTER"
+
+TAMA_filtered <- list.files(path = TAMA_filter_dir, pattern = "bed", full.names = T) %>% lapply(., function(x) read.table(x) %>% select(V1,V4) %>% mutate(V1 = as.character(V1)) %>% mutate(V4 = as.character(V4)))
+names(TAMA_filtered) <- list.files(path = TAMA_filter_dir, pattern = "bed")
+
+# Tally the number of isoforms mapped to ERCC, and the distribution of the number of isoforms
+num_isoform <- TAMA_filtered %>% bind_rows(.,.id = "variable") %>%
+  group_by(variable,V1) %>% tally() %>%
+  group_by(n, variable) %>% tally() %>%
+  `colnames<-`(c("num_of_isoforms","variable","count"))
+
+# Tally the total number of ERCCs detected across the datasets for percentage
+total_num_isoform <- num_isoform %>% group_by(variable) %>% tally(count) %>%  `colnames<-`(c("variable","total_count"))
+num_isoform %>%
+  full_join(., total_num_isoform, by = "variable") %>%
+  mutate(perc = count/total_count * 100) %>%
+  mutate(sample = word(variable, c(1), sep = fixed("_"))) %>%
+  mutate(passes = word(variable, c(2), sep = fixed("_"))) %>%
+  mutate(file = factor(word(variable, c(3), sep = fixed(".")), levels = c("bed12","bed"))) %>%
+  ggplot(., aes(x = num_of_isoforms, y = perc, fill = file)) + geom_bar(stat = "identity",position = position_dodge()) +
+  facet_grid(passes ~ sample) +
+  mytheme + labs(x = "Number of Isoforms", y = "ERCC (%)") +
+  scale_fill_manual(values = c(alpha(wes_palette("Darjeeling1")[2],0.3), wes_palette("Darjeeling1")[2]),
+                    labels = c("Pre-Filter","Post-Filter"), name = "") +
+  theme(legend.position = "bottom")
+
+
+```
+
+### Retained unique ERCCs
+While TAMA removes redundant isoforms, it does not remove unique ERCCs. This can be seen that the ERCCs that were detected pre-TAMA (grey-shaded) are still detected post-TAMA (blue) in that it's not shaded in blue in the heatmap (0 isoforms), only difference is that the number of the highly expressed ERCCs isoforms are drastically reduced (> 6 isoforms to <= 2 isoforms).
+
+```{r}
+## Heatmap of the number of FL reads associated per ERCC across the samples
+# Create matrix of the heatmap for input
+reads_heatmap <- TAMA_filtered %>% bind_rows(.,.id = "variable") %>%  group_by(variable,V1) %>% tally() %>%
+  spread(., variable, n) %>%
+  column_to_rownames(., var = "V1") %>%
+  as.matrix()
+reads_heatmap[is.na(reads_heatmap)] <- 0
+
+# Create a metadata dataframe for additional information to annotate the heatmap
+reads_metadata <- as.data.frame(unique(total_num_isoform$variable)) %>%
+  `colnames<-`(c("variable")) %>%
+  mutate(num_passes = word(variable, c(2), sep = fixed("_"))) %>%
+  mutate(RQ = word(variable, c(4), sep = fixed("_"))) %>%
+  mutate(Sample = word(variable, c(1), sep = fixed("_"))) %>%
+  mutate(Filtering = factor(word(variable, c(3), sep = fixed(".")), levels = c("bed12","bed"), labels = c("Pre-Filter","Post-Filter")))
+# only keep the relevant columns
+ann <- data.frame(reads_metadata$num_passes, reads_metadata$Sample, reads_metadata$Filtering)
+# determine the colours and format for the annotations
+colnames(ann) <- c('Passes','Sample','Filtering')
+colours <- list('Sample' = c('K18' = wes_palette("GrandBudapest1")[2],
+                             'K23' = wes_palette("GrandBudapest1")[3],
+                             'M21' = wes_palette("GrandBudapest1")[4]),
+                'Passes' = c('1' = alpha(wes_palette("Darjeeling2")[4],0.7),
+                             '2' = wes_palette("Zissou1")[2],
+                             '3' =wes_palette("Darjeeling2")[2]),
+                'Filtering' = c('Post-Filter' = wes_palette("Darjeeling1")[2],
+                           'Pre-Filter' = wes_palette("Chevalier1")[3]))
+
+colAnn <- HeatmapAnnotation(df = ann, which = 'col',
+                            col = colours, annotation_width = unit(c(1, 4), 'cm'), gap = unit(1, 'mm'))
+
+
+# Combine matrix and annotation  
+ht_list <- Heatmap(reads_heatmap,
+        top_annotation = colAnn,
+        show_row_dend = FALSE, show_column_names = FALSE, col=plasma(100),
+        name = 'Number of Isoforms',
+        row_names_gp = gpar(fontsize = 10),
+        heatmap_legend_param = list(direction = "horizontal"))
+
+
+draw(ht_list, heatmap_legend_side = "top", annotation_legend_side = "top",merge_legend = TRUE)
+```
+
+### FL read count
+
+The FL reads per ERCC is similar pre- and post-TAMA, indicating that TAMA are removing the lowly-expressed, truncated isoforms. Note, significant difference in detecting ERCCs not determined by number of passes but sequencing depth.  
+```{r}
+## Heatmap of the number of FL reads associated per ERCC across the samples
+# Create matrix of the heatmap for input
+reads_heatmap <- TAMA_filtered %>% bind_rows(.,.id = "variable") %>%
+  mutate(Filtering = variable) %>%
+  mutate(variable = str_remove(.$variable,".bed12")) %>%
+  mutate(variable = str_remove(.$variable,".bed")) %>%
+  mutate(PB.ID = word(.$V4, c(2), sep = fixed(";"))) %>%
+  mutate(PB.ID = ifelse(!is.na(.$PB.ID), .$PB.ID, .$V4)) %>%
+  mutate(ID = paste0(variable,";", PB.ID))
+
+reads_heatmap_final <- merge(reads_heatmap %>% select(ID, Filtering),
+                       collapsed_TOFU_reads %>% mutate(ID = paste0(variable,";", PB.ID)) %>% filter(V3 == "transcript") %>%
+                         select(V1, ID, count_fl),by = "ID") %>%
+  unique(.) %>%
+  group_by(V1, Filtering) %>% tally(count_fl) %>%
+  spread(., Filtering, n) %>%
+  .[complete.cases(.[ , 1]),] %>%
+  column_to_rownames(., var = "V1") %>%
+  as.matrix()
+
+# Create a metadata dataframe for additional information to annotate the heatmap
+reads_metadata <- as.data.frame(unique(total_num_isoform$variable)) %>%
+  `colnames<-`(c("variable")) %>%
+  mutate(num_passes = word(variable, c(2), sep = fixed("_"))) %>%
+  mutate(Sample = word(variable, c(1), sep = fixed("_"))) %>%
+  mutate(Filtering = factor(word(variable, c(3), sep = fixed(".")), levels = c("bed12","bed"), labels = c("Pre-Filter","Post-Filter")))
+# only keep the relevant columns
+ann <- data.frame(reads_metadata$num_passes, reads_metadata$Sample, reads_metadata$Filtering)
+# determine the colours and format for the annotations
+colnames(ann) <- c('Passes','Sample','Filtering')
+colours <- list('Sample' = c('K18' = wes_palette("GrandBudapest1")[2],
+                             'K23' = wes_palette("GrandBudapest1")[3],
+                             'M21' = wes_palette("GrandBudapest1")[4]),
+                'Passes' = c('1' = alpha(wes_palette("Darjeeling2")[4],0.7),
+                             '2' = wes_palette("Zissou1")[2],
+                             '3' =wes_palette("Darjeeling2")[2]),
+                'Filtering' = c('Post-Filter' = wes_palette("Darjeeling1")[2],
+                           'Pre-Filter' = wes_palette("Chevalier1")[3]))
+
+colAnn <- HeatmapAnnotation(df = ann, which = 'col',
+                            col = colours, annotation_width = unit(c(1, 4), 'cm'), gap = unit(1, 'mm'))
+
+
+# for ERCC not detected - replace NA as 1, as required value for heatmap clustering
+# note replace with 1 rather than 0 as log10 1 = 0
+reads_heatmap_final[is.na(reads_heatmap_final)] <- 1
+# Combine matrix and annotation  
+ht_list <- Heatmap(log10(reads_heatmap_final),
+        top_annotation = colAnn,
+        show_row_dend = FALSE, show_column_names = FALSE, col=plasma(100),
+        name = 'FL Count (Log10)',
+        row_names_gp = gpar(fontsize = 10),
+        heatmap_legend_param = list(direction = "horizontal"))
+
+draw(ht_list, heatmap_legend_side = "top", annotation_legend_side = "top",merge_legend = TRUE)
+```
+
+
+### SQANTI2 annotation  
+
+#### Number of Isoforms
+SQANTI2 filtering further eliminates redundacy post-TAMA.
+
+```{r}
+SQANTI2_prefilter <- read.table("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/WholeTranscriptome/Testing/TOFU/TAMA_FILTER/SQANTI2/K23_3_passes_0.9_TAMAFiltered.collapsed.filtered.rep_classification.txt", header=T, as.is=T, sep="\t") %>% mutate(SQANTI2 = "Pre-Filter")
+SQANTI2_postfilter <- read.table("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/WholeTranscriptome/Testing/TOFU/TAMA_FILTER/SQANTI2/K23_3_passes_0.9_TAMAFiltered.collapsed.filtered.rep_classification.filtered_lite_classification.txt", header=T, as.is=T, sep="\t") %>% mutate(SQANTI2 = "Post-Filter")
+
+bind_rows(SQANTI2_prefilter,SQANTI2_postfilter) %>% group_by(chrom, SQANTI2) %>% tally() %>% group_by(n, SQANTI2) %>% tally() %>% ggplot(., aes(x = n, y = nn, fill = SQANTI2)) + geom_bar(stat = "identity", position = position_dodge()) +
+  mytheme + labs(x = "Number of ERCCs", y = "Number of isoforms")
+```
+
+#### Correlation
+
+High correlation of FL read count (Log2) to known amount of ERCC (Log2) maintained after TAMA and SQANTI2 filtering
+```{r}
+SQANTI2_post_filter_counts <- SQANTI2_postfilter %>% group_by(chrom) %>% tally(FL)
+ERCC_conc <- read.csv("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/ONT/ERCC/ERCC_calculations.csv", header = T)[-1,]
+ERCC_output <- merge(SQANTI2_post_filter_counts, ERCC_conc, by.x = "chrom", by.y = "ERCC_ID") %>%
+  mutate(log2_amount_of_ERCC = log2(amount_of_ERCC)) %>%
+  mutate(log2_FL_reads = log2(n))
+
+density_plot(ERCC_output,"log2_amount_of_ERCC","log2_FL_reads", "Amount of ERCC (Log2)", "Number of FL reads (Log2)","")
+```
+
+# Part 2 Proposed Solution: Recollapse with Cupcake
+
+Solved redundancy by remapping the fastq from Cupcake with Minimap2 and then re-running Cupcake.  
+1. Iso-Seq3 pipeline
+2. Minimap2, input = polished.fa from Iso-Seq Cluster
+3. Cupcake, input = polished.fa from Iso-Seq Cluster, output = collapsed.rep.fa
+4. Minimap2, input = collapsed.rep.fa
+5. Cupcake, input = collapsed.rep.fa
+
+## {.tabset .tabset-pills}
+
+### Partially-resolved redundancy
+Re-running Cupcake significantly reduced redundacy, though note still some ERCCs with 2 isoforms. No difference in terms of number of isoforms collapsed between passes.
+
+```{r}
+# Input output files generated from re-running Cupcake  
+working_tofu_dir <- "/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/WholeTranscriptome/Testing/TOFU/RETOFU"
+TOFU_read("collapsed.group.txt", "Testing_grouped_reads")
+TOFU_read("collapsed.gff", "Testing_TOFU_gff")
+TOFU_read("abundance.txt", "Testing_TOFU_abundance_reads")
+
+# merge for full information
+Testing_TOFU_reads <- Testing_grouped_reads %>%
+  full_join(., Testing_TOFU_gff, by = c("PB.ID","variable")) %>%
+  full_join(., Testing_TOFU_abundance_reads, by = c("PB.ID","variable")) %>%
+  mutate(threediff = word(variable, c(5), sep = fixed("_")))
+
+# Tally the number of isoforms mapped to ERCC, and the distribution of the number of isoforms
+num_isoform <- Testing_TOFU_reads[Testing_TOFU_reads$V3 == "transcript",] %>%
+  group_by(V1, variable) %>% tally() %>%
+  group_by(n, variable) %>% tally()  %>%
+  `colnames<-`(c("num_of_isoforms","variable","count"))
+
+# Tally the total number of ERCCs detected across the datasets for percentage
+total_num_isoform <- num_isoform %>% group_by(variable) %>% tally(count) %>%  `colnames<-`(c("variable","total_count"))
+num_isoform %>%
+  full_join(., total_num_isoform, by = "variable") %>%
+  mutate(perc = count/total_count * 100) %>%
+  mutate(sample = word(variable, c(1), sep = fixed("_"))) %>%
+  mutate(passes = word(variable, c(2), sep = fixed("_"))) %>%
+  mutate(num_of_isoforms = as.factor(num_of_isoforms)) %>%
+  ggplot(., aes(x = num_of_isoforms, y = perc, fill = passes)) + geom_bar(stat = "identity",position = position_dodge()) +
+  facet_grid(~ sample) +
+  mytheme + labs(x = "Number of Isoforms", y = "ERCC (%)") + theme(legend.position = "bottom") +
+  scale_fill_manual(values = c(alpha(wes_palette("Darjeeling2")[4],0.7), wes_palette("Darjeeling2")[2]))
+```
+
+### FL read count
+
+To re-collapse with Cupcake, the abundance file is generated collapsing the output fasta from the first run with Cupcake, such as the collapse is with "PB.19.1|ERCC-00096:1-1091(+)|transcript/30027" rather than "transcript/24540,transcript/25156...". The abundance file therefore does not accurately reflect that from the clustering from Iso-Seq3 pipeline.
+
+Given that it's quite circular, and the abundance output is not appropriate, this solution is not taken forward.
+
+```{r}
+## Heatmap of the number of FL reads associated per ERCC across the samples
+# Create matrix of the heatmap for input
+
+First_Second_TOFU <- bind_rows(collapsed_TOFU_reads %>% mutate(variable = paste0(variable,"_First")),
+                           Testing_TOFU_reads %>% mutate(variable = paste0(variable,"_Second")))
+
+reads_heatmap <- First_Second_TOFU %>% filter(V3 == "transcript") %>% group_by(variable, V1) %>% tally(count_fl) %>%
+  spread(., variable, n) %>%
+  column_to_rownames(., var = "V1") %>%
+  as.matrix()
+
+# for ERCC not detected - replace NA as 1, as required value for heatmap clustering
+# note replace with 1 rather than 0 as log10 1 = 0
+reads_heatmap[is.na(reads_heatmap)] <- 1
+
+# Combine matrix and annotation  
+Heatmap(log10(reads_heatmap), show_row_dend = FALSE, col=plasma(400), name = 'FL Count (Log10)')
+```

@@ -1,0 +1,513 @@
+---
+title: "Changing Cupcake Parameters"
+author: Szi Kay Leung
+date: "`r Sys.Date()`"
+output:
+  rmdformats::material:
+    self_contained: true
+    thumbnails: true
+    lightbox: true
+    gallery: true
+    highlight: tango
+    code_folding: hide
+    fig_caption: true
+    cards: true
+
+
+
+---
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE,fig.width=14, fig.height= 7)
+#rmarkdown::render("/gpfs/ts0/home/sl693") 
+
+suppressMessages(library(reshape2))
+suppressMessages(library(dplyr))
+suppressMessages(library(tibble))
+suppressMessages(library(DT))
+suppressMessages(library(ggplot2))
+suppressMessages(library(stringr)) 
+suppressMessages(library(tidyr))
+suppressMessages(library(tidyverse))
+suppressMessages(library(scales))
+suppressMessages(library(rjson))
+suppressMessages(library(magrittr))
+suppressMessages(library(magicfor))            
+magic_for(print, silent = TRUE) # call magic_for()
+
+
+#font_import()
+#source("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/Scripts/IsoSeq_Tg4510/Rmarkdown_Input.R")
+targeted_genes <- c("Abca1","Abca7","Ank1","Apoe","App","Bin1","Cd33","Clu","Fus","Fyn","Mapt","Picalm","Ptk2b","Rhbdf2","Sorl1","Snca","Tardbp","Trem2","Trpa1")
+
+```
+
+# Aims
+
+**To evaluate consequences of reducing cupcake parameters (coverage identity) from 99% (default) to 95% on whole transcriptome**    
+- Number of isoforms and genes from SQANTI filtered report using the two different praameters  
+- Explore the additional isoforms that are retained from 95% --> lower FL count in general?  
+- Visually check additional isoforms  
+
+**Previously using ERCC**, demonstrated with ERCC that cupcake's coverage default parameter at 99% is too stringent, with 20 lowly-expressed ERCCs discarded. 
+**therefore**, reran demux pipeline on merged whole transcriptome data (n = 12) but using a lower coverage threshold (95%).  
+
+<<<<<<< HEAD
+<<<<<<< HEAD
+**Mapping alignment of merged whole transcriptome data** further showed signicant number of transcripts that had a lower coverage, and would have been discarded, **therefore**, reran demux pipeline on merged whole transcriptome data (n = 12) but using a lower coverage threshold (85%).
+
+=======
+>>>>>>> c34b526e4f39c14e6ca6579cf2dd5726cda490a5
+=======
+>>>>>>> c34b526e4f39c14e6ca6579cf2dd5726cda490a5
+# Method
+
+Checking the number of transcripts throughout pipeline from alignment with mouse genome (Minimap2):  
+1. Cupcake collapse (coverage identity at default threshold - 99% or at reduced threshold - 95%)  
+2. Cupcake filter  
+3. SQANTI characterisation   
+4. SQANTI filtering  
+5. TAMA filtering  
+  
+Two analysis were done in parallel with the only difference in the cupcake coverage identity parameter (at cupcake collapse).
+
+## Pipeline
+![Pipeline for analysis](/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/Scripts/IsoSeq_Tg4510/Images/coverage_updated_pipeline.png)
+
+```{r}
+# function to read in the individual files 
+read_inputfile <- function(path_inputfile, sqanti_gtf, file_option){
+  #cat("processing", path_inputfile,"\n")
+  
+  if (file_option == "cupcake"){
+    df <-  read.table(path_inputfile, as.is = T, sep = "\t", header = T)%>% 
+      mutate(cluster = paste0("PB.",word(.$pbid, c(2), sep = fixed("."))))
+  } else if (file_option == "sqanti_discard"){
+    df <-  read.table(path_inputfile, as.is = T, sep = ",", header = T) %>% 
+      mutate(cluster = paste0("PB.",word(.$filtered_isoform, c(2), sep = fixed(".")))) 
+  } else if (file_option == "tama_discard"){
+    df <-  read.table(path_inputfile, as.is = T) %>% 
+      mutate(id = paste0("PB.",word(.$V4, c(2), sep = fixed(";")))) 
+  } else if (file_option == "ignore"){
+    df <- read.table(path_inputfile, as.is = T, sep = "\t")
+  } else if (file_option == "sqanti"){
+    df <- read.table(path_inputfile, as.is = T, sep = "\t", header = TRUE) %>% 
+      mutate(id = paste0(ifelse(structural_category != "fusion", 
+                         word(associated_gene,c(1), sep ="_"),associated_gene),
+                         "/",associated_transcript,"/",structural_category,"/", chrom, "/", length)) 
+    # Create a new attribute called "novelGene"
+    df$novelGene <- "Annotated Genes"
+    df[grep("novelGene", df$associated_gene), "novelGene"] <- "Novel Genes"
+    df$novelGene = factor(df$novelGene, levels = c("Novel Genes","Annotated Genes"),ordered=TRUE)
+    
+    df <- read_merge_gtf(sqanti_gtf,df)
+  } else {
+    print("Check arguments")
+  }
+  
+  return(df)
+}
+
+# assume the files are the same in the two analysis, only difference is the directory name
+all_read <- function(root_dir){
+  all <- list(
+  read_inputfile(paste0(root_dir,"TOFU/WholeIsoSeq.ignored_ids.txt"),"NA", "ignore"),                  # cupcake collapse ignored isoforms 
+  read_inputfile(paste0(root_dir,"TOFU/WholeIsoSeq.collapsed.abundance.txt"),"NA", "cupcake"),   # cupcake collapse 
+  read_inputfile(paste0(root_dir,"TOFU/WholeIsoSeq.collapsed.filtered.abundance.txt"),"NA","cupcake"),  # cupcake filter 
+  read_inputfile(paste0(root_dir,"SQANTI/WholeIsoSeq.collapsed.filtered_classification.txt"),
+                 paste0(root_dir,"SQANTI/WholeIsoSeq.collapsed.filtered_corrected.gtf"), "sqanti"), # sqanti characterisation 
+  read_inputfile(paste0(root_dir,"SQANTI/WholeIsoSeq.collapsed.filtered_classification.filtered_lite_classification.txt"),
+                 paste0(root_dir,"SQANTI/WholeIsoSeq.collapsed.filtered_classification.filtered_lite.gtf"), "sqanti"), # sqanti filter
+  read_inputfile(paste0(root_dir,"SQANTI/WholeIsoSeq.collapsed.filtered_classification.filtered_lite_reasons.txt"),"NA","sqanti_discard"), # sqanti filtering reason
+  read_inputfile(paste0(root_dir,"SQANTI_TAMA_FILTER/WholeIsoSeq.collapsed_sqantitamafiltered.classification.txt"),
+                 paste0(root_dir,"SQANTI_TAMA_FILTER/WholeIsoSeq.collapsed_sqantitamafiltered.classification.gtf"), "sqanti"), # sqanti after tama filtering
+  read_inputfile(paste0(root_dir,"SQANTI_TAMA_FILTER/tama_retained_pbid.txt"),"NA", "ignore"), # tama retained
+  read_inputfile(paste0(root_dir,"TAMA_Filter/WholeIsoSeq_discarded.txt"),"NA", "tama_discard") # tama ignore
+)
+  names(all) <- c("cup_coll_ign","cup_coll","cup_fil","sq","sq_fil","sq_ign","sq_tama","sq_tama_id","sq_tama_discard")
+  return(all)
+}
+
+# coverage threshold at 99%
+
+testing_para <- "/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcriptome/OLD_2020/All_Merged/Testing_Parameters"
+c99_dir <- paste0(testing_para,"/DEMUX_CUSTOM/")
+c99 <- all_read(c99_dir)
+
+# coverage threshold at 95%
+c95_dir <- paste0(testing_para,"/DEMUX_CUSTOM_ADJUST/")
+c95 <- all_read(c95_dir)
+
+# coverage threshold at 85%
+c85_dir <-  paste0(testing_para,"/DEMUX_c85/")
+c85 <- all_read(c85_dir)
+
+c99_dir <- "/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcriptome/All_Merged/DEMUX_CUSTOM/"
+c99 <- all_read(c99_dir)
+
+# coverage threshold at 95%
+c95_dir <- "/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcriptome/All_Merged/DEMUX_CUSTOM_ADJUST/"
+c95 <- all_read(c95_dir)
+
+
+```
+
+# Mapping
+
+```{r}
+
+mapping_input_dir = "/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcriptome/OLD_2020/All_Samples/MOUSE/MAPPING/PAF"
+
+Merged_mapping <- read.table(paste0(mapping_input_dir,"/All_Merged_reads_with_alignment_statistics.txt"))
+
+# plot of Alignable length and identity
+pMergedMap <- Merged_mapping %>% 
+  mutate(identity = V8 * 100) %>% 
+  mutate(length = V6 * 100) %>%
+  ggplot(., aes(x = length, y = identity)) +
+  stat_density_2d(aes(fill = stat(level)), geom = "polygon") +
+  geom_point(size = 0.4, alpha = 0.25) +
+  scale_fill_distiller(palette=4, direction=1, name = "Density") +
+  mytheme + labs(x = "Alignment Length (%)", y = "Alignment Identity (%)", title = "\n\n") +
+  geom_hline(yintercept = 95, linetype = 2) +
+  geom_hline(yintercept = 85, linetype = 2) +
+  geom_vline(xintercept = 95, linetype = 3) + 
+  theme(legend.position = "none") +
+  annotate("text", x = 12, y = 97, label = "95% Threshold (Reduced)") + 
+  annotate("text", x = 10, y = 87, label = "85% Threshold") + 
+  annotate("text", x = 94, y = 50, label = "95% Threshold", angle = 90) +
+  annotate("rect", xmin = 95, xmax = 100, ymin = 95, ymax = 100, fill = "palegreen", alpha = 0.2)
+
+pMergedMap 
+```
+
+# Main Results 
+
+## {.tabset .tabset-fade .tabset-pills}
+
+### Cupcake Collapse - Discarded {.tabset .tabset-fade .tabset-pills}
+
+As expected, all the transcripts discarded in 95% coverage dataset are within the 99% coverage dataset
+
+#### Numbers 
+```{r}
+num <- bind_rows(sapply(c99, nrow) %>% melt() %>% rownames_to_column(., var = "fileinput") %>% mutate(type = "coverage_99"),
+          sapply(c95, nrow) %>% melt() %>% rownames_to_column(., var = "fileinput") %>% mutate(type = "coverage_95"), 
+          sapply(c85, nrow) %>% melt() %>% rownames_to_column(., var = "fileinput") %>% mutate(type = "coverage_85")) 
+
+num %>% filter(fileinput == "cup_coll_ign") %>% 
+  ggplot(., aes(x = fileinput, y = value, fill = type)) + geom_bar(stat = "identity", position = position_dodge()) + 
+  labs(y = "Number of Transcripts Discarded", x = "") + mytheme +
+  scale_x_discrete(labels=c("Cupcake Collapse")) +
+  scale_fill_discrete(labels = c("85% Coverage","95% Coverage","99% Coverage"), name = "")
+
+
+```
+
+#### Overlap
+
+```{r}
+
+# intentional mislabelling due to misleading labelling from venn diagram otherwise
+grid.draw(venn_diagram_plot_threecircles(c95$cup_coll_ign$V1,c85$cup_coll_ign$V1,c99$cup_coll_ign$V1,"99% Coverage","85% Coverage","95% Coverage"))
+#grid.draw(venn_diagram_plot_twocircles(c95$cup_coll_ign$V1,c99$cup_coll_ign$V1,"95% Coverage","99% Coverage"))
+
+```
+
+### Number of unique isoforms
+
+```{r}
+'%ni%' <- Negate('%in%')
+df <- num[num$fileinput %ni% c("cup_coll_ign","sq_ign","sq_tama_discard","sq_tama_id"),]
+ggplot(df, aes(x = fileinput, y = value, fill = type)) + 
+  geom_bar(stat = "identity", position = position_dodge()) + 
+  labs(y = "Number of Isoforms", x = "") + mytheme +
+  scale_x_discrete(labels=c("Cupcake Collapse","Cupcake Filter","Sqanti","Sqanti Filter","Post Tama")) +
+  scale_fill_discrete(labels = c("85% Coverage", "95% Coverage","99% Coverage"), name = "") +
+  theme(axis.text.x = element_text(angle = 45, hjust=1))
+```
+
+# Filters  
+
+## {.tabset .tabset-pills}
+
+### Cupcake Filter {.tabset .tabset-pills}
+
+Cupcake filter removes any 5' degraded products. Interestingly, while cupcake collapse generates almost idental dataset between the two analyses, there is very low overlap between cupcake filter. 
+
+
+```{r}
+grid.draw(venn_diagram_plot_threecircles(c99$cup_fil$pbid,c85$cup_fil$pbid,c95$cup_fil$pbid,"99% Coverage","85% Coverage","95% Coverage"))
+
+```
+
+### Sqanti {.tabset .tabset-pills}
+
+#### Overlap
+
+```{r}
+
+#grid.draw(venn_diagram_plot_twocircles(c99$sq$gtf_coordinates,c95$sq$gtf_coordinates,"99% Coverage","95% Coverage"))
+grid.draw(venn_diagram_plot_threecircles(c99$sq$gtf_coordinates,c85$sq$gtf_coordinates,c95$sq$gtf_coordinates,"99% Coverage","85% Coverage","95% Coverage"))
+
+```
+
+#### 99% Coverage {.tabset .tabset-pills}
+
+##### Unique Isoforms 
+
+```{r}
+# in 99% default but not in 95%
+c99$sq %>% filter(gtf_coordinates %in% setdiff(c99$sq$gtf_coordinates,c95$sq$gtf_coordinates)) %>% 
+  group_by(structural_category,novelGene) %>% tally() %>% 
+  ggplot(., aes(fill = structural_category, y = n, x = novelGene)) + geom_bar(stat = "identity") + 
+  mytheme + labs(y = "Number of Isoforms", x = "", title = "Unique to 99% Coverage\n\n") + ylim(0,1500)
+```
+
+##### Genes - Num of Unique Isoforms 
+
+```{r}
+datatable(c99$sq %>% filter(gtf_coordinates %in% setdiff(c99$sq$gtf_coordinates,c95$sq$gtf_coordinates)) %>% group_by(associated_gene) %>% tally() %>% arrange(desc(n)),  caption = "Genes with isoforms present in 99% but not in 95% coverage") 
+```
+
+##### Isoforms unique to coverage-99% dataset 
+
+**Figure 1: Isoforms detected in SQANTI annotation using different Cupcake collapse parameters**   
+UCSC genome browser track of isoforms annotated to **a)** *Dcc* gene and **b)** *Ctnap5a* gene from *SQANTI* annotation (pre-filtering). The same dataset was collapsed with *Cupcake* using either using coverage threshold of 99% (default) or 95% (determined experimentally using ERCCs). 
+
+Isoforms that were unique to the coverage-99% dataset are short-monoexonic isoforms at the 5' and 3' end (boxed blue).
+
+
+![](/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/Scripts/IsoSeq_Tg4510/Images/cupcakefilter2.png)
+
+#### 95% Coverage {.tabset .tabset-pills}
+
+##### Unique Isoforms 
+
+```{r}
+# in 95% but not in 99%
+c95$sq %>% filter(gtf_coordinates %in% setdiff(c95$sq$gtf_coordinates,c99$sq$gtf_coordinates)) %>% 
+  group_by(structural_category,novelGene) %>% tally() %>% 
+  ggplot(., aes(fill = structural_category, y = n, x = novelGene)) + geom_bar(stat = "identity") + 
+  mytheme + labs(y = "Number of Isoforms", x = "", title = "Unique to 95% Coverage\n\n") + ylim(0,1500)
+```
+
+##### Genes - Num of Unique Isoforms 
+
+```{r}
+datatable(c95$sq %>% filter(gtf_coordinates %in% setdiff(c95$sq$gtf_coordinates,c99$sq$gtf_coordinates)) %>% group_by(associated_gene) %>% tally() %>% arrange(desc(n)), caption = "Genes with isoforms present in 95% but not in 99% coverage")
+```
+
+##### Isoforms unique to coverage-95% dataset 
+
+**Figure 1: Isoforms detected in SQANTI annotation using different Cupcake collapse parameters**  
+UCSC genome browser track of isoforms annotated to **a)** *Ncam1* gene and **b)** *Ide* gene from *SQANTI* annotation (pre-filtering). The same dataset was collapsed with *Cupcake* using either using coverage threshold of 99% (default) or 95% (determined experimentally using ERCCs). 
+
+Isoforms that were unique to the coverage-99% dataset are multi-exonic transcripts that align well with the reference genome.
+![](/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/Scripts/IsoSeq_Tg4510/Images/cupcakefilter.png)
+
+#### 85% Coverage {.tabset .tabset-pills}
+
+In 85%, but not in 99% or 95% coverage
+
+##### Unique Isoforms 
+
+```{r}
+# in 85% but not in 99% in 95%
+c85$sq %>% filter(gtf_coordinates %in% setdiff(c85$sq$gtf_coordinates,c(c99$sq$gtf_coordinates,c95$sq$gtf_coordinates))) %>% 
+  group_by(structural_category,novelGene) %>% tally() %>% 
+  ggplot(., aes(fill = structural_category, y = n, x = novelGene)) + geom_bar(stat = "identity") + 
+  mytheme + labs(y = "Number of Isoforms", x = "", title = "Unique to 85% Coverage\n\n") + ylim(0,1500)
+```
+
+##### Genes - Num of Unique Isoforms 
+
+```{r}
+datatable(c85$sq %>% filter(gtf_coordinates %in% setdiff(c85$sq$gtf_coordinates,c(c99$sq$gtf_coordinates,c95$sq$gtf_coordinates))) %>% group_by(associated_gene) %>% tally() %>% arrange(desc(n)), caption = "Genes with isoforms present in 85% but not in 99% or 95% coverage")
+```
+
+=======
+
+### Sqanti Filter {.tabset .tabset-pills}
+
+#### Overlap
+
+```{r}
+grid.draw(venn_diagram_plot_twocircles(c99$sq_fil$gtf_coordinates,c95$sq_fil$gtf_coordinates,"99% Coverage","95% Coverage"))
+```
+
+### Post TAMA {.tabset .tabset-pills}
+
+#### Overlap 
+
+```{r}
+grid.draw(venn_diagram_plot_twocircles(c99$sq_tama$gtf_coordinates,c95$sq_tama$gtf_coordinates,"99% Coverage","95% Coverage"))
+```
+
+#### 99% Coverage {.tabset .tabset-pills}
+
+##### Unique Isoforms 
+
+```{r}
+# in 99% but not in 95%
+c99$sq_tama %>% filter(gtf_coordinates %in% setdiff(c99$sq_tama $gtf_coordinates,c95$sq_tama $gtf_coordinates)) %>% 
+  group_by(structural_category,novelGene) %>% tally() %>% 
+  ggplot(., aes(fill = structural_category, y = n, x = novelGene)) + geom_bar(stat = "identity") + 
+  mytheme + labs(y = "Number of Isoforms", x = "", title = "Unique to 99% Coverage\n\n") + ylim(0,1500)
+```
+
+##### Genes - Num of Unique Isoforms 
+
+```{r}
+datatable(c99$sq_tama %>% filter(gtf_coordinates %in% setdiff(c99$sq_tama$gtf_coordinates,c95$sq_tama$gtf_coordinates)) %>% group_by(associated_gene) %>% tally() %>% arrange(desc(n)), caption = "Genes with isoforms present in 99% but not in 95% coverage")
+
+#c99$sq_tama %>% filter(gtf_coordinates %in% setdiff(c99$sq_tama$gtf_coordinates,c95$sq_tama$gtf_coordinates)) %>% filter(associated_gene %in% targeted_genes)
+```
+
+#### 95% Coverage {.tabset .tabset-pills}
+
+##### Unique Isoforms 
+
+```{r}
+# in 95% but not in 99%
+c95$sq_tama %>% filter(gtf_coordinates %in% setdiff(c95$sq_tama $gtf_coordinates,c99$sq_tama $gtf_coordinates)) %>% 
+  group_by(structural_category,novelGene) %>% tally() %>% 
+  ggplot(., aes(fill = structural_category, y = n, x = novelGene)) + geom_bar(stat = "identity") + 
+  mytheme + labs(y = "Number of Isoforms", x = "", title = "Unique to 95% Coverage\n\n") + ylim(0,1500)
+```
+
+##### Genes - Num of Unique Isoforms 
+
+```{r}
+datatable(c95$sq_tama %>% filter(gtf_coordinates %in% setdiff(c95$sq_tama$gtf_coordinates,c99$sq_tama$gtf_coordinates)) %>% group_by(associated_gene) %>% tally() %>% arrange(desc(n)), caption = "Genes with isoforms present in 95% but not in 99% coverage")
+
+# check for difference in any of the targeted genes
+#c95$sq_tama %>% filter(gtf_coordinates %in% setdiff(c95$sq_tama$gtf_coordinates,c99$sq_tama$gtf_coordinates)) %>% filter(associated_gene %in% targeted_genes)
+```
+
+##### Isoforms unique to coverage-95% dataset 
+
+**Figure 1: Isoforms detected in after applying TAMA filtering of partial transcripts to SQANTI-filtered dataset**   
+UCSC genome browser track of isoforms annotated to **a)** *Ncam1* gene and **b)** *Cadm1* gene after applying TAMA's filtering (tama_remove_fragment_models.py). The same dataset was collapsed with *Cupcake* using either using coverage threshold of 99% (default) or 95% (determined experimentally using ERCCs). 
+
+TAMA filtering removed redundant 5' partial transcripts in both datasets. However, there are evidently some isoforms (incomplete-splice match) that are in the coverage-95% dataset and not in the coverage-99% dataset.
+
+![](/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/Scripts/IsoSeq_Tg4510/Images/sqantitamafilter.png)
+
+### NCAM1
+
+```{r}
+
+NCAM1 <- function(){
+c99$sq %>% filter(gtf_coordinates %in% setdiff(c99$sq$gtf_coordinates,c95$sq$gtf_coordinates)) %>% 
+  filter(associated_gene == "Ncam1")
+
+# transcripts discarded by 99%, but kept in the 95% during cupcake collapse
+c95_kept <- setdiff(c99$cup_coll_ign$V1,c95$cup_coll_ign$V1)
+c95$coll_group <- read.table(paste0(c95_dir,"TOFU/WholeIsoSeq.collapsed.group.txt"))
+
+#write.table(c95_kept,paste0(c95_dir,"TOFU/c95additionaltranscripts.txt"), quote = F, row.names = F, col.names = F)
+
+### extract the FL reads (clustered) which were discarded by 99%, but kept in the 95%, and which pbid they belonged to (linux)
+# All_Merged=/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcriptome/All_Merged
+#while read transcript; do grep -w $transcript $All_Merged/DEMUX_CUSTOM_ADJUST/TOFU/WholeIsoSeq.collapsed.group.txt; done < $All_Merged/DEMUX_CUSTOM_ADJUST/TOFU/c95additionaltranscripts.txt > $All_Merged/DEMUX_CUSTOM_ADJUST/TOFU/c95additionaltranscripts_pbid.txt 
+c95$cup_coll_unique <- read.table(paste0(c95_dir,"TOFU/c95additionaltranscripts_pbid.txt")) %>% 
+  left_join(., c95$sq[,c("isoform","associated_gene")], by = c("V1" = "isoform"))
+
+c95$cup_fil <- read_gtf(paste0(c95_dir,"TOFU/WholeIsoSeq.collapsed.filtered.gff")) %>% full_join(.,c95$cup_fil, by = c("isoform" = "pbid"))
+c99$cup_fil <- read_gtf(paste0(c99_dir,"TOFU/WholeIsoSeq.collapsed.filtered.gff")) %>% full_join(.,c99$cup_fil, by = c("isoform" = "pbid"))
+
+# gtf coordinate for PB.16345.61 in c95
+c95$cup_fil %>% filter(isoform == "PB.16345.61")
+c99$cup_fil %>% filter(gtf_coordinates == "chr9 : 49517085 - 49569903")
+# QC other coordinates
+c95$cup_fil %>% filter(isoform == "PB.16345.26")
+c99$cup_fil %>% filter(gtf_coordinates == "chr9 : 49505068 - 49557133")
+
+# in 99% but not in 95% 
+c99$cup_fil[c99$cup_fil$gtf_coordinates %in% 
+              setdiff(c99$cup_fil %>% filter(cluster == "PB.16234") %>% .[,c("gtf_coordinates")],
+                    c95$cup_fil %>% filter(cluster == "PB.16345")  %>% .[,c("gtf_coordinates")]),c("isoform","gtf_coordinates")] %>%
+  left_join(c99$sq[,c("isoform","associated_gene","exons","structural_category","subcategory")], by = "isoform")
+
+# in 95% but not in 99% 
+View(c95$cup_fil[c95$cup_fil$gtf_coordinates %in% 
+              setdiff(c95$cup_fil %>% filter(cluster == "PB.16345") %>% .[,c("gtf_coordinates")],
+                    c99$cup_fil %>% filter(cluster == "PB.16234")  %>% .[,c("gtf_coordinates")]),c("isoform","gtf_coordinates")] %>% 
+  left_join(c95$sq[,c("isoform","associated_gene","exons","structural_category","subcategory")], by = "isoform"))
+
+
+c95$cup_fil %>% filter(cluster == "PB.16234")  
+c99$cup_fil %>% filter(gtf_coordinates == "chr9 : 49505068 - 49557133")  
+c95$cup_fil %>% filter(gtf_coordinates == "chr9 : 49505069 - 49567424")  
+
+# 1.
+c95$cup_coll_group <- read.table(paste0(c95_dir,"TOFU/WholeIsoSeq.collapsed.group.txt"))
+c95$cup_coll_group%>% filter(V1 == "PB.16345.3")
+c99$cup_coll_ign %>% filter(V1 %in% c("transcript/6640","transcript/7702"))
+
+# 2.
+c95$cup_coll_group%>% filter(V1 == "PB.16345.61")
+c99$cup_coll_ign %>% filter(V1 %in% c("transcript/113982"))
+
+# 4.
+c95$cup_coll_group%>% filter(V1 == "PB.16345.59")
+c99$cup_coll_ign %>% filter(V1 %in% c("transcript/114114"))
+
+# counts still retained
+#Ogfrl1, 83.6 chr1 : 23366439 - 23367069
+# c95$cup_coll_unique[13,]
+c95$cup_coll_unique[13,c("V2")]
+c99$cup_coll_ign %>% filter(V1 %in% "transcript/256839")  # retained in c95 but discarded in c99
+c95$cup_coll_group%>% filter(V1 == "PB.83.6")
+c95$cup_fil %>% filter(isoform == "PB.83.6")
+
+#Ogfrl1, 80.7 chr1 : 23366439 - 23367069
+c99$cup_coll_group <- read.table(paste0(c99_dir,"TOFU/WholeIsoSeq.collapsed.group.txt"))
+c99$cup_coll_group[grep("transcript/264944",c99$cup_coll_group$V2),] 
+c99$cup_coll_group %>% filter(V1 == "PB.80.7")
+c99$cup_fil %>% filter(isoform == "PB.80.7")
+
+c95$sq %>% filter(isoform == "PB.83.6") %>% mutate(Total_Fl = sum(.[,48:59])) %>% .[,c("isoform","associated_gene","Total_Fl")]
+c99$sq %>% filter(isoform == "PB.80.7") %>% mutate(Total_Fl = sum(.[,48:59])) %>% .[,c("isoform","associated_gene","Total_Fl")]
+
+## 
+c99$cup_readstat <- read.table(paste0(c99_dir,"TOFU/WholeIsoSeq.collapsed.read_stat.txt"), header = T)
+c95$cup_readstat <- read.table(paste0(c95_dir,"TOFU/WholeIsoSeq.collapsed.read_stat.txt"), header = T)
+
+c99$cup_readstat %>% filter(pbid == "PB.80.7")
+c95$cup_readstat %>% filter(pbid == "PB.83.6")
+
+}
+
+```
+
+# Human MAPT
+```{r}
+
+hMAPTid = read.table("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcriptome/OLD_2020/QC/Human_Mapt/Sequences/Whole/All_Merged.clustered.hq_Ids.txt")
+
+map <- read.table("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcriptome/OLD_2020/All_Samples/MOUSE/MAPPING/PAF/All_Merged_reads_with_alignment_statistics.txt")
+
+hMAPTid = read.table("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcriptome/QC/Human_Mapt/Sequences/All_Merged.clustered.hq_Ids.txt")
+
+map <- read.table("/gpfs/mrc0/projects/Research_Project-MRC148213/sl693/IsoSeq/Whole_Transcriptome/All_Samples/MOUSE/MAPPING/PAF/All_Merged_reads_with_alignment_statistics.txt")
+
+
+
+hmapt_alignment <- map %>% 
+  filter(V1 %in% hMAPTid$V1) %>%
+  mutate(identity = V8 * 100) %>% 
+  mutate(length = V6 * 100) %>%
+  ggplot(., aes(x = length, y = identity)) +
+  geom_point() + mytheme + labs(x = "Alignment Length (%)", y = "Alignment Identity (%)", title = "\n\n") +
+  geom_hline(yintercept = 95, linetype = 2) +
+  geom_vline(xintercept = 95, linetype = 2) +
+  annotate("text", x = 10, y = 94, label = "95% Threshold") +
+  annotate("text", x = 94, y = 50, label = "95% Threshold", angle = 90) +
+  annotate("rect", xmin = 95, xmax = 100, ymin = 95, ymax = 100, fill = "palegreen", alpha = 0.2)
+
+colnames(map) <- c("name_of_read","chrom","start","read_length","alignment_length","alignment length(%)","length_of_target_seq_alignment","alignment identity(%","strand","num_mismatches","num_insertions","num_deletions")
+
+View(map %>% filter(name_of_read == c("transcript/6355")))
+
+```
